@@ -1,6 +1,4 @@
-<p align="center">
-  <img alt="header" src="https://shieldcn.dev/header/gradient.svg?title=HireSync&amp;subtitle=+a+modern+hiring+platform+that+connects+employers+with+qualified+talent+through+a+seamless+job+posting+and+application+experience&amp;mode=dark" />
-</p>
+<img alt="HireSync" src="https://shieldcn.dev/header/gradient.svg?title=HireSync&subtitle=+a+modern+hiring+platform+that+connects+employers+with+qualified+talent+through+a+seamless+job+posting+and+application+experience&logo=lu%3ABriefcaseBusiness&size=wide&mode=dark&border=false">
 
 ## Overview
 
