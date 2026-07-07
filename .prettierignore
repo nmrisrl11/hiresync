@@ -1,0 +1,54 @@
+# Build output
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Coverage
+coverage/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Prisma generated client (if using custom output)
+src/generated/
+generated/
+
+# Prisma migrations (optional)
+# Uncomment if you don't want Prettier formatting SQL migration files
+# prisma/migrations/
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lockb
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+
+# Temporary files
+tmp/
+temp/
+.cache/
+
+# Nest CLI output
+*.tsbuildinfo
+
+# Generated documentation
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db
