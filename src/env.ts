@@ -29,7 +29,9 @@ export const env = createEnv({
 
 		SMTP_SECURE: z
 			.string()
-			.refine((v) => v === "true" || v === "false")
+			.refine((v) => v === "true" || v === "false", {
+				message: 'SMTP_SECURE must be the string "true" or "false".',
+			})
 			.transform((v) => v === "true")
 			.optional(),
 
