@@ -5,6 +5,8 @@ import { Email } from "@/iam/domain/value-objects/email.value-object";
 import { PrismaService } from "@/shared/database/prisma.service";
 import { Injectable } from "@nestjs/common";
 import { IamMapper } from "../../mappers/iam.mapper";
+import { Prisma } from "@/generated/prisma/client";
+import { UserAlreadyExistsException } from "@/iam/application/exceptions/application.exception";
 
 @Injectable()
 export class PrismaIamRepository implements IamRepositoryPort {
@@ -73,22 +75,28 @@ export class PrismaIamRepository implements IamRepositoryPort {
 	async save(user: User): Promise<void> {
 		if (!user.account) throw new Error("Cannot persist a new user without an account.");
 
-		await this.prisma.user.create({
-			data: {
-				email: user.email.getValue(),
-				name: user.name,
-				isVerified: user.isVerified,
-				roleId: user.role.id,
-				image: user.image,
-				account: {
-					create: {
-						id: user.account.id,
-						passwordHash: user.account.getPasswordHash(),
-						verificationToken: user.account.getVerificationToken(),
-						verificationTokenExpiresAt: user.account.getVerificationTokenExpiresAt(),
+		try {
+			await this.prisma.user.create({
+				data: {
+					email: user.email.getValue(),
+					name: user.name,
+					isVerified: user.isVerified,
+					roleId: user.role.id,
+					image: user.image,
+					account: {
+						create: {
+							id: user.account.id,
+							passwordHash: user.account.getPasswordHash(),
+							verificationToken: user.account.getVerificationToken(),
+							verificationTokenExpiresAt: user.account.getVerificationTokenExpiresAt(),
+						},
 					},
 				},
-			},
-		});
+			});
+		} catch (error: unknown) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")
+				throw new UserAlreadyExistsException("An account with this email already exists.");
+			throw error;
+		}
 	}
 }
