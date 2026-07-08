@@ -42,7 +42,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 
 		const verificationToken = this.verificationTokenGenerator.generateHexToken(32);
 
-		const verificationTokenExpiresAt = 24 * 60 * 60 * 1000; // 24 hours from now
+		const verificationTokenTtlMs = 24 * 60 * 60 * 1000; // 24 hours from now
 
 		const newUser = User.createForRegistration(
 			this.idGenerator.generateId(),
@@ -52,7 +52,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 			role,
 			passwordHash,
 			verificationToken,
-			verificationTokenExpiresAt,
+			verificationTokenTtlMs,
 		);
 
 		await this.iamRepository.save(newUser);

@@ -21,10 +21,10 @@ export class User {
 		role: Role,
 		passwordHash: string,
 		verificationToken: string,
-		verificationTokenExpiresAt: number,
+		verificationTokenTtlMs: number,
 	): User {
 		const emailVo = new Email(emailString);
-		const verificationTokenExpiration = new Date(Date.now() + verificationTokenExpiresAt);
+		const verificationTokenExpiration = new Date(Date.now() + verificationTokenTtlMs);
 
 		const account = new Account(
 			accountId,

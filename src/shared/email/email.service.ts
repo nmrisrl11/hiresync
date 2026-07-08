@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { EmailProviderPort } from "./ports/email-provider.port";
+import { env } from "@/env";
 
 @Injectable()
 export class EmailService {
 	constructor(private readonly mailer: EmailProviderPort) {}
 
-	private readonly appUrl = process.env.APP_URL;
+	private readonly appUrl = env.APP_URL;
 
 	async sendVerificationEmail(email: string, token: string) {
 		const verificationUrl = `${this.appUrl}/api/auth/verify-email?token=${token}`;
