@@ -3,6 +3,7 @@ import { Email } from "@/iam/domain/value-objects/email.value-object";
 import { Injectable, Logger } from "@nestjs/common";
 import {
 	RoleNotFoundException,
+	UnauthorizedRoleException,
 	UserAlreadyExistsException,
 } from "../exceptions/application.exception";
 import {
@@ -10,7 +11,7 @@ import {
 	RegisterUserResult,
 	RegisterUserUseCasePort,
 } from "../ports/inbound/register-user.in-port";
-import { HashPasswordServicePort } from "../ports/outbound/hash-password.service.port";
+import { HashServicePort } from "../ports/outbound/hash.service.port";
 import { IamRepositoryPort } from "../ports/outbound/iam.repository.port";
 import { IdGeneratorPort } from "../ports/outbound/id-generator.port";
 import { VerificationTokenGeneratorPort } from "../ports/outbound/verification-token-generator.port";
@@ -22,7 +23,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 
 	constructor(
 		private readonly iamRepository: IamRepositoryPort,
-		private readonly hashPasswordService: HashPasswordServicePort,
+		private readonly hashService: HashServicePort,
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly verificationTokenGenerator: VerificationTokenGeneratorPort,
 		private readonly emailQueueService: EmailQueueServicePort,
@@ -38,7 +39,10 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 		const role = await this.iamRepository.findRoleByCode(command.roleCode);
 		if (!role) throw new RoleNotFoundException("Invalid role specified.");
 
-		const passwordHash = await this.hashPasswordService.hashPassword(command.password);
+		if (role.isAdmin())
+			throw new UnauthorizedRoleException("Users cannot self-register as administrators.");
+
+		const passwordHash = await this.hashService.hash(command.password, 12);
 
 		const verificationToken = this.verificationTokenGenerator.generateHexToken(32);
 

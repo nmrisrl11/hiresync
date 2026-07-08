@@ -76,8 +76,25 @@ export class PrismaIamRepository implements IamRepositoryPort {
 		if (!user.account) throw new Error("Cannot persist a new user without an account.");
 
 		try {
-			await this.prisma.user.create({
-				data: {
+			await this.prisma.user.upsert({
+				where: {
+					id: user.id,
+				},
+				update: {
+					name: user.name,
+					isVerified: user.isVerified,
+					image: user.image,
+					roleId: user.role.id,
+					account: {
+						update: {
+							passwordHash: user.account.getPasswordHash(),
+							verificationToken: user.account.getVerificationToken(),
+							verificationTokenExpiresAt: user.account.getVerificationTokenExpiresAt(),
+							refreshTokenHash: user.account.getRefreshTokenHash(),
+						},
+					},
+				},
+				create: {
 					id: user.id,
 					email: user.email.getValue(),
 					name: user.name,
@@ -90,6 +107,7 @@ export class PrismaIamRepository implements IamRepositoryPort {
 							passwordHash: user.account.getPasswordHash(),
 							verificationToken: user.account.getVerificationToken(),
 							verificationTokenExpiresAt: user.account.getVerificationTokenExpiresAt(),
+							refreshTokenHash: user.account.getRefreshTokenHash(),
 						},
 					},
 				},

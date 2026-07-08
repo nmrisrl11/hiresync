@@ -1,3 +1,5 @@
+import { InvalidDomainStateException } from "../exceptions/domain.exception";
+
 export class Account {
 	constructor(
 		public readonly id: string,
@@ -19,5 +21,26 @@ export class Account {
 
 	public getVerificationTokenExpiresAt(): Date | null {
 		return this.verificationTokenExpiresAt;
+	}
+
+	public getRefreshTokenHash(): string | null {
+		return this.refreshTokenHash;
+	}
+
+	public verify(token: string): void {
+		if (this.verificationToken !== token)
+			throw new InvalidDomainStateException("Invalid verification token.");
+
+		if (!this.verificationTokenExpiresAt || this.verificationTokenExpiresAt < new Date())
+			throw new InvalidDomainStateException(
+				"Verification token has expired. Please request a new one.",
+			);
+
+		this.verificationToken = null;
+		this.verificationTokenExpiresAt = null;
+	}
+
+	public updateRefreshTokenHash(hash: string | null): void {
+		this.refreshTokenHash = hash;
 	}
 }
