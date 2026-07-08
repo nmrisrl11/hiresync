@@ -4,4 +4,8 @@ export class Role {
 		public readonly code: string,
 		public readonly description: string | null,
 	) {}
+
+	public isAdmin(): boolean {
+		return this.code === "ADMIN";
+	}
 }

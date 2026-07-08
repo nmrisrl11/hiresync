@@ -1,3 +1,4 @@
+import { InvalidDomainStateException } from "../exceptions/domain.exception";
 import { Email } from "../value-objects/email.value-object";
 import { Account } from "./account.entity";
 import { Role } from "./role.entity";
@@ -7,7 +8,7 @@ export class User {
 		public readonly id: string,
 		public readonly email: Email,
 		public readonly name: string,
-		public readonly isVerified: boolean,
+		public isVerified: boolean,
 		public readonly role: Role,
 		public readonly account: Account | null,
 		public readonly image: string | null,
@@ -34,5 +35,13 @@ export class User {
 		);
 
 		return new User(id, emailVo, name, false, role, account, null);
+	}
+
+	public verifyEmail(token: string): void {
+		if (!this.account)
+			throw new InvalidDomainStateException("User has no associated account credentials.");
+
+		this.account.verify(token);
+		this.isVerified = true;
 	}
 }

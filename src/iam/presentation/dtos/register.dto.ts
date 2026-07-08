@@ -1,5 +1,7 @@
-import { IsEmail, IsString, MinLength, IsNotEmpty } from "class-validator";
+import { IsEmail, IsString, MinLength, IsNotEmpty, IsIn } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+
+export const ALLOWED_REGISTRATION_ROLES = ["EMPLOYER", "APPLICANT"];
 
 export class RegisterDto {
 	@ApiProperty({ example: "Name" })
@@ -16,8 +18,11 @@ export class RegisterDto {
 	@MinLength(8)
 	public readonly password!: string;
 
-	@ApiProperty({ example: "APPLICANT" })
+	@ApiProperty({ example: "APPLICANT", enum: ALLOWED_REGISTRATION_ROLES })
 	@IsString()
 	@IsNotEmpty()
+	@IsIn(ALLOWED_REGISTRATION_ROLES, {
+		message: `roleCode must be one of the following values: ${ALLOWED_REGISTRATION_ROLES.join(", ")}`,
+	})
 	public readonly roleCode!: string;
 }
