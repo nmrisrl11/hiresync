@@ -78,6 +78,7 @@ export class PrismaIamRepository implements IamRepositoryPort {
 		try {
 			await this.prisma.user.create({
 				data: {
+					id: user.id,
 					email: user.email.getValue(),
 					name: user.name,
 					isVerified: user.isVerified,
