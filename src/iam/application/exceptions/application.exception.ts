@@ -12,6 +12,13 @@ export class RoleNotFoundException extends Error {
 	}
 }
 
+export class UnauthorizedRoleException extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "UnauthorizedRoleException";
+	}
+}
+
 export class InvalidVerificationTokenException extends Error {
 	constructor(message: string) {
 		super(message);
@@ -19,9 +26,9 @@ export class InvalidVerificationTokenException extends Error {
 	}
 }
 
-export class UnauthorizedRoleException extends Error {
+export class InvalidLoginException extends Error {
 	constructor(message: string) {
 		super(message);
-		this.name = "UnauthorizedRoleException";
+		this.name = "InvalidLoginException";
 	}
 }

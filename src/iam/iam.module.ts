@@ -18,6 +18,8 @@ import { VerifyEmailUseCase } from "./application/use-cases/verify-email.use-cas
 import { JwtServicePort } from "./application/ports/outbound/jwt.service.port";
 import { NestjsJwtAdapter } from "./infrastructure/adapters/outbound/nestjs-jwt.adapter";
 import { JwtModule } from "@nestjs/jwt";
+import { LoginUserUseCasePort } from "./application/ports/inbound/login-user.in-port";
+import { LoginUserUseCase } from "./application/use-cases/login-user.use-case";
 
 @Module({
 	imports: [DatabaseModule, QueueModule, JwtModule.register({})],
@@ -25,6 +27,7 @@ import { JwtModule } from "@nestjs/jwt";
 	providers: [
 		{ provide: RegisterUserUseCasePort, useClass: RegisterUserUseCase },
 		{ provide: VerifyEmailUseCasePort, useClass: VerifyEmailUseCase },
+		{ provide: LoginUserUseCasePort, useClass: LoginUserUseCase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
