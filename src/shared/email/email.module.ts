@@ -3,6 +3,7 @@ import { EmailService } from "./email.service";
 import { EmailProviderPort } from "./ports/email-provider.port";
 import { NodemailerAdapter } from "./adapters/nodemailer.adapter";
 import { MailModule } from "./mail.module";
+import { ResendAdapter } from "./adapters/resend.adapter";
 // Import ResendAdapter when you implement it
 
 const isNodemailer = process.env.EMAIL_PROVIDER === "nodemailer";
@@ -13,7 +14,7 @@ const isNodemailer = process.env.EMAIL_PROVIDER === "nodemailer";
 		EmailService,
 		{
 			provide: EmailProviderPort,
-			useClass: isNodemailer ? NodemailerAdapter : NodemailerAdapter, // Swap second one for ResendAdapter
+			useClass: isNodemailer ? NodemailerAdapter : ResendAdapter,
 		},
 	],
 	exports: [EmailService],

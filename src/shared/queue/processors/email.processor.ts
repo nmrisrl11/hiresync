@@ -12,6 +12,7 @@ export class EmailProcessor extends WorkerHost {
 		super();
 	}
 
+	//! This method automatically triggers when a new job hits the "email" queue
 	async process(job: Job<EmailJobPayload>): Promise<void> {
 		const result = EmailJobPayloadSchema.safeParse(job.data);
 
