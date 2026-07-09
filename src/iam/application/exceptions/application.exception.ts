@@ -38,3 +38,10 @@ export class InvalidLoginException extends Error {
 		this.name = "InvalidLoginException";
 	}
 }
+
+export class QueueProcessingException extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "QueueProcessingException";
+	}
+}
