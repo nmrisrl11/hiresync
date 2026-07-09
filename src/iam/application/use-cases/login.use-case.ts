@@ -1,9 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import {
-	LoginUserCommand,
-	LoginUserResult,
-	LoginUserUseCasePort,
-} from "../ports/inbound/login-user.in-port";
+import { LoginCommand, LoginResult, LoginUseCasePort } from "../ports/inbound/login.in-port";
 import { IamRepositoryPort } from "../ports/outbound/iam.repository.port";
 import { JwtServicePort } from "../ports/outbound/jwt.service.port";
 import { HashServicePort } from "../ports/outbound/hash.service.port";
@@ -11,14 +7,14 @@ import { Email } from "@/iam/domain/value-objects/email.value-object";
 import { InvalidLoginException } from "../exceptions/application.exception";
 
 @Injectable()
-export class LoginUserUseCase implements LoginUserUseCasePort {
+export class LoginUseCase implements LoginUseCasePort {
 	constructor(
 		private readonly iamRepository: IamRepositoryPort,
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
 	) {}
 
-	public async execute(command: LoginUserCommand): Promise<LoginUserResult> {
+	public async execute(command: LoginCommand): Promise<LoginResult> {
 		const emailVo = new Email(command.email);
 
 		const user = await this.iamRepository.findByEmail(emailVo);

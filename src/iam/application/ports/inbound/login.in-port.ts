@@ -1,11 +1,11 @@
-export class LoginUserCommand {
+export class LoginCommand {
 	constructor(
 		public readonly email: string,
 		public readonly password: string,
 	) {}
 }
 
-export type LoginUserResult = {
+export type LoginResult = {
 	accessToken: string;
 	refreshToken: string;
 	user: {
@@ -16,6 +16,6 @@ export type LoginUserResult = {
 	};
 };
 
-export abstract class LoginUserUseCasePort {
-	abstract execute(command: LoginUserCommand): Promise<LoginUserResult>;
+export abstract class LoginUseCasePort {
+	abstract execute(command: LoginCommand): Promise<LoginResult>;
 }

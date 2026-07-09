@@ -7,10 +7,7 @@ import {
 	UserAlreadyExistsException,
 	UserNotFoundException,
 } from "@/iam/application/exceptions/application.exception";
-import {
-	LoginUserCommand,
-	LoginUserUseCasePort,
-} from "@/iam/application/ports/inbound/login-user.in-port";
+import { LoginCommand, LoginUseCasePort } from "@/iam/application/ports/inbound/login.in-port";
 import { LogoutCommand, LogoutUseCasePort } from "@/iam/application/ports/inbound/logout.in-port";
 import {
 	RegisterUserCommand,
@@ -52,7 +49,7 @@ export class AuthController {
 	constructor(
 		private readonly registerUserUseCase: RegisterUserUseCasePort,
 		private readonly verifyEmailUseCase: VerifyEmailUseCasePort,
-		private readonly loginUserUseCase: LoginUserUseCasePort,
+		private readonly loginUseCase: LoginUseCasePort,
 		private readonly logoutUseCase: LogoutUseCasePort,
 	) {}
 
@@ -126,8 +123,8 @@ export class AuthController {
 	@ApiOperation({ summary: "Login and receive access and refresh tokens." })
 	public async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
 		try {
-			const command = new LoginUserCommand(dto.email, dto.password);
-			const result = await this.loginUserUseCase.execute(command);
+			const command = new LoginCommand(dto.email, dto.password);
+			const result = await this.loginUseCase.execute(command);
 
 			res.cookie("refresh_token", result.refreshToken, {
 				httpOnly: true,
