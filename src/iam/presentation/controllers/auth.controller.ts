@@ -80,14 +80,15 @@ export class AuthController {
 
 			return AuthResponseMapper.toRegistrationMessage(result.isEmailQueued);
 		} catch (error: unknown) {
-			if (error instanceof UserAlreadyExistsException) {
-				throw new ConflictException(error.message);
-			}
-			if (error instanceof RoleNotFoundException || error instanceof InvalidDomainStateException) {
+			if (error instanceof UserAlreadyExistsException) throw new ConflictException(error.message);
+
+			if (error instanceof RoleNotFoundException || error instanceof InvalidDomainStateException)
 				throw new BadRequestException(error.message);
-			}
 
 			if (error instanceof UnauthorizedRoleException) throw new ForbiddenException(error.message);
+
+			if (error instanceof QueueProcessingException)
+				throw new InternalServerErrorException(error.message);
 
 			throw error;
 		}
@@ -184,9 +185,9 @@ export class AuthController {
 			const command = new ResendVerificationCommand(dto.email);
 			return await this.resendVerificationUseCase.execute(command);
 		} catch (error: unknown) {
-			if (error instanceof QueueProcessingException) {
+			if (error instanceof QueueProcessingException)
 				throw new InternalServerErrorException(error.message);
-			}
+
 			throw error;
 		}
 	}

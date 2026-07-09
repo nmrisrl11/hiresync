@@ -2,6 +2,7 @@ import { User } from "@/iam/domain/entities/user.entity";
 import { Email } from "@/iam/domain/value-objects/email.value-object";
 import { Injectable, Logger } from "@nestjs/common";
 import {
+	QueueProcessingException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
@@ -68,6 +69,10 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 
 		if (!emailQueued) {
 			this.logger.warn(`Failed to queue verification email for ${newUser.email.getValue()}`);
+
+			throw new QueueProcessingException(
+				"We are currently experiencing issues sending emails. Please try again later.",
+			);
 		}
 
 		return { isEmailQueued: emailQueued };
