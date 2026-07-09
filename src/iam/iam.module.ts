@@ -21,6 +21,8 @@ import { NestjsJwtAdapter } from "./infrastructure/adapters/outbound/nestjs-jwt.
 import { NodeCryptoAdapter } from "./infrastructure/adapters/outbound/node-crypto.adapter";
 import { PrismaIamRepository } from "./infrastructure/adapters/outbound/prisma-iam.repository";
 import { AuthController } from "./presentation/controllers/auth.controller";
+import { ResendVerificationUseCasePort } from "./application/ports/inbound/resend-verification.in-port";
+import { ResendVerificationUsecase } from "./application/use-cases/resend-verification.use-case";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
@@ -30,6 +32,7 @@ import { AuthController } from "./presentation/controllers/auth.controller";
 		{ provide: VerifyEmailUseCasePort, useClass: VerifyEmailUseCase },
 		{ provide: LoginUseCasePort, useClass: LoginUseCase },
 		{ provide: LogoutUseCasePort, useClass: LogoutUseCase },
+		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },

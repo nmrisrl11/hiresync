@@ -2,6 +2,7 @@ import { env } from "@/env";
 import {
 	InvalidLoginException,
 	InvalidVerificationTokenException,
+	QueueProcessingException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
@@ -27,6 +28,7 @@ import {
 	ForbiddenException,
 	HttpCode,
 	HttpStatus,
+	InternalServerErrorException,
 	NotFoundException,
 	Post,
 	Res,
@@ -42,6 +44,11 @@ import { RegisterDto } from "../dtos/register.dto";
 import { VerifyEmailDto } from "../dtos/verify-email.dto";
 import { AuthResponseMapper } from "../mappers/auth-response.mapper";
 import { Public } from "../decorators/public.decorator";
+import { ResendVerificationDto } from "../dtos/resend-verification.dto";
+import {
+	ResendVerificationCommand,
+	ResendVerificationUseCasePort,
+} from "@/iam/application/ports/inbound/resend-verification.in-port";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -51,6 +58,7 @@ export class AuthController {
 		private readonly verifyEmailUseCase: VerifyEmailUseCasePort,
 		private readonly loginUseCase: LoginUseCasePort,
 		private readonly logoutUseCase: LogoutUseCasePort,
+		private readonly resendVerificationUseCase: ResendVerificationUseCasePort,
 	) {}
 
 	private readonly jwtAccessSecret = env.JWT_ACCESS_SECRET;
@@ -163,6 +171,22 @@ export class AuthController {
 		} catch (error: unknown) {
 			if (error instanceof UserNotFoundException) throw new NotFoundException(error.message);
 
+			throw error;
+		}
+	}
+
+	@Public()
+	@Post("resend-verification")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Resend the verification email." })
+	public async resendVerification(@Body() dto: ResendVerificationDto) {
+		try {
+			const command = new ResendVerificationCommand(dto.email);
+			return await this.resendVerificationUseCase.execute(command);
+		} catch (error: unknown) {
+			if (error instanceof QueueProcessingException) {
+				throw new InternalServerErrorException(error.message);
+			}
 			throw error;
 		}
 	}

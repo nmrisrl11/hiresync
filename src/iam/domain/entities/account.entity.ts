@@ -43,4 +43,14 @@ export class Account {
 	public updateRefreshTokenHash(hash: string | null): void {
 		this.refreshTokenHash = hash;
 	}
+
+	public updateVerificationToken(token: string, tokenExpiresInMs: number): void {
+		this.verificationToken = token;
+		this.verificationTokenExpiresAt = new Date(Date.now() + tokenExpiresInMs);
+	}
+
+	public restoreVerificationToken(token: string | null, expiresAt: Date | null): void {
+		this.verificationToken = token;
+		this.verificationTokenExpiresAt = expiresAt;
+	}
 }
