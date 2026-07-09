@@ -5,7 +5,13 @@ import {
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
+	UserNotFoundException,
 } from "@/iam/application/exceptions/application.exception";
+import {
+	LoginUserCommand,
+	LoginUserUseCasePort,
+} from "@/iam/application/ports/inbound/login-user.in-port";
+import { LogoutCommand, LogoutUseCasePort } from "@/iam/application/ports/inbound/logout.in-port";
 import {
 	RegisterUserCommand,
 	RegisterUserUseCasePort,
@@ -14,6 +20,7 @@ import {
 	VerifyEmailCommand,
 	VerifyEmailUseCasePort,
 } from "@/iam/application/ports/inbound/verify-email.in-port";
+import type { JwtPayload } from "@/iam/application/ports/outbound/jwt.service.port";
 import { InvalidDomainStateException } from "@/iam/domain/exceptions/domain.exception";
 import {
 	BadRequestException,
@@ -23,22 +30,21 @@ import {
 	ForbiddenException,
 	HttpCode,
 	HttpStatus,
+	NotFoundException,
 	Post,
 	Res,
 	UnauthorizedException,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import type { Response } from "express";
 import type { StringValue } from "ms";
 import ms from "ms";
+import { CurrentUser } from "../decorators/current-user.decorator";
+import { LoginDto } from "../dtos/login.dto";
 import { RegisterDto } from "../dtos/register.dto";
 import { VerifyEmailDto } from "../dtos/verify-email.dto";
 import { AuthResponseMapper } from "../mappers/auth-response.mapper";
-import {
-	LoginUserCommand,
-	LoginUserUseCasePort,
-} from "@/iam/application/ports/inbound/login-user.in-port";
-import { LoginDto } from "../dtos/login.dto";
+import { Public } from "../decorators/public.decorator";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -47,6 +53,7 @@ export class AuthController {
 		private readonly registerUserUseCase: RegisterUserUseCasePort,
 		private readonly verifyEmailUseCase: VerifyEmailUseCasePort,
 		private readonly loginUserUseCase: LoginUserUseCasePort,
+		private readonly logoutUseCase: LogoutUseCasePort,
 	) {}
 
 	private readonly jwtAccessSecret = env.JWT_ACCESS_SECRET;
@@ -56,6 +63,7 @@ export class AuthController {
 	private readonly refreshCookieMaxAge = ms(this.jwtRefreshExpiresIn);
 	private readonly isProduction = env.NODE_ENV === "production";
 
+	@Public()
 	@Post("register")
 	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: "Register a new user." })
@@ -80,6 +88,7 @@ export class AuthController {
 		}
 	}
 
+	@Public()
 	@Post("verify-email")
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Verify email address and auto login." })
@@ -111,6 +120,7 @@ export class AuthController {
 		}
 	}
 
+	@Public()
 	@Post("login")
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Login and receive access and refresh tokens." })
@@ -132,6 +142,29 @@ export class AuthController {
 			};
 		} catch (error: unknown) {
 			if (error instanceof InvalidLoginException) throw new UnauthorizedException(error.message);
+
+			throw error;
+		}
+	}
+
+	@Post("logout")
+	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
+	@ApiOperation({ summary: "Logout and invalidate refresh token." })
+	public async logout(
+		@CurrentUser() userPayload: JwtPayload,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		try {
+			const command = new LogoutCommand(userPayload.sub);
+
+			await this.logoutUseCase.execute(command);
+
+			res.clearCookie("refresh_token");
+
+			return { message: "Logged out successfully." };
+		} catch (error: unknown) {
+			if (error instanceof UserNotFoundException) throw new NotFoundException(error.message);
 
 			throw error;
 		}

@@ -1,3 +1,9 @@
+export class UserNotFoundException extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "UserNotFoundException";
+	}
+}
 export class UserAlreadyExistsException extends Error {
 	constructor(message: string) {
 		super(message);
