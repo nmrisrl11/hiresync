@@ -3,10 +3,8 @@ import {
 	Account as PrismaAccount,
 	Role as PrismaRole,
 } from "@/generated/prisma/client";
-import { Account } from "@/iam/domain/entities/account.entity";
-import { Role } from "@/iam/domain/entities/role.entity";
-import { User } from "@/iam/domain/entities/user.entity";
-import { Email } from "@/iam/domain/value-objects/email.value-object";
+import { Account, Role, User } from "@/iam/domain/entities";
+import { Email } from "@/iam/domain/value-objects";
 
 type PrismaUserWithRelations = PrismaUser & { role: PrismaRole; account: PrismaAccount | null };
 

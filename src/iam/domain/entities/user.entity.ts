@@ -1,5 +1,5 @@
-import { InvalidDomainStateException } from "../exceptions/domain.exception";
-import { Email } from "../value-objects/email.value-object";
+import { InvalidDomainStateException } from "../exceptions";
+import { Email } from "../value-objects";
 import { Account } from "./account.entity";
 import { Role } from "./role.entity";
 

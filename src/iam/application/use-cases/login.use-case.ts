@@ -3,8 +3,8 @@ import { LoginCommand, LoginResult, LoginUseCasePort } from "../ports/inbound/lo
 import { IamRepositoryPort } from "../ports/outbound/iam.repository.port";
 import { JwtServicePort } from "../ports/outbound/jwt.service.port";
 import { HashServicePort } from "../ports/outbound/hash.service.port";
-import { Email } from "@/iam/domain/value-objects/email.value-object";
 import { InvalidLoginException } from "../exceptions/application.exception";
+import { Email } from "@/iam/domain/value-objects";
 
 @Injectable()
 export class LoginUseCase implements LoginUseCasePort {

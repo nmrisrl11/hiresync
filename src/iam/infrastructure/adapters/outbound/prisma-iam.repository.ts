@@ -1,12 +1,11 @@
 import { IamRepositoryPort } from "@/iam/application/ports/outbound/iam.repository.port";
-import { Role } from "@/iam/domain/entities/role.entity";
-import { User } from "@/iam/domain/entities/user.entity";
-import { Email } from "@/iam/domain/value-objects/email.value-object";
 import { PrismaService } from "@/shared/database/prisma.service";
 import { Injectable } from "@nestjs/common";
 import { IamMapper } from "../../mappers/iam.mapper";
 import { Prisma } from "@/generated/prisma/client";
 import { UserAlreadyExistsException } from "@/iam/application/exceptions/application.exception";
+import { Role, User } from "@/iam/domain/entities";
+import { Email } from "@/iam/domain/value-objects";
 
 @Injectable()
 export class PrismaIamRepository implements IamRepositoryPort {

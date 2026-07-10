@@ -7,8 +7,8 @@ import {
 import { IamRepositoryPort } from "../ports/outbound/iam.repository.port";
 import { EmailQueueServicePort } from "../ports/outbound/email-queue.service.port";
 import { VerificationTokenGeneratorPort } from "../ports/outbound/verification-token-generator.port";
-import { Email } from "@/iam/domain/value-objects/email.value-object";
 import { QueueProcessingException } from "../exceptions/application.exception";
+import { Email } from "@/iam/domain/value-objects";
 
 @Injectable()
 export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {

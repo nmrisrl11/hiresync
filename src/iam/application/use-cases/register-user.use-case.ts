@@ -1,5 +1,3 @@
-import { User } from "@/iam/domain/entities/user.entity";
-import { Email } from "@/iam/domain/value-objects/email.value-object";
 import { Injectable, Logger } from "@nestjs/common";
 import {
 	QueueProcessingException,
@@ -17,6 +15,8 @@ import { IamRepositoryPort } from "../ports/outbound/iam.repository.port";
 import { IdGeneratorPort } from "../ports/outbound/id-generator.port";
 import { VerificationTokenGeneratorPort } from "../ports/outbound/verification-token-generator.port";
 import { EmailQueueServicePort } from "../ports/outbound/email-queue.service.port";
+import { User } from "@/iam/domain/entities";
+import { Email } from "@/iam/domain/value-objects";
 
 @Injectable()
 export class RegisterUserUseCase implements RegisterUserUseCasePort {
