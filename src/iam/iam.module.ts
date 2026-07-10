@@ -1,12 +1,6 @@
 import { DatabaseModule } from "@/shared/database/database.module";
 import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
-import { BcryptHashAdapter } from "./infrastructure/adapters/outbound/bcrypt-hash.adapter";
-import { BullMqEmailQueueAdapter } from "./infrastructure/adapters/outbound/bullmq-email-queue.adapter";
-import { NestjsJwtAdapter } from "./infrastructure/adapters/outbound/nestjs-jwt.adapter";
-import { NodeCryptoAdapter } from "./infrastructure/adapters/outbound/node-crypto.adapter";
-import { PrismaIamRepository } from "./infrastructure/adapters/outbound/prisma-iam.repository";
-import { AuthController } from "./presentation/controllers/auth.controller";
 import {
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
@@ -16,11 +10,13 @@ import {
 	VerifyEmailUseCasePort,
 } from "./application/ports/inbound";
 import {
+	AuthConfigPort,
 	EmailQueueServicePort,
 	HashServicePort,
 	IamRepositoryPort,
 	IdGeneratorPort,
 	JwtServicePort,
+	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "./application/ports/outbound";
 import {
@@ -31,6 +27,14 @@ import {
 	ResendVerificationUsecase,
 	VerifyEmailUseCase,
 } from "./application/use-cases";
+import { BcryptHashAdapter } from "./infrastructure/adapters/outbound/bcrypt-hash.adapter";
+import { BullMqEmailQueueAdapter } from "./infrastructure/adapters/outbound/bullmq-email-queue.adapter";
+import { MsTimeFormatterAdapter } from "./infrastructure/adapters/outbound/ms-time-formatter.adapter";
+import { NestjsJwtAdapter } from "./infrastructure/adapters/outbound/nestjs-jwt.adapter";
+import { NodeCryptoAdapter } from "./infrastructure/adapters/outbound/node-crypto.adapter";
+import { PrismaIamRepository } from "./infrastructure/adapters/outbound/prisma-iam.repository";
+import { AuthController } from "./presentation/controllers/auth.controller";
+import { EnvAuthConfigAdapter } from "./infrastructure/adapters/outbound/env-auth-config.adapter";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
@@ -49,6 +53,8 @@ import {
 		{ provide: IdGeneratorPort, useClass: NodeCryptoAdapter },
 		{ provide: VerificationTokenGeneratorPort, useClass: NodeCryptoAdapter },
 		{ provide: EmailQueueServicePort, useClass: BullMqEmailQueueAdapter },
+		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
+		{ provide: AuthConfigPort, useClass: EnvAuthConfigAdapter },
 	],
 })
 export class IamModule {}

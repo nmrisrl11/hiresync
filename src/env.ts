@@ -20,6 +20,9 @@ export const env = createEnv({
 		JWT_REFRESH_SECRET: z.string().min(128),
 		JWT_REFRESH_EXPIRES_IN: z.string().default("7d"),
 
+		VERIFICATION_TOKEN_EXPIRES_IN: z.string().default("24h"),
+		PASSWORD_RESET_TOKEN_EXPIRES_IN: z.string().default("1h"),
+
 		REDIS_URL: z.url().optional(),
 
 		RESEND_API_KEY: z.string().optional(),

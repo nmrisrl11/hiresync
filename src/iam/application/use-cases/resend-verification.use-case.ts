@@ -7,8 +7,10 @@ import {
 	ResendVerificationUseCasePort,
 } from "../ports/inbound";
 import {
+	AuthConfigPort,
 	EmailQueueServicePort,
 	IamRepositoryPort,
+	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../ports/outbound";
 
@@ -18,6 +20,8 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 		private readonly iamRepository: IamRepositoryPort,
 		private readonly emailQueueService: EmailQueueServicePort,
 		private readonly tokenGenerator: VerificationTokenGeneratorPort,
+		private readonly timeFormatter: TimeFormatterPort,
+		private readonly authConfig: AuthConfigPort,
 	) {}
 
 	private readonly logger = new Logger(ResendVerificationUsecase.name);
@@ -37,7 +41,10 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 		const previousExpiresAt = user.account?.getVerificationTokenExpiresAt() ?? null;
 
 		const newVerificationToken = this.tokenGenerator.generateHexToken(32);
-		const tokenExpiresInMs = 24 * 60 * 60 * 1000;
+
+		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
+		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
+		const tokenExpiresInText = this.timeFormatter.formatToHumanReadable(tokenExpiresInMs);
 
 		user.refreshVerificationToken(newVerificationToken, tokenExpiresInMs);
 		await this.iamRepository.save(user);
@@ -46,6 +53,7 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 			await this.emailQueueService.enqueueVerificationEmail(
 				user.email.getValue(),
 				newVerificationToken,
+				tokenExpiresInText,
 			);
 		} catch {
 			this.logger.error(
