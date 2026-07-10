@@ -49,6 +49,11 @@ import {
 	ResendVerificationCommand,
 	ResendVerificationUseCasePort,
 } from "@/iam/application/ports/inbound/resend-verification.in-port";
+import { ForgotPasswordDto } from "../dtos/forgot-password.dto";
+import {
+	ForgotPasswordCommand,
+	ForgotPasswordUseCasePort,
+} from "@/iam/application/ports/inbound/forgot-password.in-port";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -58,6 +63,7 @@ export class AuthController {
 		private readonly verifyEmailUseCase: VerifyEmailUseCasePort,
 		private readonly loginUseCase: LoginUseCasePort,
 		private readonly logoutUseCase: LogoutUseCasePort,
+		private readonly forgotPasswordUseCase: ForgotPasswordUseCasePort,
 		private readonly resendVerificationUseCase: ResendVerificationUseCasePort,
 	) {}
 
@@ -171,6 +177,22 @@ export class AuthController {
 			return { message: "Logged out successfully." };
 		} catch (error: unknown) {
 			if (error instanceof UserNotFoundException) throw new NotFoundException(error.message);
+
+			throw error;
+		}
+	}
+
+	@Public()
+	@Post("forgot-password")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Request a password reset email." })
+	public async forgotPassword(@Body() dto: ForgotPasswordDto) {
+		try {
+			const command = new ForgotPasswordCommand(dto.email);
+			return await this.forgotPasswordUseCase.execute(command);
+		} catch (error: unknown) {
+			if (error instanceof QueueProcessingException)
+				throw new InternalServerErrorException(error.message);
 
 			throw error;
 		}
