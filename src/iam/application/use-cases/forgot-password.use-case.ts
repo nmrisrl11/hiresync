@@ -1,14 +1,16 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { Email } from "@/iam/domain/value-objects";
+import { QueueProcessingException } from "../exceptions";
 import {
 	ForgotPasswordCommand,
 	ForgotPasswordResult,
 	ForgotPasswordUseCasePort,
-} from "../ports/inbound/forgot-password.in-port";
-import { IamRepositoryPort } from "../ports/outbound/iam.repository.port";
-import { EmailQueueServicePort } from "../ports/outbound/email-queue.service.port";
-import { VerificationTokenGeneratorPort } from "../ports/outbound/verification-token-generator.port";
-import { QueueProcessingException } from "../exceptions/application.exception";
-import { Email } from "@/iam/domain/value-objects";
+} from "../ports/inbound";
+import {
+	EmailQueueServicePort,
+	IamRepositoryPort,
+	VerificationTokenGeneratorPort,
+} from "../ports/outbound";
 
 @Injectable()
 export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {

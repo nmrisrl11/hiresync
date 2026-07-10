@@ -1,4 +1,4 @@
-import { HashServicePort } from "@/iam/application/ports/outbound/hash.service.port";
+import { HashServicePort } from "@/iam/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import * as bcrypt from "bcryptjs";
 

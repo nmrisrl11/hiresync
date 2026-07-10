@@ -1,7 +1,7 @@
-import { EmailQueueServicePort } from "@/iam/application/ports/outbound/email-queue.service.port";
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectQueue } from "@nestjs/bullmq";
 import { Queue } from "bullmq";
+import { EmailQueueServicePort } from "@/iam/application/ports/outbound";
 
 @Injectable()
 export class BullMqEmailQueueAdapter implements EmailQueueServicePort {

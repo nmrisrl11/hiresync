@@ -1,9 +1,5 @@
 import { env } from "@/env";
-import {
-	GeneratedTokens,
-	JwtPayload,
-	JwtServicePort,
-} from "@/iam/application/ports/outbound/jwt.service.port";
+import { GeneratedTokens, JwtPayload, JwtServicePort } from "@/iam/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import type { StringValue } from "ms";

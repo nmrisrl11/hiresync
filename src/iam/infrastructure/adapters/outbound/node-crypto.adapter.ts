@@ -1,5 +1,4 @@
-import { IdGeneratorPort } from "@/iam/application/ports/outbound/id-generator.port";
-import { VerificationTokenGeneratorPort } from "@/iam/application/ports/outbound/verification-token-generator.port";
+import { IdGeneratorPort, VerificationTokenGeneratorPort } from "@/iam/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import * as crypto from "crypto";
 

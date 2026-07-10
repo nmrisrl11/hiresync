@@ -1,22 +1,20 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { User } from "@/iam/domain/entities";
+import { Email } from "@/iam/domain/value-objects";
 import {
 	QueueProcessingException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
-} from "../exceptions/application.exception";
+} from "../exceptions";
+import { RegisterUserCommand, RegisterUserResult, RegisterUserUseCasePort } from "../ports/inbound";
 import {
-	RegisterUserCommand,
-	RegisterUserResult,
-	RegisterUserUseCasePort,
-} from "../ports/inbound/register-user.in-port";
-import { HashServicePort } from "../ports/outbound/hash.service.port";
-import { IamRepositoryPort } from "../ports/outbound/iam.repository.port";
-import { IdGeneratorPort } from "../ports/outbound/id-generator.port";
-import { VerificationTokenGeneratorPort } from "../ports/outbound/verification-token-generator.port";
-import { EmailQueueServicePort } from "../ports/outbound/email-queue.service.port";
-import { User } from "@/iam/domain/entities";
-import { Email } from "@/iam/domain/value-objects";
+	EmailQueueServicePort,
+	HashServicePort,
+	IamRepositoryPort,
+	IdGeneratorPort,
+	VerificationTokenGeneratorPort,
+} from "../ports/outbound";
 
 @Injectable()
 export class RegisterUserUseCase implements RegisterUserUseCasePort {

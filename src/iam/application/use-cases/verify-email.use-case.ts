@@ -1,13 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { InvalidVerificationTokenException } from "../exceptions/application.exception";
-import {
-	VerifyEmailCommand,
-	VerifyEmailResult,
-	VerifyEmailUseCasePort,
-} from "../ports/inbound/verify-email.in-port";
-import { HashServicePort } from "../ports/outbound/hash.service.port";
-import { IamRepositoryPort } from "../ports/outbound/iam.repository.port";
-import { JwtServicePort } from "../ports/outbound/jwt.service.port";
+import { InvalidVerificationTokenException } from "../exceptions";
+import { VerifyEmailCommand, VerifyEmailResult, VerifyEmailUseCasePort } from "../ports/inbound";
+import { HashServicePort, IamRepositoryPort, JwtServicePort } from "../ports/outbound";
 
 @Injectable()
 export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
