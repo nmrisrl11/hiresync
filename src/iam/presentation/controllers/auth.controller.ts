@@ -1,25 +1,5 @@
 import { env } from "@/env";
 import {
-	InvalidLoginException,
-	InvalidVerificationTokenException,
-	QueueProcessingException,
-	RoleNotFoundException,
-	UnauthorizedRoleException,
-	UserAlreadyExistsException,
-	UserNotFoundException,
-} from "@/iam/application/exceptions/application.exception";
-import { LoginCommand, LoginUseCasePort } from "@/iam/application/ports/inbound/login.in-port";
-import { LogoutCommand, LogoutUseCasePort } from "@/iam/application/ports/inbound/logout.in-port";
-import {
-	RegisterUserCommand,
-	RegisterUserUseCasePort,
-} from "@/iam/application/ports/inbound/register-user.in-port";
-import {
-	VerifyEmailCommand,
-	VerifyEmailUseCasePort,
-} from "@/iam/application/ports/inbound/verify-email.in-port";
-import type { JwtPayload } from "@/iam/application/ports/outbound/jwt.service.port";
-import {
 	BadRequestException,
 	Body,
 	ConflictException,
@@ -44,16 +24,32 @@ import { VerifyEmailDto } from "../dtos/verify-email.dto";
 import { AuthResponseMapper } from "../mappers/auth-response.mapper";
 import { Public } from "../decorators/public.decorator";
 import { ResendVerificationDto } from "../dtos/resend-verification.dto";
-import {
-	ResendVerificationCommand,
-	ResendVerificationUseCasePort,
-} from "@/iam/application/ports/inbound/resend-verification.in-port";
 import { ForgotPasswordDto } from "../dtos/forgot-password.dto";
+import { InvalidDomainStateException } from "@/iam/domain/exceptions";
+import {
+	InvalidLoginException,
+	InvalidVerificationTokenException,
+	QueueProcessingException,
+	RoleNotFoundException,
+	UnauthorizedRoleException,
+	UserAlreadyExistsException,
+	UserNotFoundException,
+} from "@/iam/application/exceptions";
 import {
 	ForgotPasswordCommand,
 	ForgotPasswordUseCasePort,
-} from "@/iam/application/ports/inbound/forgot-password.in-port";
-import { InvalidDomainStateException } from "@/iam/domain/exceptions";
+	LoginCommand,
+	LoginUseCasePort,
+	LogoutCommand,
+	LogoutUseCasePort,
+	RegisterUserCommand,
+	RegisterUserUseCasePort,
+	ResendVerificationCommand,
+	ResendVerificationUseCasePort,
+	VerifyEmailCommand,
+	VerifyEmailUseCasePort,
+} from "@/iam/application/ports/inbound";
+import { type JwtPayload } from "@/iam/application/ports/outbound";
 
 @ApiTags("Authentication")
 @Controller("auth")

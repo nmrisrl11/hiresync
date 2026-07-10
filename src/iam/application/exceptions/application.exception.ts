@@ -1,47 +1,6 @@
-export class UserNotFoundException extends Error {
-	constructor(message: string) {
+export abstract class ApplicationException extends Error {
+	protected constructor(message: string) {
 		super(message);
-		this.name = "UserNotFoundException";
-	}
-}
-export class UserAlreadyExistsException extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = "UserAlreadyExistsException";
-	}
-}
-
-export class RoleNotFoundException extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = "RoleNotFoundException";
-	}
-}
-
-export class UnauthorizedRoleException extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = "UnauthorizedRoleException";
-	}
-}
-
-export class InvalidVerificationTokenException extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = "InvalidVerificationTokenException";
-	}
-}
-
-export class InvalidLoginException extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = "InvalidLoginException";
-	}
-}
-
-export class QueueProcessingException extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = "QueueProcessingException";
+		this.name = new.target.name;
 	}
 }
