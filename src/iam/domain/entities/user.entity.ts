@@ -1,4 +1,4 @@
-import { InvalidDomainStateException } from "../exceptions";
+import { NoAccountFoundException } from "../exceptions";
 import { Email } from "../value-objects";
 import { Account } from "./account.entity";
 import { Role } from "./role.entity";
@@ -39,7 +39,7 @@ export class User {
 
 	public verifyEmail(token: string): void {
 		if (!this.account)
-			throw new InvalidDomainStateException("User has no associated account credentials.");
+			throw new NoAccountFoundException("User has no associated account credentials.");
 
 		this.account.verify(token);
 		this.isVerified = true;
@@ -47,7 +47,7 @@ export class User {
 
 	public refreshVerificationToken(token: string, tokenExpiresInMs: number): void {
 		if (!this.account)
-			throw new InvalidDomainStateException("User has no associated account credentials.");
+			throw new NoAccountFoundException("User has no associated account credentials.");
 		this.account.updateVerificationToken(token, tokenExpiresInMs);
 	}
 
@@ -57,7 +57,7 @@ export class User {
 
 	public setResetToken(token: string, tokenExpiresInMs: number): void {
 		if (!this.account)
-			throw new InvalidDomainStateException("User has no associated account credentials.");
+			throw new NoAccountFoundException("User has no associated account credentials.");
 		this.account.updateResetToken(token, tokenExpiresInMs);
 	}
 

@@ -1,4 +1,7 @@
-import { InvalidDomainStateException } from "../exceptions";
+import {
+	InvalidVerificationTokenException,
+	VerificationTokenExpiredException,
+} from "../exceptions";
 
 export class Account {
 	constructor(
@@ -37,10 +40,10 @@ export class Account {
 
 	public verify(token: string): void {
 		if (this.verificationToken !== token)
-			throw new InvalidDomainStateException("Invalid verification token.");
+			throw new InvalidVerificationTokenException("Invalid verification token.");
 
 		if (!this.verificationTokenExpiresAt || this.verificationTokenExpiresAt < new Date())
-			throw new InvalidDomainStateException(
+			throw new VerificationTokenExpiredException(
 				"Verification token has expired. Please request a new one.",
 			);
 

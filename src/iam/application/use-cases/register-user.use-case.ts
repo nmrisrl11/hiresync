@@ -1,8 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common";
 import { User } from "@/iam/domain/entities";
 import { Email } from "@/iam/domain/value-objects";
+import { Injectable, Logger } from "@nestjs/common";
 import {
-	QueueProcessingException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
@@ -60,19 +59,19 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 
 		await this.iamRepository.save(newUser);
 
-		const emailQueued = await this.emailQueueService.enqueueVerificationEmail(
-			newUser.email.getValue(),
-			verificationToken,
-		);
+		let verificationEmailEnqueued = true;
 
-		if (!emailQueued) {
-			this.logger.warn(`Failed to queue verification email for ${newUser.email.getValue()}`);
-
-			throw new QueueProcessingException(
-				"We are currently experiencing issues sending emails. Please try again later.",
+		try {
+			await this.emailQueueService.enqueueVerificationEmail(
+				newUser.email.getValue(),
+				verificationToken,
 			);
+		} catch (error) {
+			this.logger.warn(`Unable to queue verification email for ${newUser.email.getValue()}`, error);
+
+			verificationEmailEnqueued = false;
 		}
 
-		return { isEmailQueued: emailQueued };
+		return { verificationEmailEnqueued };
 	}
 }

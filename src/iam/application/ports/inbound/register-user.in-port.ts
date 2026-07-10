@@ -8,7 +8,7 @@ export class RegisterUserCommand {
 }
 
 export type RegisterUserResult = {
-	isEmailQueued: boolean;
+	verificationEmailEnqueued: boolean;
 };
 
 export abstract class RegisterUserUseCasePort {
