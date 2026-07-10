@@ -18,13 +18,8 @@ import type { Response } from "express";
 import type { StringValue } from "ms";
 import ms from "ms";
 import { CurrentUser } from "../decorators/current-user.decorator";
-import { LoginDto } from "../dtos/login.dto";
-import { RegisterDto } from "../dtos/register.dto";
-import { VerifyEmailDto } from "../dtos/verify-email.dto";
 import { AuthResponseMapper } from "../mappers/auth-response.mapper";
 import { Public } from "../decorators/public.decorator";
-import { ResendVerificationDto } from "../dtos/resend-verification.dto";
-import { ForgotPasswordDto } from "../dtos/forgot-password.dto";
 import { InvalidDomainStateException } from "@/iam/domain/exceptions";
 import {
 	InvalidLoginException,
@@ -50,6 +45,13 @@ import {
 	VerifyEmailUseCasePort,
 } from "@/iam/application/ports/inbound";
 import { type JwtPayload } from "@/iam/application/ports/outbound";
+import {
+	ForgotPasswordDto,
+	LoginDto,
+	RegisterDto,
+	ResendVerificationDto,
+	VerifyEmailDto,
+} from "../dtos";
 
 @ApiTags("Authentication")
 @Controller("auth")
