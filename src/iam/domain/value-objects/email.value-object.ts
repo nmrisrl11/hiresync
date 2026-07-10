@@ -1,4 +1,4 @@
-import { InvalidDomainStateException } from "../exceptions/domain.exception";
+import { InvalidDomainStateException } from "../exceptions";
 
 export class Email {
 	private readonly value: string;

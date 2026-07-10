@@ -19,7 +19,6 @@ import {
 	VerifyEmailUseCasePort,
 } from "@/iam/application/ports/inbound/verify-email.in-port";
 import type { JwtPayload } from "@/iam/application/ports/outbound/jwt.service.port";
-import { InvalidDomainStateException } from "@/iam/domain/exceptions/domain.exception";
 import {
 	BadRequestException,
 	Body,
@@ -54,6 +53,7 @@ import {
 	ForgotPasswordCommand,
 	ForgotPasswordUseCasePort,
 } from "@/iam/application/ports/inbound/forgot-password.in-port";
+import { InvalidDomainStateException } from "@/iam/domain/exceptions";
 
 @ApiTags("Authentication")
 @Controller("auth")

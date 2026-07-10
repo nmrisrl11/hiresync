@@ -1,4 +1,4 @@
-import { InvalidDomainStateException } from "../exceptions/domain.exception";
+import { InvalidDomainStateException } from "../exceptions";
 
 export class Account {
 	constructor(

@@ -1,6 +1,5 @@
-import { Role } from "@/iam/domain/entities/role.entity";
-import { User } from "@/iam/domain/entities/user.entity";
-import { Email } from "@/iam/domain/value-objects/email.value-object";
+import { Role, User } from "@/iam/domain/entities";
+import { Email } from "@/iam/domain/value-objects";
 
 export abstract class IamRepositoryPort {
 	abstract findAll(): Promise<User[]>;
