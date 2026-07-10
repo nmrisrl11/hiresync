@@ -23,6 +23,8 @@ import { PrismaIamRepository } from "./infrastructure/adapters/outbound/prisma-i
 import { AuthController } from "./presentation/controllers/auth.controller";
 import { ResendVerificationUseCasePort } from "./application/ports/inbound/resend-verification.in-port";
 import { ResendVerificationUsecase } from "./application/use-cases/resend-verification.use-case";
+import { ForgotPasswordUseCasePort } from "./application/ports/inbound/forgot-password.in-port";
+import { ForgotPasswordUseCase } from "./application/use-cases/forgot-password.use-case";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
@@ -32,6 +34,7 @@ import { ResendVerificationUsecase } from "./application/use-cases/resend-verifi
 		{ provide: VerifyEmailUseCasePort, useClass: VerifyEmailUseCase },
 		{ provide: LoginUseCasePort, useClass: LoginUseCase },
 		{ provide: LogoutUseCasePort, useClass: LogoutUseCase },
+		{ provide: ForgotPasswordUseCasePort, useClass: ForgotPasswordUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },

@@ -90,6 +90,8 @@ export class PrismaIamRepository implements IamRepositoryPort {
 							passwordHash: user.account.getPasswordHash(),
 							verificationToken: user.account.getVerificationToken(),
 							verificationTokenExpiresAt: user.account.getVerificationTokenExpiresAt(),
+							resetToken: user.account.getResetToken(),
+							resetTokenExpiresAt: user.account.getResetTokenExpiresAt(),
 							refreshTokenHash: user.account.getRefreshTokenHash(),
 						},
 					},

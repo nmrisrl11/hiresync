@@ -23,6 +23,14 @@ export class Account {
 		return this.verificationTokenExpiresAt;
 	}
 
+	public getResetToken(): string | null {
+		return this.resetToken;
+	}
+
+	public getResetTokenExpiresAt(): Date | null {
+		return this.resetTokenExpiresAt;
+	}
+
 	public getRefreshTokenHash(): string | null {
 		return this.refreshTokenHash;
 	}
@@ -40,10 +48,6 @@ export class Account {
 		this.verificationTokenExpiresAt = null;
 	}
 
-	public updateRefreshTokenHash(hash: string | null): void {
-		this.refreshTokenHash = hash;
-	}
-
 	public updateVerificationToken(token: string, tokenExpiresInMs: number): void {
 		this.verificationToken = token;
 		this.verificationTokenExpiresAt = new Date(Date.now() + tokenExpiresInMs);
@@ -52,5 +56,19 @@ export class Account {
 	public restoreVerificationToken(token: string | null, expiresAt: Date | null): void {
 		this.verificationToken = token;
 		this.verificationTokenExpiresAt = expiresAt;
+	}
+
+	public updateResetToken(token: string, tokenExpiresInMs: number): void {
+		this.resetToken = token;
+		this.resetTokenExpiresAt = new Date(Date.now() + tokenExpiresInMs);
+	}
+
+	public restoreResetToken(): void {
+		this.resetToken = null;
+		this.resetTokenExpiresAt = null;
+	}
+
+	public updateRefreshTokenHash(hash: string | null): void {
+		this.refreshTokenHash = hash;
 	}
 }

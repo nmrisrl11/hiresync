@@ -22,4 +22,18 @@ export class BullMqEmailQueueAdapter implements EmailQueueServicePort {
 			return false;
 		}
 	}
+
+	public async enqueuePasswordResetEmail(email: string, token: string): Promise<boolean> {
+		try {
+			await this.emailQueue.add(
+				"send-password-reset",
+				{ email, token },
+				{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+			);
+			return true;
+		} catch (error) {
+			this.logger.error(`BullMQ enqueue failed for ${email}`, error);
+			return false;
+		}
+	}
 }

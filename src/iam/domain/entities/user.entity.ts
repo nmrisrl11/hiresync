@@ -54,4 +54,14 @@ export class User {
 	public rollbackVerificationToken(token: string | null, expiresAt: Date | null): void {
 		this.account?.restoreVerificationToken(token, expiresAt);
 	}
+
+	public setResetToken(token: string, tokenExpiresInMs: number): void {
+		if (!this.account)
+			throw new InvalidDomainStateException("User has no associated account credentials.");
+		this.account.updateResetToken(token, tokenExpiresInMs);
+	}
+
+	public rollbackResetToken(): void {
+		this.account?.restoreResetToken();
+	}
 }
