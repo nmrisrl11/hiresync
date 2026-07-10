@@ -1,36 +1,5 @@
 import { env } from "@/env";
 import {
-	BadRequestException,
-	Body,
-	ConflictException,
-	Controller,
-	ForbiddenException,
-	HttpCode,
-	HttpStatus,
-	InternalServerErrorException,
-	NotFoundException,
-	Post,
-	Res,
-	UnauthorizedException,
-} from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import type { Response } from "express";
-import type { StringValue } from "ms";
-import ms from "ms";
-import { CurrentUser } from "../decorators/current-user.decorator";
-import { AuthResponseMapper } from "../mappers/auth-response.mapper";
-import { Public } from "../decorators/public.decorator";
-import { InvalidDomainStateException } from "@/iam/domain/exceptions";
-import {
-	InvalidLoginException,
-	InvalidVerificationTokenException,
-	QueueProcessingException,
-	RoleNotFoundException,
-	UnauthorizedRoleException,
-	UserAlreadyExistsException,
-	UserNotFoundException,
-} from "@/iam/application/exceptions";
-import {
 	ForgotPasswordCommand,
 	ForgotPasswordUseCasePort,
 	LoginCommand,
@@ -45,6 +14,13 @@ import {
 	VerifyEmailUseCasePort,
 } from "@/iam/application/ports/inbound";
 import { type JwtPayload } from "@/iam/application/ports/outbound";
+import { Body, Controller, HttpCode, HttpStatus, Post, Res, UseFilters } from "@nestjs/common";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import type { Response } from "express";
+import type { StringValue } from "ms";
+import ms from "ms";
+import { CurrentUser } from "../decorators/current-user.decorator";
+import { Public } from "../decorators/public.decorator";
 import {
 	ForgotPasswordDto,
 	LoginDto,
@@ -52,7 +28,10 @@ import {
 	ResendVerificationDto,
 	VerifyEmailDto,
 } from "../dtos";
+import { IamExceptionFilter } from "../filters/iam-exception.filter";
+import { AuthResponseMapper } from "../mappers/auth-response.mapper";
 
+@UseFilters(IamExceptionFilter)
 @ApiTags("Authentication")
 @Controller("auth")
 export class AuthController {
@@ -77,25 +56,11 @@ export class AuthController {
 	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: "Register a new user." })
 	public async register(@Body() dto: RegisterDto) {
-		try {
-			const command = new RegisterUserCommand(dto.email, dto.name, dto.password, dto.roleCode);
+		const command = new RegisterUserCommand(dto.email, dto.name, dto.password, dto.roleCode);
 
-			const result = await this.registerUserUseCase.execute(command);
+		const result = await this.registerUserUseCase.execute(command);
 
-			return AuthResponseMapper.toRegistrationMessage(result.isEmailQueued);
-		} catch (error: unknown) {
-			if (error instanceof UserAlreadyExistsException) throw new ConflictException(error.message);
-
-			if (error instanceof RoleNotFoundException || error instanceof InvalidDomainStateException)
-				throw new BadRequestException(error.message);
-
-			if (error instanceof UnauthorizedRoleException) throw new ForbiddenException(error.message);
-
-			if (error instanceof QueueProcessingException)
-				throw new InternalServerErrorException(error.message);
-
-			throw error;
-		}
+		return AuthResponseMapper.toRegistrationMessage(result.verificationEmailEnqueued);
 	}
 
 	@Public()
@@ -103,31 +68,21 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Verify email address and auto login." })
 	public async verifyEmail(@Body() dto: VerifyEmailDto, @Res({ passthrough: true }) res: Response) {
-		try {
-			const command = new VerifyEmailCommand(dto.token);
-			const result = await this.verifyEmailUseCase.execute(command);
+		const command = new VerifyEmailCommand(dto.token);
+		const result = await this.verifyEmailUseCase.execute(command);
 
-			res.cookie("refresh_token", result.refreshToken, {
-				httpOnly: true,
-				secure: this.isProduction,
-				sameSite: "lax",
-				maxAge: this.refreshCookieMaxAge,
-			});
+		res.cookie("refresh_token", result.refreshToken, {
+			httpOnly: true,
+			secure: this.isProduction,
+			sameSite: "lax",
+			maxAge: this.refreshCookieMaxAge,
+		});
 
-			return {
-				message: result.message,
-				accessToken: result.accessToken,
-				user: result.user,
-			};
-		} catch (error: unknown) {
-			if (
-				error instanceof InvalidVerificationTokenException ||
-				error instanceof InvalidDomainStateException
-			)
-				throw new BadRequestException(error.message);
-
-			throw error;
-		}
+		return {
+			message: result.message,
+			accessToken: result.accessToken,
+			user: result.user,
+		};
 	}
 
 	@Public()
@@ -135,26 +90,20 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Login and receive access and refresh tokens." })
 	public async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
-		try {
-			const command = new LoginCommand(dto.email, dto.password);
-			const result = await this.loginUseCase.execute(command);
+		const command = new LoginCommand(dto.email, dto.password);
+		const result = await this.loginUseCase.execute(command);
 
-			res.cookie("refresh_token", result.refreshToken, {
-				httpOnly: true,
-				secure: this.isProduction,
-				sameSite: "lax",
-				maxAge: this.refreshCookieMaxAge,
-			});
+		res.cookie("refresh_token", result.refreshToken, {
+			httpOnly: true,
+			secure: this.isProduction,
+			sameSite: "lax",
+			maxAge: this.refreshCookieMaxAge,
+		});
 
-			return {
-				accessToken: result.accessToken,
-				user: result.user,
-			};
-		} catch (error: unknown) {
-			if (error instanceof InvalidLoginException) throw new UnauthorizedException(error.message);
-
-			throw error;
-		}
+		return {
+			accessToken: result.accessToken,
+			user: result.user,
+		};
 	}
 
 	@Post("logout")
@@ -165,19 +114,13 @@ export class AuthController {
 		@CurrentUser() userPayload: JwtPayload,
 		@Res({ passthrough: true }) res: Response,
 	) {
-		try {
-			const command = new LogoutCommand(userPayload.sub);
+		const command = new LogoutCommand(userPayload.sub);
 
-			await this.logoutUseCase.execute(command);
+		await this.logoutUseCase.execute(command);
 
-			res.clearCookie("refresh_token");
+		res.clearCookie("refresh_token");
 
-			return { message: "Logged out successfully." };
-		} catch (error: unknown) {
-			if (error instanceof UserNotFoundException) throw new NotFoundException(error.message);
-
-			throw error;
-		}
+		return { message: "Logged out successfully." };
 	}
 
 	@Public()
@@ -185,15 +128,8 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Request a password reset email." })
 	public async forgotPassword(@Body() dto: ForgotPasswordDto) {
-		try {
-			const command = new ForgotPasswordCommand(dto.email);
-			return await this.forgotPasswordUseCase.execute(command);
-		} catch (error: unknown) {
-			if (error instanceof QueueProcessingException)
-				throw new InternalServerErrorException(error.message);
-
-			throw error;
-		}
+		const command = new ForgotPasswordCommand(dto.email);
+		return await this.forgotPasswordUseCase.execute(command);
 	}
 
 	@Public()
@@ -201,14 +137,7 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Resend the verification email." })
 	public async resendVerification(@Body() dto: ResendVerificationDto) {
-		try {
-			const command = new ResendVerificationCommand(dto.email);
-			return await this.resendVerificationUseCase.execute(command);
-		} catch (error: unknown) {
-			if (error instanceof QueueProcessingException)
-				throw new InternalServerErrorException(error.message);
-
-			throw error;
-		}
+		const command = new ResendVerificationCommand(dto.email);
+		return await this.resendVerificationUseCase.execute(command);
 	}
 }

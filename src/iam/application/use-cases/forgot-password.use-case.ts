@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Email } from "@/iam/domain/value-objects";
-import { QueueProcessingException } from "../exceptions";
+import { EmailDispatchFailedException } from "../exceptions";
 import {
 	ForgotPasswordCommand,
 	ForgotPasswordResult,
@@ -37,18 +37,15 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 		user.setResetToken(resetToken, resetTokenExpiresAt);
 		await this.iamRepository.save(user);
 
-		const emailQueued = await this.emailQueueService.enqueuePasswordResetEmail(
-			user.email.getValue(),
-			resetToken,
-		);
-
-		if (!emailQueued) {
+		try {
+			await this.emailQueueService.enqueuePasswordResetEmail(user.email.getValue(), resetToken);
+		} catch {
 			this.logger.error(`Queue failed. Restoring previous reset token for: ${command.email}`);
 
 			user.rollbackResetToken();
 			await this.iamRepository.save(user);
 
-			throw new QueueProcessingException(
+			throw new EmailDispatchFailedException(
 				"We are currently experiencing issues sending emails. Please try again later.",
 			);
 		}

@@ -1,6 +1,6 @@
 export class AuthResponseMapper {
-	public static toRegistrationMessage(isEmailQueued: boolean): { message: string } {
-		if (!isEmailQueued) {
+	public static toRegistrationMessage(verificationEmailEnqueued: boolean): { message: string } {
+		if (!verificationEmailEnqueued) {
 			return {
 				message:
 					"Account created successfully, but we encountered an issue sending the verification email. Please use the resend verification option later.",

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Email } from "@/iam/domain/value-objects";
-import { QueueProcessingException } from "../exceptions";
+import { EmailDispatchFailedException } from "../exceptions";
 import {
 	ResendVerificationCommand,
 	ResendVerificationResult,
@@ -42,12 +42,12 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 		user.refreshVerificationToken(newVerificationToken, tokenExpiresInMs);
 		await this.iamRepository.save(user);
 
-		const emailQueued = await this.emailQueueService.enqueueVerificationEmail(
-			user.email.getValue(),
-			newVerificationToken,
-		);
-
-		if (!emailQueued) {
+		try {
+			await this.emailQueueService.enqueueVerificationEmail(
+				user.email.getValue(),
+				newVerificationToken,
+			);
+		} catch {
 			this.logger.error(
 				`Queue failed. Restoring previous verification token for: ${command.email}`,
 			);
@@ -55,7 +55,7 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 			user.rollbackVerificationToken(previousToken, previousExpiresAt);
 			await this.iamRepository.save(user);
 
-			throw new QueueProcessingException(
+			throw new EmailDispatchFailedException(
 				"We are currently experiencing issues sending emails. Please try again later.",
 			);
 		}
