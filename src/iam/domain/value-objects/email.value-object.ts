@@ -1,4 +1,4 @@
-import { InvalidDomainStateException } from "../exceptions";
+import { InvalidEmailFormatException } from "../exceptions";
 
 export class Email {
 	private readonly value: string;
@@ -6,7 +6,7 @@ export class Email {
 	constructor(email: string) {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email)) {
-			throw new InvalidDomainStateException("Invalid email format.");
+			throw new InvalidEmailFormatException("Invalid email format.");
 		}
 		this.value = email.toLowerCase().trim();
 	}

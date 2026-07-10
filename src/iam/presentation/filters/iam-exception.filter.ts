@@ -11,6 +11,7 @@ import {
 import {
 	DomainException,
 	InvalidVerificationTokenException as InvalidDomainVerificationTokenException,
+	InvalidEmailFormatException,
 	NoAccountFoundException,
 	VerificationTokenExpiredException,
 } from "@/iam/domain/exceptions";
@@ -21,6 +22,7 @@ import { Response } from "express";
 export class IamExceptionFilter implements ExceptionFilter<ApplicationException | DomainException> {
 	private getDomainStatus(exception: DomainException): HttpStatus {
 		switch (exception.constructor) {
+			case InvalidEmailFormatException:
 			case InvalidDomainVerificationTokenException:
 			case VerificationTokenExpiredException:
 				return HttpStatus.BAD_REQUEST;
