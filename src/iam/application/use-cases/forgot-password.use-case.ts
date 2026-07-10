@@ -7,8 +7,10 @@ import {
 	ForgotPasswordUseCasePort,
 } from "../ports/inbound";
 import {
+	AuthConfigPort,
 	EmailQueueServicePort,
 	IamRepositoryPort,
+	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../ports/outbound";
 
@@ -18,6 +20,8 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 		private readonly iamRepository: IamRepositoryPort,
 		private readonly emailQueueService: EmailQueueServicePort,
 		private readonly tokenGenerator: VerificationTokenGeneratorPort,
+		private readonly timeFormatter: TimeFormatterPort,
+		private readonly authConfig: AuthConfigPort,
 	) {}
 
 	private readonly logger = new Logger(ForgotPasswordUseCase.name);
@@ -32,13 +36,20 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 			};
 
 		const resetToken = this.tokenGenerator.generateHexToken(32);
-		const resetTokenExpiresAt = 60 * 60 * 1000; // 1 hour
 
-		user.setResetToken(resetToken, resetTokenExpiresAt);
+		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
+		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
+		const tokenExpiresInText = this.timeFormatter.formatToHumanReadable(tokenExpiresInMs);
+
+		user.setResetToken(resetToken, tokenExpiresInMs);
 		await this.iamRepository.save(user);
 
 		try {
-			await this.emailQueueService.enqueuePasswordResetEmail(user.email.getValue(), resetToken);
+			await this.emailQueueService.enqueuePasswordResetEmail(
+				user.email.getValue(),
+				resetToken,
+				tokenExpiresInText,
+			);
 		} catch {
 			this.logger.error(`Queue failed. Restoring previous reset token for: ${command.email}`);
 

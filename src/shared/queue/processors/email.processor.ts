@@ -21,17 +21,17 @@ export class EmailProcessor extends WorkerHost {
 			throw new Error("Invalid job payload");
 		}
 
-		const { email, token } = result.data;
+		const { email, token, expiresInText } = result.data;
 
 		this.logger.log(`Processing job ${job.id} of type ${job.name} for ${email}...`);
 
 		try {
 			switch (job.name) {
 				case "send-verification":
-					await this.emailService.sendVerificationEmail(email, token);
+					await this.emailService.sendVerificationEmail(email, token, expiresInText ?? "24 hours");
 					break;
 				case "send-password-reset":
-					await this.emailService.sendPasswordResetEmail(email, token);
+					await this.emailService.sendPasswordResetEmail(email, token, expiresInText ?? "1 hour");
 					break;
 				default:
 					throw new Error(`Unknown job type: ${job.name}`);

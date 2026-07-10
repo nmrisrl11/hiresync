@@ -8,10 +8,12 @@ import {
 } from "../exceptions";
 import { RegisterUserCommand, RegisterUserResult, RegisterUserUseCasePort } from "../ports/inbound";
 import {
+	AuthConfigPort,
 	EmailQueueServicePort,
 	HashServicePort,
 	IamRepositoryPort,
 	IdGeneratorPort,
+	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../ports/outbound";
 
@@ -25,6 +27,8 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly verificationTokenGenerator: VerificationTokenGeneratorPort,
 		private readonly emailQueueService: EmailQueueServicePort,
+		private readonly timeFormatter: TimeFormatterPort,
+		private readonly authConfig: AuthConfigPort,
 	) {}
 
 	public async execute(command: RegisterUserCommand): Promise<RegisterUserResult> {
@@ -44,7 +48,9 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 
 		const verificationToken = this.verificationTokenGenerator.generateHexToken(32);
 
-		const verificationTokenTtlMs = 24 * 60 * 60 * 1000; // 24 hours from now
+		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
+		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
+		const tokenExpiresInText = this.timeFormatter.formatToHumanReadable(tokenExpiresInMs);
 
 		const newUser = User.createForRegistration(
 			this.idGenerator.generateId(),
@@ -54,7 +60,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 			role,
 			passwordHash,
 			verificationToken,
-			verificationTokenTtlMs,
+			tokenExpiresInMs,
 		);
 
 		await this.iamRepository.save(newUser);
@@ -65,6 +71,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 			await this.emailQueueService.enqueueVerificationEmail(
 				newUser.email.getValue(),
 				verificationToken,
+				tokenExpiresInText,
 			);
 		} catch (error) {
 			this.logger.warn(`Unable to queue verification email for ${newUser.email.getValue()}`, error);
