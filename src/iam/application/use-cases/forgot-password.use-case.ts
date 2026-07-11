@@ -56,9 +56,7 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 			user.rollbackResetToken();
 			await this.iamRepository.save(user);
 
-			throw new EmailDispatchFailedException(
-				"We are currently experiencing issues sending emails. Please try again later.",
-			);
+			throw new EmailDispatchFailedException();
 		}
 
 		return { message: "If account with that email exists, a reset link has been sent." };

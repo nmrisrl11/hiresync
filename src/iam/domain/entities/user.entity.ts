@@ -38,16 +38,14 @@ export class User {
 	}
 
 	public verifyEmail(token: string): void {
-		if (!this.account)
-			throw new NoAccountFoundException("User has no associated account credentials.");
+		if (!this.account) throw new NoAccountFoundException();
 
 		this.account.verify(token);
 		this.isVerified = true;
 	}
 
 	public refreshVerificationToken(token: string, tokenExpiresInMs: number): void {
-		if (!this.account)
-			throw new NoAccountFoundException("User has no associated account credentials.");
+		if (!this.account) throw new NoAccountFoundException();
 		this.account.updateVerificationToken(token, tokenExpiresInMs);
 	}
 
@@ -56,8 +54,7 @@ export class User {
 	}
 
 	public setResetToken(token: string, tokenExpiresInMs: number): void {
-		if (!this.account)
-			throw new NoAccountFoundException("User has no associated account credentials.");
+		if (!this.account) throw new NoAccountFoundException();
 		this.account.updateResetToken(token, tokenExpiresInMs);
 	}
 
@@ -66,14 +63,12 @@ export class User {
 	}
 
 	public updateRefreshToken(hash: string | null): void {
-		if (!this.account)
-			throw new NoAccountFoundException("User has no associated account credentials.");
+		if (!this.account) throw new NoAccountFoundException();
 		this.account.updateRefreshTokenHash(hash);
 	}
 
 	public changePassword(token: string, password: string): void {
-		if (!this.account)
-			throw new NoAccountFoundException("User has no associated account credentials.");
+		if (!this.account) throw new NoAccountFoundException();
 		this.account.updatePasswordHash(token, password);
 	}
 }

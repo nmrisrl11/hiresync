@@ -35,14 +35,12 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 		const emailVo = new Email(command.email);
 
 		const existingUser = await this.iamRepository.findByEmail(emailVo);
-		if (existingUser)
-			throw new UserAlreadyExistsException("An account with this email already exists.");
+		if (existingUser) throw new UserAlreadyExistsException();
 
 		const role = await this.iamRepository.findRoleByCode(command.roleCode);
-		if (!role) throw new RoleNotFoundException("Invalid role specified.");
+		if (!role) throw new RoleNotFoundException();
 
-		if (role.isAdmin())
-			throw new UnauthorizedRoleException("Users cannot self-register as administrators.");
+		if (role.isAdmin()) throw new UnauthorizedRoleException();
 
 		const passwordHash = await this.hashService.hash(command.password, 12);
 

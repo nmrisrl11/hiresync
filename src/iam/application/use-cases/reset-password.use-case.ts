@@ -5,6 +5,7 @@ import {
 	ResetPasswordUseCasePort,
 } from "../ports/inbound";
 import { HashServicePort, IamRepositoryPort } from "../ports/outbound";
+import { InvalidTokenException } from "../exceptions";
 
 @Injectable()
 export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
@@ -18,11 +19,8 @@ export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 	public async execute(command: ResetPasswordCommand): Promise<ResetPasswordResult> {
 		const user = await this.iamRepository.findByResetToken(command.token);
 
-		//! change this to be exception
 		if (!user || !user.account?.getResetToken())
-			return {
-				message: "Invalid reset token.",
-			};
+			throw new InvalidTokenException("Reset token not found or invalid.");
 
 		const passwordHash = await this.hashService.hash(command.password, 12);
 

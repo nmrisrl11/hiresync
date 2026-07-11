@@ -63,9 +63,7 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 			user.rollbackVerificationToken(previousToken, previousExpiresAt);
 			await this.iamRepository.save(user);
 
-			throw new EmailDispatchFailedException(
-				"We are currently experiencing issues sending emails. Please try again later.",
-			);
+			throw new EmailDispatchFailedException();
 		}
 
 		return { message: "A new verification email has been sent." };

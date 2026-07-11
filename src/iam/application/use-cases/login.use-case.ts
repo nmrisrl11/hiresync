@@ -17,14 +17,14 @@ export class LoginUseCase implements LoginUseCasePort {
 
 		const user = await this.iamRepository.findByEmail(emailVo);
 
-		if (!user || !user.account) throw new InvalidLoginException("Invalid email or password.");
+		if (!user || !user.account) throw new InvalidLoginException();
 
 		const passwordMatch = await this.hashService.compare(
 			command.password,
 			user.account?.getPasswordHash(),
 		);
 
-		if (!passwordMatch) throw new InvalidLoginException("Invalid email or password.");
+		if (!passwordMatch) throw new InvalidLoginException();
 
 		if (!user.isVerified)
 			throw new InvalidLoginException("Please verify your email address before logging in.");

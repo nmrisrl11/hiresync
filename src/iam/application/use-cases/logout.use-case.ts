@@ -10,7 +10,7 @@ export class LogoutUseCase implements LogoutUseCasePort {
 	public async execute(command: LogoutCommand): Promise<void> {
 		const user = await this.iamRepository.findById(command.userId);
 
-		if (!user) throw new UserNotFoundException("User not found.");
+		if (!user) throw new UserNotFoundException();
 
 		user.updateRefreshToken(null);
 
