@@ -23,5 +23,15 @@
 	},
 	"[html]": {
 		"editor.defaultFormatter": "vscode.html-language-features"
-	}
+	},
+    // Prevents the editor from smoothly animating scrolls, which cuts down redraw rates
+    "editor.smoothScrolling": false,
+    "workbench.list.smoothScrolling": false,
+
+    // Controls how the cursor is drawn (blinking instead of a smooth phase lowers CPU)
+    "editor.cursorBlinking": "blink",
+    "editor.cursorSmoothCaretAnimation": "off",
+
+    // Optimizes text rendering
+    "editor.renderLineHighlight": "none"
 }

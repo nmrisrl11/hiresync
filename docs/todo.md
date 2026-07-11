@@ -7,7 +7,7 @@
 [x] - Password Hashing with bcrypt
 [x] - Email Verification with nodemailer and resend
 [x] - Forgot Password
-[] - Reset Password
+[x] - Reset Password
 [] - Refresh Access Token with refresh token
 [x] - Resending email verification
 

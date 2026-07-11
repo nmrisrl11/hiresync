@@ -12,7 +12,7 @@ export class LogoutUseCase implements LogoutUseCasePort {
 
 		if (!user) throw new UserNotFoundException("User not found.");
 
-		user.account?.updateRefreshTokenHash(null);
+		user.updateRefreshToken(null);
 
 		await this.iamRepository.save(user);
 	}
