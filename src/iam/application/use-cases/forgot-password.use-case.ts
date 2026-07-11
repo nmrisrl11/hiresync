@@ -37,7 +37,7 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 
 		const resetToken = this.tokenGenerator.generateHexToken(32);
 
-		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
+		const expiresInEnv = this.authConfig.getPasswordResetTokenExpiration();
 		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 		const tokenExpiresInText = this.timeFormatter.formatToHumanReadable(tokenExpiresInMs);
 

@@ -4,3 +4,4 @@ export * from "./logout.in-port";
 export * from "./register-user.in-port";
 export * from "./resend-verification.in-port";
 export * from "./verify-email.in-port";
+export * from "./reset-password.in-port";
