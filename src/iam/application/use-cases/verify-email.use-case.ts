@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { InvalidVerificationTokenException } from "../exceptions";
+import { InvalidTokenException } from "../exceptions";
 import { VerifyEmailCommand, VerifyEmailResult, VerifyEmailUseCasePort } from "../ports/inbound";
 import { HashServicePort, IamRepositoryPort, JwtServicePort } from "../ports/outbound";
 
@@ -14,7 +14,7 @@ export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 	public async execute(command: VerifyEmailCommand): Promise<VerifyEmailResult> {
 		const user = await this.iamRepository.findByVerificationToken(command.token);
 
-		if (!user) throw new InvalidVerificationTokenException("Invalid verification token.");
+		if (!user) throw new InvalidTokenException("Verification token not found or invalid.");
 
 		user.verifyEmail(command.token);
 

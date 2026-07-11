@@ -1,7 +1,7 @@
 import {
 	ApplicationException,
 	EmailDispatchFailedException,
-	InvalidVerificationTokenException as InvalidApplicationVerificationTokenException,
+	InvalidTokenException as InvalidApplicationTokenException,
 	InvalidLoginException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
@@ -10,10 +10,9 @@ import {
 } from "@/iam/application/exceptions";
 import {
 	DomainException,
-	InvalidVerificationTokenException as InvalidDomainVerificationTokenException,
+	InvalidTokenException as InvalidDomainTokenException,
 	InvalidEmailFormatException,
 	NoAccountFoundException,
-	VerificationTokenExpiredException,
 } from "@/iam/domain/exceptions";
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from "@nestjs/common";
 import { Response } from "express";
@@ -23,8 +22,7 @@ export class IamExceptionFilter implements ExceptionFilter<ApplicationException 
 	private getDomainStatus(exception: DomainException): HttpStatus {
 		switch (exception.constructor) {
 			case InvalidEmailFormatException:
-			case InvalidDomainVerificationTokenException:
-			case VerificationTokenExpiredException:
+			case InvalidDomainTokenException:
 				return HttpStatus.BAD_REQUEST;
 			case NoAccountFoundException:
 				return HttpStatus.NOT_FOUND;
@@ -37,7 +35,7 @@ export class IamExceptionFilter implements ExceptionFilter<ApplicationException 
 		switch (exception.constructor) {
 			case InvalidLoginException:
 				return HttpStatus.UNAUTHORIZED;
-			case InvalidApplicationVerificationTokenException:
+			case InvalidApplicationTokenException:
 			case RoleNotFoundException:
 				return HttpStatus.BAD_REQUEST;
 			case UnauthorizedRoleException:
