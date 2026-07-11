@@ -64,4 +64,10 @@ export class User {
 	public rollbackResetToken(): void {
 		this.account?.restoreResetToken();
 	}
+
+	public changePassword(token: string, password: string): void {
+		if (!this.account)
+			throw new NoAccountFoundException("User has no associated account credentials.");
+		this.account.updatePasswordHash(token, password);
+	}
 }

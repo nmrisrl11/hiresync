@@ -1,5 +1,7 @@
 import {
+	InvalidResetTokenException,
 	InvalidVerificationTokenException,
+	ResetTokenExpiredException,
 	VerificationTokenExpiredException,
 } from "../exceptions";
 
@@ -73,5 +75,16 @@ export class Account {
 
 	public updateRefreshTokenHash(hash: string | null): void {
 		this.refreshTokenHash = hash;
+	}
+
+	public updatePasswordHash(token: string, password: string) {
+		if (this.resetToken !== token) throw new InvalidResetTokenException("Invalid reset token.");
+
+		if (!this.resetTokenExpiresAt || this.resetTokenExpiresAt < new Date())
+			throw new ResetTokenExpiredException("Reset token has expired. Please request a new one.");
+
+		this.passwordHash = password;
+		this.resetToken = null;
+		this.resetTokenExpiresAt = null;
 	}
 }

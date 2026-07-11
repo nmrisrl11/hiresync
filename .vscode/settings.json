@@ -16,7 +16,6 @@
 	"[javascriptreact]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
-	"js/ts.tsdk.path": "node_modules/typescript/lib",
 	"prettier.requireConfig": true,
 	"flow-icons.activeIconPack": {
 		"angular": false,

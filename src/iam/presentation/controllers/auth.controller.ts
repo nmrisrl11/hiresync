@@ -10,6 +10,8 @@ import {
 	RegisterUserUseCasePort,
 	ResendVerificationCommand,
 	ResendVerificationUseCasePort,
+	ResetPasswordCommand,
+	ResetPasswordUseCasePort,
 	VerifyEmailCommand,
 	VerifyEmailUseCasePort,
 } from "@/iam/application/ports/inbound";
@@ -26,6 +28,7 @@ import {
 	LoginDto,
 	RegisterDto,
 	ResendVerificationDto,
+	ResetPasswordDto,
 	VerifyEmailDto,
 } from "../dtos";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
@@ -41,6 +44,7 @@ export class AuthController {
 		private readonly loginUseCase: LoginUseCasePort,
 		private readonly logoutUseCase: LogoutUseCasePort,
 		private readonly forgotPasswordUseCase: ForgotPasswordUseCasePort,
+		private readonly resetPasswordUseCase: ResetPasswordUseCasePort,
 		private readonly resendVerificationUseCase: ResendVerificationUseCasePort,
 	) {}
 
@@ -130,6 +134,16 @@ export class AuthController {
 	public async forgotPassword(@Body() dto: ForgotPasswordDto) {
 		const command = new ForgotPasswordCommand(dto.email);
 		return await this.forgotPasswordUseCase.execute(command);
+	}
+
+	@Public()
+	@Post("reset-password")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Reset password using token from email." })
+	public async resetPassword(@Body() dto: ResetPasswordDto) {
+		const command = new ResetPasswordCommand(dto.token, dto.newPassword);
+
+		return await this.resetPasswordUseCase.execute(command);
 	}
 
 	@Public()

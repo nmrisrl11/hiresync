@@ -7,6 +7,7 @@ import {
 	LogoutUseCasePort,
 	RegisterUserUseCasePort,
 	ResendVerificationUseCasePort,
+	ResetPasswordUseCasePort,
 	VerifyEmailUseCasePort,
 } from "./application/ports/inbound";
 import {
@@ -25,6 +26,7 @@ import {
 	LogoutUseCase,
 	RegisterUserUseCase,
 	ResendVerificationUsecase,
+	ResetPasswordUseCase,
 	VerifyEmailUseCase,
 } from "./application/use-cases";
 import { BcryptHashAdapter } from "./infrastructure/adapters/outbound/bcrypt-hash.adapter";
@@ -45,6 +47,7 @@ import { EnvAuthConfigAdapter } from "./infrastructure/adapters/outbound/env-aut
 		{ provide: LoginUseCasePort, useClass: LoginUseCase },
 		{ provide: LogoutUseCasePort, useClass: LogoutUseCase },
 		{ provide: ForgotPasswordUseCasePort, useClass: ForgotPasswordUseCase },
+		{ provide: ResetPasswordUseCasePort, useClass: ResetPasswordUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
