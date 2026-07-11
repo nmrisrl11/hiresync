@@ -65,6 +65,12 @@ export class User {
 		this.account?.restoreResetToken();
 	}
 
+	public updateRefreshToken(hash: string | null): void {
+		if (!this.account)
+			throw new NoAccountFoundException("User has no associated account credentials.");
+		this.account.updateRefreshTokenHash(hash);
+	}
+
 	public changePassword(token: string, password: string): void {
 		if (!this.account)
 			throw new NoAccountFoundException("User has no associated account credentials.");

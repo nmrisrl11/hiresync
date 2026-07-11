@@ -36,7 +36,7 @@ export class LoginUseCase implements LoginUseCasePort {
 		});
 
 		const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
-		user.account.updateRefreshTokenHash(refreshTokenHash);
+		user.updateRefreshToken(refreshTokenHash);
 
 		await this.iamRepository.save(user);
 

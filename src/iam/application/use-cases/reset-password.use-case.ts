@@ -27,6 +27,7 @@ export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 		const passwordHash = await this.hashService.hash(command.password, 12);
 
 		user.changePassword(command.token, passwordHash);
+
 		await this.iamRepository.save(user);
 
 		return { message: "Password reset successful. You can now login." };

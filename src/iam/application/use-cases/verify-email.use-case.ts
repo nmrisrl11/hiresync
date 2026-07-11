@@ -25,7 +25,7 @@ export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 		});
 
 		const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
-		user.account?.updateRefreshTokenHash(refreshTokenHash);
+		user.updateRefreshToken(refreshTokenHash);
 
 		await this.iamRepository.save(user);
 
