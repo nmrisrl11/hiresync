@@ -6,6 +6,8 @@ import {
 	LoginUseCasePort,
 	LogoutCommand,
 	LogoutUseCasePort,
+	RefreshTokenCommand,
+	RefreshTokenUseCasePort,
 	RegisterUserCommand,
 	RegisterUserUseCasePort,
 	ResendVerificationCommand,
@@ -16,9 +18,19 @@ import {
 	VerifyEmailUseCasePort,
 } from "@/iam/application/ports/inbound";
 import { type JwtPayload } from "@/iam/application/ports/outbound";
-import { Body, Controller, HttpCode, HttpStatus, Post, Res, UseFilters } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import type { Response } from "express";
+import {
+	Body,
+	Controller,
+	HttpCode,
+	HttpStatus,
+	Post,
+	Req,
+	Res,
+	UnauthorizedException,
+	UseFilters,
+} from "@nestjs/common";
+import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import type { Request, Response } from "express";
 import type { StringValue } from "ms";
 import ms from "ms";
 import { CurrentUser } from "../decorators/current-user.decorator";
@@ -46,13 +58,10 @@ export class AuthController {
 		private readonly forgotPasswordUseCase: ForgotPasswordUseCasePort,
 		private readonly resetPasswordUseCase: ResetPasswordUseCasePort,
 		private readonly resendVerificationUseCase: ResendVerificationUseCasePort,
+		private readonly refreshTokenUseCase: RefreshTokenUseCasePort,
 	) {}
 
-	private readonly jwtAccessSecret = env.JWT_ACCESS_SECRET;
-	private readonly jwtAccessExpiresIn = env.JWT_ACCESS_EXPIRES_IN as StringValue;
-	private readonly jwtRefreshSecret = env.JWT_REFRESH_SECRET;
-	private readonly jwtRefreshExpiresIn = env.JWT_REFRESH_EXPIRES_IN as StringValue;
-	private readonly refreshCookieMaxAge = ms(this.jwtRefreshExpiresIn);
+	private readonly refreshCookieMaxAge = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
 	private readonly isProduction = env.NODE_ENV === "production";
 
 	@Public()
@@ -125,6 +134,31 @@ export class AuthController {
 		res.clearCookie("refresh_token");
 
 		return { message: "Logged out successfully." };
+	}
+
+	@Public()
+	@Post("refresh")
+	@HttpCode(HttpStatus.OK)
+	@ApiCookieAuth()
+	@ApiOperation({ summary: "Refresh access token using the refresh token cookie." })
+	public async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+		const cookies = req.cookies as Record<string, string>;
+		const refreshToken = cookies?.refresh_token;
+
+		if (!refreshToken) throw new UnauthorizedException("No refresh token provided.");
+
+		const command = new RefreshTokenCommand(refreshToken);
+
+		const result = await this.refreshTokenUseCase.execute(command);
+
+		res.cookie("refresh_token", result.refreshToken, {
+			httpOnly: true,
+			secure: this.isProduction,
+			sameSite: "lax",
+			maxAge: this.refreshCookieMaxAge,
+		});
+
+		return { accessToken: result.accessToken };
 	}
 
 	@Public()
