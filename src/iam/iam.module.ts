@@ -5,6 +5,7 @@ import {
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
+	RefreshTokenUseCasePort,
 	RegisterUserUseCasePort,
 	ResendVerificationUseCasePort,
 	ResetPasswordUseCasePort,
@@ -24,6 +25,7 @@ import {
 	ForgotPasswordUseCase,
 	LoginUseCase,
 	LogoutUseCase,
+	RefreshTokenUseCase,
 	RegisterUserUseCase,
 	ResendVerificationUsecase,
 	ResetPasswordUseCase,
@@ -48,6 +50,7 @@ import { EnvAuthConfigAdapter } from "./infrastructure/adapters/outbound/env-aut
 		{ provide: LogoutUseCasePort, useClass: LogoutUseCase },
 		{ provide: ForgotPasswordUseCasePort, useClass: ForgotPasswordUseCase },
 		{ provide: ResetPasswordUseCasePort, useClass: ResetPasswordUseCase },
+		{ provide: RefreshTokenUseCasePort, useClass: RefreshTokenUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },

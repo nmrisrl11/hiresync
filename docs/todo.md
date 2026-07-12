@@ -8,7 +8,7 @@
 [x] - Email Verification with nodemailer and resend
 [x] - Forgot Password
 [x] - Reset Password
-[] - Refresh Access Token with refresh token
+[x] - Refresh Access Token with refresh token
 [x] - Resending email verification
 
 ## User
