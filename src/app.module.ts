@@ -8,10 +8,23 @@ import { JwtAuthGuard } from "./iam/presentation/guards/jwt-auth.guard";
 import { DatabaseModule } from "./shared/database/database.module";
 import { EmailModule } from "./shared/email/email.module";
 import { QueueModule } from "./shared/queue/queue.module";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
 @Module({
 	imports: [
 		ConfigModule.forRoot({ isGlobal: true }),
+		ThrottlerModule.forRoot([
+			{
+				name: "short",
+				ttl: 1000,
+				limit: 3,
+			},
+			{
+				name: "medium",
+				ttl: 10000,
+				limit: 20,
+			},
+		]),
 		DatabaseModule,
 		JwtModule.register({ global: true }),
 		SharedModule,
@@ -19,6 +32,9 @@ import { QueueModule } from "./shared/queue/queue.module";
 		EmailModule,
 		QueueModule,
 	],
-	providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
+	providers: [
+		{ provide: APP_GUARD, useClass: ThrottlerGuard },
+		{ provide: APP_GUARD, useClass: JwtAuthGuard },
+	],
 })
 export class AppModule {}
