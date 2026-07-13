@@ -1,6 +1,8 @@
 # HireSync - Todos 
 
-## Authentication
+## Roadmap
+
+### Authentication
 
 [x] - Registration
 [x] - Login
@@ -28,8 +30,8 @@
     - Upgrading the single refreshTokenHash into a separate Session entity (one-to-many relationship with Account), allowing users to see active devices and click "Log out of all other sessions."
     [] - Manual OAuth Integration
     - Building custom authorization flows for providers like Google, GitHub, or Microsoft without relying on third-party UI libraries, keeping the domain architecture strictly under your control.
-
-## User
+    
+### User
 
 [x] - Create user
 [] - Get user by id
@@ -40,7 +42,7 @@
 [] - Update user by id
 [] - Delete user by id
 
-## Role
+### Role
 
 [] - Create role
 [] - Get roles
