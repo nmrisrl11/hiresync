@@ -23,3 +23,9 @@ export class InvalidTokenException extends ApplicationException {
 		super(message);
 	}
 }
+
+export class InvalidPasswordException extends ApplicationException {
+	constructor(message: string = "The current password provided is incorrect.") {
+		super(message);
+	}
+}
