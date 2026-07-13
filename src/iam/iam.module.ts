@@ -1,8 +1,10 @@
+import { AccountController } from "./presentation/controllers/account.controller";
 import { DatabaseModule } from "@/shared/database/database.module";
 import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
 import {
 	ForgotPasswordUseCasePort,
+	GetUserByIdUseCasePort,
 	GetUsersUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
@@ -24,6 +26,7 @@ import {
 } from "./application/ports/outbound";
 import {
 	ForgotPasswordUseCase,
+	GetUserByIdUseCase,
 	GetUsersUseCase,
 	LoginUseCase,
 	LogoutUseCase,
@@ -45,7 +48,7 @@ import { AdminController } from "./presentation/controllers/admin.controller";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
-	controllers: [AuthController, AdminController],
+	controllers: [AccountController, AuthController, AdminController],
 	providers: [
 		{ provide: RegisterUserUseCasePort, useClass: RegisterUserUseCase },
 		{ provide: VerifyEmailUseCasePort, useClass: VerifyEmailUseCase },
@@ -57,6 +60,7 @@ import { AdminController } from "./presentation/controllers/admin.controller";
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
 
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
+		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
