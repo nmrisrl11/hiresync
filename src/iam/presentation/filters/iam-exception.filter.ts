@@ -3,6 +3,7 @@ import {
 	EmailDispatchFailedException,
 	InvalidTokenException as InvalidApplicationTokenException,
 	InvalidLoginException,
+	InvalidPasswordException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
@@ -37,6 +38,7 @@ export class IamExceptionFilter implements ExceptionFilter<ApplicationException 
 				return HttpStatus.UNAUTHORIZED;
 			case InvalidApplicationTokenException:
 			case RoleNotFoundException:
+			case InvalidPasswordException:
 				return HttpStatus.BAD_REQUEST;
 			case UnauthorizedRoleException:
 				return HttpStatus.FORBIDDEN;

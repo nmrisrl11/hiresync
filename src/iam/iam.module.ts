@@ -1,7 +1,10 @@
 import { DatabaseModule } from "@/shared/database/database.module";
 import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
-import { GetUserByIdUseCasePort } from "./application/ports/inbound/account";
+import {
+	ChangePasswordUseCasePort,
+	GetUserByIdUseCasePort,
+} from "./application/ports/inbound/account";
 import {
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
@@ -26,7 +29,7 @@ import {
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "./application/ports/outbound";
-import { GetUserByIdUseCase } from "./application/use-cases/account";
+import { ChangePasswordUseCase, GetUserByIdUseCase } from "./application/use-cases/account";
 import {
 	ForgotPasswordUseCase,
 	LoginUseCase,
@@ -66,6 +69,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 
 		//! Account
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
+		{ provide: ChangePasswordUseCasePort, useClass: ChangePasswordUseCase },
 
 		//! Users
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },

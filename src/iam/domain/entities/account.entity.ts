@@ -85,4 +85,8 @@ export class Account {
 		this.resetToken = null;
 		this.resetTokenExpiresAt = null;
 	}
+
+	public setPasswordHash(newHash: string): void {
+		this.passwordHash = newHash;
+	}
 }

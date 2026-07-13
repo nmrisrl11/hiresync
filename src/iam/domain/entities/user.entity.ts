@@ -74,4 +74,9 @@ export class User {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.updatePasswordHash(token, password);
 	}
+
+	public updatePassword(newHash: string): void {
+		if (!this.account) throw new NoAccountFoundException();
+		this.account.setPasswordHash(newHash);
+	}
 }

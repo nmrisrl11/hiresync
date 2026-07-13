@@ -16,7 +16,7 @@
 [x] - Resending email verification
 
 - To add on IAM (Identity and Access Management) module
-    [] - Update Password (Authenticated) 
+    [x] - Update Password (Authenticated) 
     - A secure flow for logged-in users to change their password by validating their oldPassword hash before accepting a newPassword.
     [] - Updated Email Address
     - A dual-step flow that generates a new verification token and sends it to the new email address before updating the actual database record, preventing accidental account lockouts.
@@ -34,14 +34,12 @@
 ### User
 
 [x] - Create user
-[] - Get users
-[] - Get user by id
-[] - Delete user by id
+[x] - Get user profile of current authenticated user
+[x] - Get users (ADMIN)
+[x] - Get user by id (ADMIN)
+[x] - Get user by id (PUBLIC)
 [] - Update user by id
-
-[] - Get user by email
-[] - Get user by reset token
-[x] - Get user by verification token
+[] - Delete user by id
 
 ### Role
 
@@ -50,3 +48,5 @@
 [] - Get role by id
 [] - Update role by id
 [] - Delete role by id
+
+### Changing of account image with S3
