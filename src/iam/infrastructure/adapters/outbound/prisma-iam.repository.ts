@@ -22,6 +22,10 @@ export class PrismaIamRepository implements IamRepositoryPort {
 		return users.map((user) => IamMapper.toDomain(user));
 	}
 
+	async countAll(): Promise<number> {
+		return await this.prisma.user.count();
+	}
+
 	async findById(id: string): Promise<User | null> {
 		const user = await this.prisma.user.findUnique({
 			where: { id },

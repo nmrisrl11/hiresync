@@ -16,23 +16,20 @@ export class AdminController {
 	@ApiQuery({ name: "limit", required: false, type: Number, description: "Default is 50" })
 	@ApiQuery({ name: "offset", required: false, type: Number, description: "Default is 0" })
 	public async findAll(@Query("limit") limit?: string, @Query("offset") offset?: string) {
-		// 1. Parse incoming strings to strict integers with safe fallbacks
+		//! Parse incoming strings to strict integers with safe fallbacks
 		const parsedLimit = limit ? parseInt(limit, 10) : 50;
 		const parsedOffset = offset ? parseInt(offset, 10) : 0;
 
-		// 2. Instantiate the strict Query object
 		const query = new GetUsersQuery(parsedLimit, parsedOffset);
+		const result = await this.getUsersUseCase.execute(query);
 
-		// 3. Execute the Use Case
-		const users = await this.getUsersUseCase.execute(query);
-
-		// 4. Return a standardized paginated response structure
 		return {
-			data: users,
+			data: result.items,
 			meta: {
 				limit: parsedLimit,
 				offset: parsedOffset,
-				count: users.length,
+				count: result.items.length,
+				totalRecords: result.total,
 			},
 		};
 	}
