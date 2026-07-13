@@ -5,8 +5,8 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CurrentUser } from "../decorators/current-user.decorator";
 
 @ApiBearerAuth()
-@ApiTags("Account")
-@Controller("account")
+@ApiTags("Accounts")
+@Controller("accounts")
 export class AccountController {
 	constructor(private readonly getUserByIdUseCase: GetUserByIdUseCasePort) {}
 

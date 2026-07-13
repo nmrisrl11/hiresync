@@ -1,9 +1,11 @@
+import { UserController } from "./presentation/controllers/user.controller";
 import { AccountController } from "./presentation/controllers/account.controller";
 import { DatabaseModule } from "@/shared/database/database.module";
 import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
 import {
 	ForgotPasswordUseCasePort,
+	GetPublicUserProfileUseCasePort,
 	GetUserByIdUseCasePort,
 	GetUsersUseCasePort,
 	LoginUseCasePort,
@@ -26,6 +28,7 @@ import {
 } from "./application/ports/outbound";
 import {
 	ForgotPasswordUseCase,
+	GetPublicUserProfileUseCase,
 	GetUserByIdUseCase,
 	GetUsersUseCase,
 	LoginUseCase,
@@ -48,7 +51,7 @@ import { AdminController } from "./presentation/controllers/admin.controller";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
-	controllers: [AccountController, AuthController, AdminController],
+	controllers: [AuthController, AccountController, AdminController, UserController],
 	providers: [
 		{ provide: RegisterUserUseCasePort, useClass: RegisterUserUseCase },
 		{ provide: VerifyEmailUseCasePort, useClass: VerifyEmailUseCase },
@@ -61,6 +64,7 @@ import { AdminController } from "./presentation/controllers/admin.controller";
 
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
+		{ provide: GetPublicUserProfileUseCasePort, useClass: GetPublicUserProfileUseCase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
