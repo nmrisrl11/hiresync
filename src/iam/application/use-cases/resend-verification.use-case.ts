@@ -1,5 +1,6 @@
-import { Injectable, Logger } from "@nestjs/common";
 import { Email } from "@/iam/domain/value-objects";
+import { LoggerPort } from "@/shared/logger/application/ports/outbound";
+import { Injectable } from "@nestjs/common";
 import { EmailDispatchFailedException } from "../exceptions";
 import {
 	ResendVerificationCommand,
@@ -22,9 +23,8 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 		private readonly tokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
+		private readonly logger: LoggerPort,
 	) {}
-
-	private readonly logger = new Logger(ResendVerificationUsecase.name);
 
 	public async execute(command: ResendVerificationCommand): Promise<ResendVerificationResult> {
 		const emailVo = new Email(command.email);

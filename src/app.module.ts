@@ -1,3 +1,4 @@
+import { SharedModule } from "./shared/shared.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
@@ -13,6 +14,7 @@ import { QueueModule } from "./shared/queue/queue.module";
 		ConfigModule.forRoot({ isGlobal: true }),
 		DatabaseModule,
 		JwtModule.register({ global: true }),
+		SharedModule,
 		IamModule,
 		EmailModule,
 		QueueModule,
