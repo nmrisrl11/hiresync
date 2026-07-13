@@ -33,6 +33,7 @@ export class IamMapper {
 			role,
 			account,
 			raw.image,
+			raw.createdAt,
 		);
 	}
 }

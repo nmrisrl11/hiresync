@@ -12,6 +12,7 @@ export class User {
 		public readonly role: Role,
 		public readonly account: Account | null,
 		public readonly image: string | null,
+		public readonly createdAt: Date,
 	) {}
 
 	public static createForRegistration(
@@ -34,7 +35,9 @@ export class User {
 			verificationTokenExpiration,
 		);
 
-		return new User(id, emailVo, name, false, role, account, null);
+		const createdAt = new Date();
+
+		return new User(id, emailVo, name, false, role, account, null, createdAt);
 	}
 
 	public verifyEmail(token: string): void {
