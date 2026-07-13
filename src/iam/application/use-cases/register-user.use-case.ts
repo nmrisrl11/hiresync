@@ -1,6 +1,7 @@
 import { User } from "@/iam/domain/entities";
 import { Email } from "@/iam/domain/value-objects";
-import { Injectable, Logger } from "@nestjs/common";
+import { LoggerPort } from "@/shared/logger/application/ports/outbound";
+import { Injectable } from "@nestjs/common";
 import {
 	RoleNotFoundException,
 	UnauthorizedRoleException,
@@ -19,8 +20,6 @@ import {
 
 @Injectable()
 export class RegisterUserUseCase implements RegisterUserUseCasePort {
-	private readonly logger = new Logger(RegisterUserUseCase.name);
-
 	constructor(
 		private readonly iamRepository: IamRepositoryPort,
 		private readonly hashService: HashServicePort,
@@ -29,6 +28,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 		private readonly emailQueueService: EmailQueueServicePort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
+		private readonly logger: LoggerPort,
 	) {}
 
 	public async execute(command: RegisterUserCommand): Promise<RegisterUserResult> {
@@ -71,8 +71,8 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 				verificationToken,
 				tokenExpiresInText,
 			);
-		} catch (error) {
-			this.logger.warn(`Unable to queue verification email for ${newUser.email.getValue()}`, error);
+		} catch {
+			this.logger.warn(`Unable to queue verification email for ${newUser.email.getValue()}`);
 
 			verificationEmailEnqueued = false;
 		}

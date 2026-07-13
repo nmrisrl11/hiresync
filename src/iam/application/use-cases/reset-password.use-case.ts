@@ -1,11 +1,11 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
+import { InvalidTokenException } from "../exceptions";
 import {
 	ResetPasswordCommand,
 	ResetPasswordResult,
 	ResetPasswordUseCasePort,
 } from "../ports/inbound";
 import { HashServicePort, IamRepositoryPort } from "../ports/outbound";
-import { InvalidTokenException } from "../exceptions";
 
 @Injectable()
 export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
@@ -13,8 +13,6 @@ export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 		private readonly iamRepository: IamRepositoryPort,
 		private readonly hashService: HashServicePort,
 	) {}
-
-	private logger = new Logger(ResetPasswordUseCase.name);
 
 	public async execute(command: ResetPasswordCommand): Promise<ResetPasswordResult> {
 		const user = await this.iamRepository.findByResetToken(command.token);
