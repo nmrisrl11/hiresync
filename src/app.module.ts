@@ -9,6 +9,7 @@ import { DatabaseModule } from "./shared/database/database.module";
 import { EmailModule } from "./shared/email/email.module";
 import { QueueModule } from "./shared/queue/queue.module";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { RolesGuard } from "./iam/presentation/guards/roles.guard";
 
 @Module({
 	imports: [
@@ -35,6 +36,7 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 	providers: [
 		{ provide: APP_GUARD, useClass: ThrottlerGuard },
 		{ provide: APP_GUARD, useClass: JwtAuthGuard },
+		{ provide: APP_GUARD, useClass: RolesGuard },
 	],
 })
 export class AppModule {}
