@@ -14,6 +14,11 @@ export type UserResult = {
 	createdAt: Date;
 };
 
+export type PaginatedUserResult = {
+	items: UserResult[];
+	total: number;
+};
+
 export abstract class GetUsersUseCasePort {
-	abstract execute(query: GetUsersQuery): Promise<UserResult[]>;
+	abstract execute(query: GetUsersQuery): Promise<PaginatedUserResult>;
 }

@@ -34,13 +34,14 @@
 ### User
 
 [x] - Create user
-[] - Get user by id
-[] - Get user by email
-[x] - Get user by verification token
-[] - Get user by reset token
 [] - Get users
-[] - Update user by id
+[] - Get user by id
 [] - Delete user by id
+[] - Update user by id
+
+[] - Get user by email
+[] - Get user by reset token
+[x] - Get user by verification token
 
 ### Role
 
