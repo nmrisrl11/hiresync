@@ -11,8 +11,10 @@ import { IamRepositoryPort } from "@/iam/application/ports/outbound";
 export class PrismaIamRepository implements IamRepositoryPort {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async findAll(): Promise<User[]> {
+	async findAll(limit: number, offset: number): Promise<User[]> {
 		const users = await this.prisma.user.findMany({
+			take: limit,
+			skip: offset,
 			orderBy: { createdAt: "desc" },
 			include: { role: true, account: true },
 		});

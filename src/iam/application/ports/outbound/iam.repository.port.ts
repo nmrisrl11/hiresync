@@ -2,7 +2,7 @@ import { Role, User } from "@/iam/domain/entities";
 import { Email } from "@/iam/domain/value-objects";
 
 export abstract class IamRepositoryPort {
-	abstract findAll(): Promise<User[]>;
+	abstract findAll(limit: number, offset: number): Promise<User[]>;
 	abstract findById(id: string): Promise<User | null>;
 	abstract findByEmail(email: Email): Promise<User | null>;
 	abstract findByVerificationToken(verificationToken: string): Promise<User | null>;

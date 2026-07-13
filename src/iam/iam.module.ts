@@ -3,6 +3,7 @@ import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
 import {
 	ForgotPasswordUseCasePort,
+	GetUsersUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
 	RefreshTokenUseCasePort,
@@ -23,6 +24,7 @@ import {
 } from "./application/ports/outbound";
 import {
 	ForgotPasswordUseCase,
+	GetUsersUseCase,
 	LoginUseCase,
 	LogoutUseCase,
 	RefreshTokenUseCase,
@@ -39,10 +41,11 @@ import { NodeCryptoAdapter } from "./infrastructure/adapters/outbound/node-crypt
 import { PrismaIamRepository } from "./infrastructure/adapters/outbound/prisma-iam.repository";
 import { AuthController } from "./presentation/controllers/auth.controller";
 import { EnvAuthConfigAdapter } from "./infrastructure/adapters/outbound/env-auth-config.adapter";
+import { AdminController } from "./presentation/controllers/admin.controller";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
-	controllers: [AuthController],
+	controllers: [AuthController, AdminController],
 	providers: [
 		{ provide: RegisterUserUseCasePort, useClass: RegisterUserUseCase },
 		{ provide: VerifyEmailUseCasePort, useClass: VerifyEmailUseCase },
@@ -52,6 +55,8 @@ import { EnvAuthConfigAdapter } from "./infrastructure/adapters/outbound/env-aut
 		{ provide: ResetPasswordUseCasePort, useClass: ResetPasswordUseCase },
 		{ provide: RefreshTokenUseCasePort, useClass: RefreshTokenUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
+
+		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
