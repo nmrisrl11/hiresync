@@ -7,3 +7,4 @@ export * from "./verify-email.use-case";
 export * from "./reset-password.use-case";
 export * from "./refresh-token.use-case";
 export * from "./get-users.use-case";
+export * from "./get-user-by-id.use-case";
