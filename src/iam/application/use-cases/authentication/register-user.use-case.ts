@@ -1,13 +1,11 @@
 import { User } from "@/iam/domain/entities";
 import { Email } from "@/iam/domain/value-objects";
-import { LoggerPort } from "@/shared/logger/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
-} from "../exceptions";
-import { RegisterUserCommand, RegisterUserResult, RegisterUserUseCasePort } from "../ports/inbound";
+} from "../../exceptions";
 import {
 	AuthConfigPort,
 	EmailQueueServicePort,
@@ -16,7 +14,13 @@ import {
 	IdGeneratorPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
-} from "../ports/outbound";
+} from "../../ports/outbound";
+import {
+	RegisterUserCommand,
+	RegisterUserResult,
+	RegisterUserUseCasePort,
+} from "../../ports/inbound/authentication";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 
 @Injectable()
 export class RegisterUserUseCase implements RegisterUserUseCasePort {

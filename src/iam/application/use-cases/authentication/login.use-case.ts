@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { Email } from "@/iam/domain/value-objects";
-import { InvalidLoginException } from "../exceptions";
-import { LoginCommand, LoginResult, LoginUseCasePort } from "../ports/inbound";
-import { HashServicePort, IamRepositoryPort, JwtServicePort } from "../ports/outbound";
+import { InvalidLoginException } from "../../exceptions";
+import { HashServicePort, IamRepositoryPort, JwtServicePort } from "../../ports/outbound";
+import { LoginCommand, LoginResult, LoginUseCasePort } from "../../ports/inbound/authentication";
 
 @Injectable()
 export class LoginUseCase implements LoginUseCasePort {

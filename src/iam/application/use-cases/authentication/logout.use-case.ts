@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { UserNotFoundException } from "../exceptions";
-import { LogoutCommand, LogoutUseCasePort } from "../ports/inbound";
-import { IamRepositoryPort } from "../ports/outbound";
+import { UserNotFoundException } from "../../exceptions";
+import { IamRepositoryPort } from "../../ports/outbound";
+import { LogoutCommand, LogoutUseCasePort } from "../../ports/inbound/authentication";
 
 @Injectable()
 export class LogoutUseCase implements LogoutUseCasePort {

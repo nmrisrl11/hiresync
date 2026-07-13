@@ -1,7 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { RefreshTokenCommand, RefreshTokenResult, RefreshTokenUseCasePort } from "../ports/inbound";
-import { HashServicePort, IamRepositoryPort, JwtPayload, JwtServicePort } from "../ports/outbound";
-import { InvalidLoginException, InvalidTokenException } from "../exceptions";
+import {
+	HashServicePort,
+	IamRepositoryPort,
+	JwtPayload,
+	JwtServicePort,
+} from "../../ports/outbound";
+import { InvalidLoginException, InvalidTokenException } from "../../exceptions";
+import {
+	RefreshTokenCommand,
+	RefreshTokenResult,
+	RefreshTokenUseCasePort,
+} from "../../ports/inbound/authentication";
 
 @Injectable()
 export class RefreshTokenUseCase implements RefreshTokenUseCasePort {

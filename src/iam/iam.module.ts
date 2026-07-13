@@ -1,13 +1,9 @@
-import { UserController } from "./presentation/controllers/user.controller";
-import { AccountController } from "./presentation/controllers/account.controller";
 import { DatabaseModule } from "@/shared/database/database.module";
 import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
+import { GetUserByIdUseCasePort } from "./application/ports/inbound/account";
 import {
 	ForgotPasswordUseCasePort,
-	GetPublicUserProfileUseCasePort,
-	GetUserByIdUseCasePort,
-	GetUsersUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
 	RefreshTokenUseCasePort,
@@ -15,7 +11,11 @@ import {
 	ResendVerificationUseCasePort,
 	ResetPasswordUseCasePort,
 	VerifyEmailUseCasePort,
-} from "./application/ports/inbound";
+} from "./application/ports/inbound/authentication";
+import {
+	GetPublicUserProfileUseCasePort,
+	GetUsersUseCasePort,
+} from "./application/ports/inbound/users";
 import {
 	AuthConfigPort,
 	EmailQueueServicePort,
@@ -26,11 +26,9 @@ import {
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "./application/ports/outbound";
+import { GetUserByIdUseCase } from "./application/use-cases/account";
 import {
 	ForgotPasswordUseCase,
-	GetPublicUserProfileUseCase,
-	GetUserByIdUseCase,
-	GetUsersUseCase,
 	LoginUseCase,
 	LogoutUseCase,
 	RefreshTokenUseCase,
@@ -38,21 +36,25 @@ import {
 	ResendVerificationUsecase,
 	ResetPasswordUseCase,
 	VerifyEmailUseCase,
-} from "./application/use-cases";
+} from "./application/use-cases/authentication";
+import { GetPublicUserProfileUseCase, GetUsersUseCase } from "./application/use-cases/users";
 import { BcryptHashAdapter } from "./infrastructure/adapters/outbound/bcrypt-hash.adapter";
 import { BullMqEmailQueueAdapter } from "./infrastructure/adapters/outbound/bullmq-email-queue.adapter";
+import { EnvAuthConfigAdapter } from "./infrastructure/adapters/outbound/env-auth-config.adapter";
 import { MsTimeFormatterAdapter } from "./infrastructure/adapters/outbound/ms-time-formatter.adapter";
 import { NestjsJwtAdapter } from "./infrastructure/adapters/outbound/nestjs-jwt.adapter";
 import { NodeCryptoAdapter } from "./infrastructure/adapters/outbound/node-crypto.adapter";
 import { PrismaIamRepository } from "./infrastructure/adapters/outbound/prisma-iam.repository";
-import { AuthController } from "./presentation/controllers/auth.controller";
-import { EnvAuthConfigAdapter } from "./infrastructure/adapters/outbound/env-auth-config.adapter";
+import { AccountController } from "./presentation/controllers/account.controller";
 import { AdminController } from "./presentation/controllers/admin.controller";
+import { AuthController } from "./presentation/controllers/auth.controller";
+import { UserController } from "./presentation/controllers/user.controller";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
 	controllers: [AuthController, AccountController, AdminController, UserController],
 	providers: [
+		//! Authentication
 		{ provide: RegisterUserUseCasePort, useClass: RegisterUserUseCase },
 		{ provide: VerifyEmailUseCasePort, useClass: VerifyEmailUseCase },
 		{ provide: LoginUseCasePort, useClass: LoginUseCase },
@@ -62,8 +64,11 @@ import { AdminController } from "./presentation/controllers/admin.controller";
 		{ provide: RefreshTokenUseCasePort, useClass: RefreshTokenUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
 
-		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
+		//! Account
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
+
+		//! Users
+		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
 		{ provide: GetPublicUserProfileUseCasePort, useClass: GetPublicUserProfileUseCase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },

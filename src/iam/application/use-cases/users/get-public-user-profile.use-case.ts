@@ -3,9 +3,9 @@ import {
 	GetPublicUserProfileQuery,
 	GetPublicUserProfileUseCasePort,
 	PublicUserResult,
-} from "../ports/inbound";
-import { IamRepositoryPort } from "../ports/outbound";
-import { UserNotFoundException } from "../exceptions";
+} from "../../ports/inbound/users";
+import { IamRepositoryPort } from "../../ports/outbound";
+import { UserNotFoundException } from "../../exceptions";
 
 @Injectable()
 export class GetPublicUserProfileUseCase implements GetPublicUserProfileUseCasePort {
