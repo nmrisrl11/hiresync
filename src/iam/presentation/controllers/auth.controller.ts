@@ -45,6 +45,7 @@ import {
 } from "../dtos";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import { AuthResponseMapper } from "../mappers/auth-response.mapper";
+import { Throttle } from "@nestjs/throttler";
 
 @UseFilters(IamExceptionFilter)
 @ApiTags("Authentication")
@@ -67,6 +68,7 @@ export class AuthController {
 	@Public()
 	@Post("register")
 	@HttpCode(HttpStatus.CREATED)
+	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Register a new user." })
 	public async register(@Body() dto: RegisterDto) {
 		const command = new RegisterUserCommand(dto.email, dto.name, dto.password, dto.roleCode);
@@ -101,6 +103,7 @@ export class AuthController {
 	@Public()
 	@Post("login")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Login and receive access and refresh tokens." })
 	public async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
 		const command = new LoginCommand(dto.email, dto.password);
@@ -164,12 +167,14 @@ export class AuthController {
 	@Public()
 	@Post("forgot-password")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 3 } })
 	@ApiOperation({ summary: "Request a password reset email." })
 	public async forgotPassword(@Body() dto: ForgotPasswordDto) {
 		const command = new ForgotPasswordCommand(dto.email);
 		return await this.forgotPasswordUseCase.execute(command);
 	}
 
+	@Throttle({ default: { ttl: 60000, limit: 3 } })
 	@Public()
 	@Post("reset-password")
 	@HttpCode(HttpStatus.OK)
@@ -180,6 +185,7 @@ export class AuthController {
 		return await this.resetPasswordUseCase.execute(command);
 	}
 
+	@Throttle({ default: { ttl: 60000, limit: 3 } })
 	@Public()
 	@Post("resend-verification")
 	@HttpCode(HttpStatus.OK)
