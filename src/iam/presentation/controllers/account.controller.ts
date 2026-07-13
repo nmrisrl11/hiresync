@@ -1,8 +1,8 @@
-import { GetUserByIdQuery, GetUserByIdUseCasePort } from "@/iam/application/ports/inbound";
 import { type JwtPayload } from "@/iam/application/ports/outbound";
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CurrentUser } from "../decorators/current-user.decorator";
+import { GetUserByIdQuery, GetUserByIdUseCasePort } from "@/iam/application/ports/inbound/account";
 
 @ApiBearerAuth()
 @ApiTags("Accounts")

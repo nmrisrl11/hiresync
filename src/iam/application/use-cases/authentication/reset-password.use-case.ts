@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { InvalidTokenException } from "../exceptions";
+import { InvalidTokenException } from "../../exceptions";
+import { HashServicePort, IamRepositoryPort } from "../../ports/outbound";
 import {
 	ResetPasswordCommand,
 	ResetPasswordResult,
 	ResetPasswordUseCasePort,
-} from "../ports/inbound";
-import { HashServicePort, IamRepositoryPort } from "../ports/outbound";
+} from "../../ports/inbound/authentication";
 
 @Injectable()
 export class ResetPasswordUseCase implements ResetPasswordUseCasePort {

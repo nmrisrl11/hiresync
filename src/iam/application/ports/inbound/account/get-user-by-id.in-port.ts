@@ -1,4 +1,4 @@
-import { UserResult } from "./get-users.in-port";
+import { UserResult } from "../users/get-users.in-port";
 
 export class GetUserByIdQuery {
 	constructor(public readonly userId: string) {}

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { GetUsersQuery, GetUsersUseCasePort, PaginatedUserResult } from "../ports/inbound";
-import { IamRepositoryPort } from "../ports/outbound";
+import { GetUsersQuery, GetUsersUseCasePort, PaginatedUserResult } from "../../ports/inbound/users";
+import { IamRepositoryPort } from "../../ports/outbound";
 
 @Injectable()
 export class GetUsersUseCase implements GetUsersUseCasePort {

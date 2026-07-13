@@ -1,6 +1,6 @@
 import { Global, Module } from "@nestjs/common";
-import { NestjsLoggerAdapter } from "./logger/infrastructure/adapters/nestjs-logger.adapter";
-import { LoggerPort } from "./logger/application/ports/outbound";
+import { NestjsLoggerAdapter } from "./logger/adapters/nestjs-logger.adapter";
+import { LoggerPort } from "./logger/ports/logger.port";
 
 @Global()
 @Module({

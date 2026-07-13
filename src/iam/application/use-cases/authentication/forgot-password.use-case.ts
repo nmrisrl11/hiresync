@@ -1,19 +1,19 @@
 import { Email } from "@/iam/domain/value-objects";
-import { LoggerPort } from "@/shared/logger/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
-import { EmailDispatchFailedException } from "../exceptions";
-import {
-	ForgotPasswordCommand,
-	ForgotPasswordResult,
-	ForgotPasswordUseCasePort,
-} from "../ports/inbound";
+import { EmailDispatchFailedException } from "../../exceptions";
 import {
 	AuthConfigPort,
 	EmailQueueServicePort,
 	IamRepositoryPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
-} from "../ports/outbound";
+} from "../../ports/outbound";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
+import {
+	ForgotPasswordCommand,
+	ForgotPasswordResult,
+	ForgotPasswordUseCasePort,
+} from "../../ports/inbound/authentication";
 
 @Injectable()
 export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {

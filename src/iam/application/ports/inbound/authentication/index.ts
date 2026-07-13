@@ -6,6 +6,3 @@ export * from "./resend-verification.in-port";
 export * from "./verify-email.in-port";
 export * from "./reset-password.in-port";
 export * from "./refresh-token.in-port.ts";
-export * from "./get-users.in-port";
-export * from "./get-user-by-id.in-port";
-export * from "./get-public-user-profile.in-port";

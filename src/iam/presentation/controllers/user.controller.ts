@@ -1,7 +1,7 @@
 import {
 	GetPublicUserProfileQuery,
 	GetPublicUserProfileUseCasePort,
-} from "@/iam/application/ports/inbound";
+} from "@/iam/application/ports/inbound/users";
 import { Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 

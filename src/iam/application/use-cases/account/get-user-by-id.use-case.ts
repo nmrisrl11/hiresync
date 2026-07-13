@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { GetUserByIdQuery, GetUserByIdUseCasePort, UserResult } from "../ports/inbound";
-import { IamRepositoryPort } from "../ports/outbound";
-import { UserNotFoundException } from "../exceptions";
+import { IamRepositoryPort } from "../../ports/outbound";
+import { UserNotFoundException } from "../../exceptions";
+import { GetUserByIdQuery, GetUserByIdUseCasePort } from "../../ports/inbound/account";
+import { UserResult } from "../../ports/inbound/users";
 
 @Injectable()
 export class GetUserByIdUseCase implements GetUserByIdUseCasePort {

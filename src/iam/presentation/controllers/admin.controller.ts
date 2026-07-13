@@ -2,12 +2,8 @@ import { ROLES } from "@/shared/domain/types/role.type";
 import { ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
 import { Roles } from "../decorators/roles.decorator";
 import { Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Query } from "@nestjs/common";
-import {
-	GetUserByIdQuery,
-	GetUserByIdUseCasePort,
-	GetUsersQuery,
-	GetUsersUseCasePort,
-} from "@/iam/application/ports/inbound";
+import { GetUsersQuery, GetUsersUseCasePort } from "@/iam/application/ports/inbound/users";
+import { GetUserByIdQuery, GetUserByIdUseCasePort } from "@/iam/application/ports/inbound/account";
 
 @ApiBearerAuth()
 @Roles(ROLES.ADMIN)

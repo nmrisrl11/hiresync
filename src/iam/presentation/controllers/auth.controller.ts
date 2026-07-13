@@ -16,7 +16,7 @@ import {
 	ResetPasswordUseCasePort,
 	VerifyEmailCommand,
 	VerifyEmailUseCasePort,
-} from "@/iam/application/ports/inbound";
+} from "@/iam/application/ports/inbound/authentication";
 import { type JwtPayload } from "@/iam/application/ports/outbound";
 import {
 	Body,
@@ -30,6 +30,7 @@ import {
 	UseFilters,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 import type { Request, Response } from "express";
 import type { StringValue } from "ms";
 import ms from "ms";
@@ -45,7 +46,6 @@ import {
 } from "../dtos";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import { AuthResponseMapper } from "../mappers/auth-response.mapper";
-import { Throttle } from "@nestjs/throttler";
 
 @UseFilters(IamExceptionFilter)
 @ApiTags("Authentication")
