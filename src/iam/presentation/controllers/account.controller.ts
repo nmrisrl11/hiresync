@@ -1,10 +1,21 @@
 import { type JwtPayload } from "@/iam/application/ports/outbound";
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, UseFilters } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpCode,
+	HttpStatus,
+	Patch,
+	UseFilters,
+} from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CurrentUser } from "../decorators/current-user.decorator";
 import {
 	ChangePasswordCommand,
 	ChangePasswordUseCasePort,
+	DeleteAccountCommand,
+	DeleteAccountUseCasePort,
 	GetUserByIdQuery,
 	GetUserByIdUseCasePort,
 	UpdateAccountCommand,
@@ -22,6 +33,7 @@ export class AccountController {
 		private readonly getUserByIdUseCase: GetUserByIdUseCasePort,
 		private readonly changePasswordUseCase: ChangePasswordUseCasePort,
 		private readonly updateAccountUseCase: UpdateAccountUseCasePort,
+		private readonly deleteAccountUseCase: DeleteAccountUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -59,5 +71,14 @@ export class AccountController {
 		);
 
 		await this.changePasswordUseCase.execute(command);
+	}
+
+	@Delete()
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiOperation({ summary: "Delete the current authenticated user's account permanently" })
+	public async deleteAccount(@CurrentUser() userPayload: JwtPayload): Promise<void> {
+		const command = new DeleteAccountCommand(userPayload.sub);
+
+		await this.deleteAccountUseCase.execute(command);
 	}
 }
