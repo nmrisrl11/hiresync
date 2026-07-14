@@ -528,3 +528,10 @@ This organization emphasizes:
 - Explicit, verb-based use cases.
 - Technology-specific infrastructure implementations.
 - Clear separation of responsibilities across layers.
+
+### VS Code Preview
+
+| Platform | Shortcut |
+|----------|----------|
+| Windows / Linux | `Ctrl + Shift +V` |
+| macOS | `Cmd + Shift +V` |

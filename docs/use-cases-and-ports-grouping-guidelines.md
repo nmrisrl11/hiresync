@@ -161,3 +161,10 @@ use-cases/
 - Scale by **Sub-Domain Concept** (e.g., `authentication`, `account`) when hitting the "Rule of 15" threshold.
 - Keep folder names strictly objective and domain-driven.
 - Ensure your `inbound` ports structure is an exact reflection of your `use-cases` structure.
+
+### VS Code Preview
+
+| Platform | Shortcut |
+|----------|----------|
+| Windows / Linux | `Ctrl + Shift +V` |
+| macOS | `Cmd + Shift +V` |

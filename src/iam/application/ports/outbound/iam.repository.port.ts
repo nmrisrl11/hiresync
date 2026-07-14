@@ -9,6 +9,7 @@ export abstract class IamRepositoryPort {
 	abstract findByVerificationToken(verificationToken: string): Promise<User | null>;
 	abstract findByResetToken(resetToken: string): Promise<User | null>;
 	abstract findRoleByCode(code: string): Promise<Role | null>;
+	abstract findAllRoles(): Promise<Role[]>;
 	abstract delete(id: string): Promise<void>;
 	abstract save(user: User): Promise<void>;
 }
