@@ -6,6 +6,7 @@ import {
 	Get,
 	HttpCode,
 	HttpStatus,
+	Param,
 	Patch,
 	UseFilters,
 } from "@nestjs/common";
@@ -14,15 +15,22 @@ import { CurrentUser } from "../decorators/current-user.decorator";
 import {
 	ChangePasswordCommand,
 	ChangePasswordUseCasePort,
+	ConfirmEmailChangeCommand,
+	ConfirmEmailChangeUseCasePort,
 	DeleteAccountCommand,
 	DeleteAccountUseCasePort,
 	GetUserByIdQuery,
 	GetUserByIdUseCasePort,
+	RequestEmailChangeCommand,
+	RequestEmailChangeUseCasePort,
 	UpdateAccountCommand,
 	UpdateAccountUseCasePort,
 } from "@/iam/application/ports/inbound/account";
-import { ChangePasswordDto, UpdateAccountDto } from "../dtos";
+import { ChangePasswordDto, RequestEmailChangeDto, UpdateAccountDto } from "../dtos";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
+import { ResponseMapper } from "../mappers/response.mapper";
+import { Throttle } from "@nestjs/throttler";
+import { Public } from "../decorators/public.decorator";
 
 @UseFilters(IamExceptionFilter)
 @ApiBearerAuth()
@@ -34,11 +42,13 @@ export class AccountController {
 		private readonly changePasswordUseCase: ChangePasswordUseCasePort,
 		private readonly updateAccountUseCase: UpdateAccountUseCasePort,
 		private readonly deleteAccountUseCase: DeleteAccountUseCasePort,
+		private readonly requestEmailChangeUseCase: RequestEmailChangeUseCasePort,
+		private readonly confirmEmailChangeUseCase: ConfirmEmailChangeUseCasePort,
 	) {}
 
 	@Get("profile")
 	@HttpCode(HttpStatus.OK)
-	@ApiOperation({ summary: "Get current authenticated user profile" })
+	@ApiOperation({ summary: "Get current authenticated user profile." })
 	public async getProfile(@CurrentUser() userPayload: JwtPayload) {
 		const query = new GetUserByIdQuery(userPayload.sub);
 
@@ -47,7 +57,7 @@ export class AccountController {
 
 	@Patch("profile")
 	@HttpCode(HttpStatus.OK)
-	@ApiOperation({ summary: "Update the current authenticated user's profile details" })
+	@ApiOperation({ summary: "Update the current authenticated user's profile details." })
 	public async updateProfile(
 		@CurrentUser() userPayload: JwtPayload,
 		@Body() dto: UpdateAccountDto,
@@ -59,7 +69,7 @@ export class AccountController {
 
 	@Patch("change-password")
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@ApiOperation({ summary: "Change the password for the current authenticated user" })
+	@ApiOperation({ summary: "Change the password for the current authenticated user." })
 	public async changePassword(
 		@CurrentUser() userPayload: JwtPayload,
 		@Body() dto: ChangePasswordDto,
@@ -73,9 +83,33 @@ export class AccountController {
 		await this.changePasswordUseCase.execute(command);
 	}
 
+	@Patch("change-email/request")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 5 } })
+	@ApiOperation({ summary: "Request an email change and send verification to the new address." })
+	public async requestEmailChange(
+		@CurrentUser() userPayload: JwtPayload,
+		@Body() dto: RequestEmailChangeDto,
+	) {
+		const command = new RequestEmailChangeCommand(userPayload.sub, dto.newEmail);
+
+		const result = await this.requestEmailChangeUseCase.execute(command);
+
+		return ResponseMapper.toRequestEmailChangeMessage(result.changeEmailRequestEnqueued);
+	}
+
+	@Public()
+	@Patch("change-email/confirm/:token")
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiOperation({ summary: "Confirm an email change using the verification token." })
+	public async confirmEmailChange(@Param("token") token: string): Promise<void> {
+		const command = new ConfirmEmailChangeCommand(token);
+		await this.confirmEmailChangeUseCase.execute(command);
+	}
+
 	@Delete()
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@ApiOperation({ summary: "Delete the current authenticated user's account permanently" })
+	@ApiOperation({ summary: "Delete the current authenticated user's account permanently." })
 	public async deleteAccount(@CurrentUser() userPayload: JwtPayload): Promise<void> {
 		const command = new DeleteAccountCommand(userPayload.sub);
 

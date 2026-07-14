@@ -17,3 +17,9 @@ export class NoAccountFoundException extends DomainException {
 		super(message);
 	}
 }
+
+export class NoPendingEmailChangeException extends DomainException {
+	constructor(message: string = "No pending email change request found.") {
+		super(message);
+	}
+}

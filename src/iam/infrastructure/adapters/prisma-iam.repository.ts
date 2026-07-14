@@ -94,6 +94,8 @@ export class PrismaIamRepository implements IamRepositoryPort {
 					id: user.id,
 				},
 				update: {
+					email: user.email.getValue(),
+					pendingEmail: user.pendingEmail,
 					name: user.name,
 					isVerified: user.isVerified,
 					image: user.image,

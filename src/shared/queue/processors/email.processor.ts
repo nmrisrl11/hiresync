@@ -33,6 +33,13 @@ export class EmailProcessor extends WorkerHost {
 				case "send-password-reset":
 					await this.emailService.sendPasswordResetEmail(email, token, expiresInText ?? "1 hour");
 					break;
+				case "send-change-email":
+					await this.emailService.sendChangeEmailRequestEmail(
+						email,
+						token,
+						expiresInText ?? "24 hours",
+					);
+					break;
 				default:
 					throw new Error(`Unknown job type: ${job.name}`);
 			}

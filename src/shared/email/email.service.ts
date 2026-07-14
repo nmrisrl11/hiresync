@@ -29,4 +29,15 @@ export class EmailService {
 			context: { resetUrl, expiresInText },
 		});
 	}
+
+	async sendChangeEmailRequestEmail(email: string, token: string, expiresInText: string) {
+		const confirmEmailChangeUrl = `${this.appUrl}/api/account/change-email?token=${token}`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: "Change your email address",
+			template: "change-email",
+			context: { confirmEmailChangeUrl, expiresInText },
+		});
+	}
 }

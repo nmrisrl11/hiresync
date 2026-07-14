@@ -45,7 +45,7 @@ import {
 	VerifyEmailDto,
 } from "../dtos";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
-import { AuthResponseMapper } from "../mappers/auth-response.mapper";
+import { ResponseMapper } from "../mappers/response.mapper";
 
 @UseFilters(IamExceptionFilter)
 @ApiTags("Authentication")
@@ -75,7 +75,7 @@ export class AuthController {
 
 		const result = await this.registerUserUseCase.execute(command);
 
-		return AuthResponseMapper.toRegistrationMessage(result.verificationEmailEnqueued);
+		return ResponseMapper.toRegistrationMessage(result.verificationEmailEnqueued);
 	}
 
 	@Public()

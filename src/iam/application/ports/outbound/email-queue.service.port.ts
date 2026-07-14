@@ -10,4 +10,10 @@ export abstract class EmailQueueServicePort {
 		token: string,
 		expiresInText: string,
 	): Promise<void>;
+
+	abstract enqueueChangeEmailRequestEmail(
+		email: string,
+		token: string,
+		expiresInText: string,
+	): Promise<void>;
 }

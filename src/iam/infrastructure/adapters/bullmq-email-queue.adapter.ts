@@ -30,4 +30,16 @@ export class BullMqEmailQueueAdapter implements EmailQueueServicePort {
 			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
 		);
 	}
+
+	public async enqueueChangeEmailRequestEmail(
+		email: string,
+		token: string,
+		expiresInText: string,
+	): Promise<void> {
+		await this.emailQueue.add(
+			"send-change-email",
+			{ email, token, expiresInText },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
 }
