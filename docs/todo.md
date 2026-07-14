@@ -39,7 +39,7 @@
 [x] - Get user by id (ADMIN)
 [x] - Get user by id (PUBLIC)
 [x] - Update user
-[] - Delete user
+[x] - Delete user
 
 ### Role
 

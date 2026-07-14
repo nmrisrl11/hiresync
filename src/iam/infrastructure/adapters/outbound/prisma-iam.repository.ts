@@ -125,4 +125,15 @@ export class PrismaIamRepository implements IamRepositoryPort {
 			throw error;
 		}
 	}
+
+	async delete(id: string): Promise<void> {
+		await this.prisma.$transaction([
+			this.prisma.account.deleteMany({
+				where: { id },
+			}),
+			this.prisma.user.delete({
+				where: { id },
+			}),
+		]);
+	}
 }

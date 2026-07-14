@@ -3,6 +3,7 @@ import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
 import {
 	ChangePasswordUseCasePort,
+	DeleteAccountUseCasePort,
 	GetUserByIdUseCasePort,
 	UpdateAccountUseCasePort,
 } from "./application/ports/inbound/account";
@@ -32,6 +33,7 @@ import {
 } from "./application/ports/outbound";
 import {
 	ChangePasswordUseCase,
+	DeleteAccountUseCase,
 	GetUserByIdUseCase,
 	UpdateAccountUseCase,
 } from "./application/use-cases/account";
@@ -76,6 +78,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
 		{ provide: ChangePasswordUseCasePort, useClass: ChangePasswordUseCase },
 		{ provide: UpdateAccountUseCasePort, useClass: UpdateAccountUseCase },
+		{ provide: DeleteAccountUseCasePort, useClass: DeleteAccountUseCase },
 
 		//! Users
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
