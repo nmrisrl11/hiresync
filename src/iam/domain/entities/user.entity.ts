@@ -7,11 +7,11 @@ export class User {
 	constructor(
 		public readonly id: string,
 		public readonly email: Email,
-		public readonly name: string,
+		public name: string,
 		public isVerified: boolean,
 		public readonly role: Role,
 		public readonly account: Account | null,
-		public readonly image: string | null,
+		public image: string | null,
 		public readonly createdAt: Date,
 	) {}
 
@@ -78,5 +78,11 @@ export class User {
 	public updatePassword(newHash: string): void {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.setPasswordHash(newHash);
+	}
+
+	public updateProfile(name?: string, image?: string | null): void {
+		if (name !== undefined) this.name = name;
+
+		if (image !== undefined) this.image = image;
 	}
 }

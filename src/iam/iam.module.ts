@@ -4,6 +4,7 @@ import { Module } from "@nestjs/common";
 import {
 	ChangePasswordUseCasePort,
 	GetUserByIdUseCasePort,
+	UpdateAccountUseCasePort,
 } from "./application/ports/inbound/account";
 import {
 	ForgotPasswordUseCasePort,
@@ -29,7 +30,11 @@ import {
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "./application/ports/outbound";
-import { ChangePasswordUseCase, GetUserByIdUseCase } from "./application/use-cases/account";
+import {
+	ChangePasswordUseCase,
+	GetUserByIdUseCase,
+	UpdateAccountUseCase,
+} from "./application/use-cases/account";
 import {
 	ForgotPasswordUseCase,
 	LoginUseCase,
@@ -70,6 +75,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		//! Account
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
 		{ provide: ChangePasswordUseCasePort, useClass: ChangePasswordUseCase },
+		{ provide: UpdateAccountUseCasePort, useClass: UpdateAccountUseCase },
 
 		//! Users
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },

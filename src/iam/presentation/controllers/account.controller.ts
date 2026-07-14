@@ -7,8 +7,10 @@ import {
 	ChangePasswordUseCasePort,
 	GetUserByIdQuery,
 	GetUserByIdUseCasePort,
+	UpdateAccountCommand,
+	UpdateAccountUseCasePort,
 } from "@/iam/application/ports/inbound/account";
-import { ChangePasswordDto } from "../dtos";
+import { ChangePasswordDto, UpdateAccountDto } from "../dtos";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 
 @UseFilters(IamExceptionFilter)
@@ -19,6 +21,7 @@ export class AccountController {
 	constructor(
 		private readonly getUserByIdUseCase: GetUserByIdUseCasePort,
 		private readonly changePasswordUseCase: ChangePasswordUseCasePort,
+		private readonly updateAccountUseCase: UpdateAccountUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -28,6 +31,18 @@ export class AccountController {
 		const query = new GetUserByIdQuery(userPayload.sub);
 
 		return await this.getUserByIdUseCase.execute(query);
+	}
+
+	@Patch("profile")
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiOperation({ summary: "Update the current authenticated user's profile details" })
+	public async updateProfile(
+		@CurrentUser() userPayload: JwtPayload,
+		@Body() dto: UpdateAccountDto,
+	): Promise<void> {
+		const command = new UpdateAccountCommand(userPayload.sub, dto.name, dto.image);
+
+		await this.updateAccountUseCase.execute(command);
 	}
 
 	@Patch("change-password")
