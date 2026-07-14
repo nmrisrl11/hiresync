@@ -17,6 +17,7 @@ import {
 	ResetPasswordUseCasePort,
 	VerifyEmailUseCasePort,
 } from "./application/ports/inbound/authentication";
+import { GetRolesUseCasePort } from "./application/ports/inbound/roles";
 import {
 	GetPublicUserProfileUseCasePort,
 	GetUsersUseCasePort,
@@ -47,6 +48,7 @@ import {
 	ResetPasswordUseCase,
 	VerifyEmailUseCase,
 } from "./application/use-cases/authentication";
+import { GetRolesUseCase } from "./application/use-cases/roles";
 import { GetPublicUserProfileUseCase, GetUsersUseCase } from "./application/use-cases/users";
 import { BcryptHashAdapter } from "./infrastructure/adapters/outbound/bcrypt-hash.adapter";
 import { BullMqEmailQueueAdapter } from "./infrastructure/adapters/outbound/bullmq-email-queue.adapter";
@@ -58,11 +60,12 @@ import { PrismaIamRepository } from "./infrastructure/adapters/outbound/prisma-i
 import { AccountController } from "./presentation/controllers/account.controller";
 import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
+import { RoleController } from "./presentation/controllers/role.controller";
 import { UserController } from "./presentation/controllers/user.controller";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
-	controllers: [AuthController, AccountController, AdminController, UserController],
+	controllers: [AuthController, AccountController, AdminController, UserController, RoleController],
 	providers: [
 		//! Authentication
 		{ provide: RegisterUserUseCasePort, useClass: RegisterUserUseCase },
@@ -83,6 +86,9 @@ import { UserController } from "./presentation/controllers/user.controller";
 		//! Users
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
 		{ provide: GetPublicUserProfileUseCasePort, useClass: GetPublicUserProfileUseCase },
+
+		//! Roles
+		{ provide: GetRolesUseCasePort, useClass: GetRolesUseCase },
 
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },

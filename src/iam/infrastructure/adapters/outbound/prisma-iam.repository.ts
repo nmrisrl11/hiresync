@@ -77,6 +77,14 @@ export class PrismaIamRepository implements IamRepositoryPort {
 		return new Role(role.id, role.code, role.description);
 	}
 
+	async findAllRoles(): Promise<Role[]> {
+		const roles = await this.prisma.role.findMany({
+			orderBy: { code: "asc" },
+		});
+
+		return roles.map((role) => new Role(role.id, role.code, role.description));
+	}
+
 	async save(user: User): Promise<void> {
 		if (!user.account) throw new Error("Cannot persist a new user without an account.");
 

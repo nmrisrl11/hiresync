@@ -271,3 +271,10 @@ import { HashServicePort } from "@/iam/application/ports/outbound";
 - Use barrels to simplify imports **between folders and layers**, not **within the same folder**.
 - Avoid root barrels unless they provide a meaningful, stable API.
 - Keep dependency directions explicit and never sacrifice architecture for shorter import paths.
+
+### VS Code Preview
+
+| Platform | Shortcut |
+|----------|----------|
+| Windows / Linux | `Ctrl + Shift +V` |
+| macOS | `Cmd + Shift +V` |

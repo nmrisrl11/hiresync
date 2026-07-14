@@ -1,52 +1,68 @@
-# HireSync - Todos 
+# HireSync - Todos
 
 ## Roadmap
 
 ### Authentication
 
-[x] - Registration
-[x] - Login
-[x] - Logout
-[x] - Assigning and Verifying JWT Access and Refresh Tokens
-[x] - Password Hashing with bcrypt
-[x] - Email Verification with nodemailer and resend
-[x] - Forgot Password
-[x] - Reset Password
-[x] - Refresh Access Token with refresh token
-[x] - Resending email verification
+- [x] Registration
+- [x] Login
+- [x] Logout
+- [x] Assigning and Verifying JWT Access and Refresh Tokens
+- [x] Password Hashing with bcrypt
+- [x] Email Verification with nodemailer and resend
+- [x] Forgot Password
+- [x] Reset Password
+- [x] Refresh Access Token with refresh token
+- [x] Resending Email Verification
 
-- To add on IAM (Identity and Access Management) module
-    [x] - Update Password (Authenticated) 
-    - A secure flow for logged-in users to change their password by validating their oldPassword hash before accepting a newPassword.
-    [] - Updated Email Address
-    - A dual-step flow that generates a new verification token and sends it to the new email address before updating the actual database record, preventing accidental account lockouts.
-    [] - Account deletion
-    - A compliance-driven feature (GDPR/CCPA) that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.
-    [] - Account Lockout (Brute Force Protection)
-    - Tracking consecutive failed login attempts on the Account entity and temporarily locking the account (e.g., for 15 minutes) if a threshold is reached.
-    [] - Multi-Factor Authentication (MFA / 2FA)
-    - Implementing Time-based One-Time Passwords (TOTP) to require a secondary rotating code from apps like Google Authenticator or Authy during login.
-    [] - Multi-Device Session Management
-    - Upgrading the single refreshTokenHash into a separate Session entity (one-to-many relationship with Account), allowing users to see active devices and click "Log out of all other sessions."
-    [] - Manual OAuth Integration
-    - Building custom authorization flows for providers like Google, GitHub, or Microsoft without relying on third-party UI libraries, keeping the domain architecture strictly under your control.
-    
+#### To add on IAM (Identity and Access Management)
+
+- [x] Update Password (Authenticated)
+  - A secure flow for logged-in users to change their password by validating their old password hash before accepting a new password.
+
+- [ ] Update Email Address
+  - A dual-step flow that generates a new verification token and sends it to the new email address before updating the actual database record, preventing accidental account lockouts.
+
+- [ ] Account Deletion
+  - A compliance-driven feature (GDPR/CCPA) that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.
+
+- [ ] Account Lockout (Brute Force Protection)
+  - Track consecutive failed login attempts and temporarily lock the account (e.g., 15 minutes) after exceeding a threshold.
+
+- [ ] Multi-Factor Authentication (MFA / 2FA)
+  - Implement TOTP authentication using apps like Google Authenticator or Authy.
+
+- [ ] Multi-Device Session Management
+  - Replace the single refreshTokenHash with a Session entity (one-to-many) to allow users to manage active sessions.
+
+- [ ] Manual OAuth Integration
+  - Build custom authorization flows for Google, GitHub, Microsoft, etc., without relying on third-party UI libraries.
+
 ### User
 
-[x] - Create user
-[x] - Get user profile of current authenticated user
-[x] - Get users (ADMIN)
-[x] - Get user by id (ADMIN)
-[x] - Get user by id (PUBLIC)
-[x] - Update user
-[x] - Delete user
+- [x] Create User
+- [x] Get Current Authenticated User
+- [x] Get Users (Admin)
+- [x] Get User by ID (Admin)
+- [x] Get User by ID (Public)
+- [x] Update User
+- [x] Delete User
 
 ### Role
 
-[] - Create role
-[] - Get roles
-[] - Get role by id
-[] - Update role by id
-[] - Delete role by id
+- [ ] Create Role
+- [x] Get Roles
+- [ ] Get Role by ID
+- [ ] Update Role
+- [ ] Delete Role
 
-### Changing of account image with S3
+### Storage
+
+- [ ] Change Account Image with Amazon S3
+
+### VS Code Preview
+
+| Platform | Shortcut |
+|----------|----------|
+| Windows / Linux | `Ctrl + Shift +V` |
+| macOS | `Cmd + Shift +V` |
