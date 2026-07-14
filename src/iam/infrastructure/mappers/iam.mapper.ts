@@ -34,6 +34,7 @@ export class IamMapper {
 			account,
 			raw.image,
 			raw.createdAt,
+			raw.pendingEmail,
 		);
 	}
 }

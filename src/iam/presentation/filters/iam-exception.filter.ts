@@ -14,6 +14,7 @@ import {
 	InvalidTokenException as InvalidDomainTokenException,
 	InvalidEmailFormatException,
 	NoAccountFoundException,
+	NoPendingEmailChangeException,
 } from "@/iam/domain/exceptions";
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from "@nestjs/common";
 import { Response } from "express";
@@ -24,6 +25,7 @@ export class IamExceptionFilter implements ExceptionFilter<ApplicationException 
 		switch (exception.constructor) {
 			case InvalidEmailFormatException:
 			case InvalidDomainTokenException:
+			case NoPendingEmailChangeException:
 				return HttpStatus.BAD_REQUEST;
 			case NoAccountFoundException:
 				return HttpStatus.NOT_FOUND;

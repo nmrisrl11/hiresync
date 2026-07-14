@@ -20,7 +20,7 @@
 - [x] Update Password (Authenticated)
   - A secure flow for logged-in users to change their password by validating their old password hash before accepting a new password.
 
-- [ ] Update Email Address
+- [x] Update Email Address
   - A dual-step flow that generates a new verification token and sends it to the new email address before updating the actual database record, preventing accidental account lockouts.
 
 - [ ] Account Deletion

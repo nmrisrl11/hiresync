@@ -1,4 +1,4 @@
-import { NoAccountFoundException } from "../exceptions";
+import { NoAccountFoundException, NoPendingEmailChangeException } from "../exceptions";
 import { Email } from "../value-objects";
 import { Account } from "./account.entity";
 import { Role } from "./role.entity";
@@ -6,13 +6,14 @@ import { Role } from "./role.entity";
 export class User {
 	constructor(
 		public readonly id: string,
-		public readonly email: Email,
+		public email: Email,
 		public name: string,
 		public isVerified: boolean,
 		public readonly role: Role,
 		public readonly account: Account | null,
 		public image: string | null,
 		public readonly createdAt: Date,
+		public pendingEmail: string | null,
 	) {}
 
 	public static createForRegistration(
@@ -37,7 +38,7 @@ export class User {
 
 		const createdAt = new Date();
 
-		return new User(id, emailVo, name, false, role, account, null, createdAt);
+		return new User(id, emailVo, name, false, role, account, null, createdAt, null);
 	}
 
 	public verifyEmail(token: string): void {
@@ -84,5 +85,27 @@ export class User {
 		if (name !== undefined) this.name = name;
 
 		if (image !== undefined) this.image = image;
+	}
+
+	public requestEmailChange(newEmail: string, token: string, tokenExpiresInMs: number): void {
+		if (!this.account) throw new NoAccountFoundException();
+
+		//! Set the pending email
+		this.pendingEmail = newEmail;
+
+		//! Generate new verification token
+		this.account.updateVerificationToken(token, tokenExpiresInMs);
+	}
+
+	public confirmEmailChange(token: string): void {
+		if (!this.account) throw new NoAccountFoundException();
+		if (!this.pendingEmail) throw new NoPendingEmailChangeException();
+
+		//! Verify the token
+		this.account.verify(token);
+
+		//! Apply the new email and clear the pending state
+		this.email = new Email(this.pendingEmail);
+		this.pendingEmail = null;
 	}
 }
