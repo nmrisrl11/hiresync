@@ -9,6 +9,7 @@ export type UserResult = {
 	id: string;
 	email: string;
 	name: string;
+	image: string | null;
 	role: string;
 	isVerified: boolean;
 	createdAt: Date;

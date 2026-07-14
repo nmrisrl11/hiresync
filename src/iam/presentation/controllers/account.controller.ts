@@ -34,15 +34,15 @@ export class AccountController {
 	}
 
 	@Patch("profile")
-	@HttpCode(HttpStatus.NO_CONTENT)
+	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Update the current authenticated user's profile details" })
 	public async updateProfile(
 		@CurrentUser() userPayload: JwtPayload,
 		@Body() dto: UpdateAccountDto,
-	): Promise<void> {
+	) {
 		const command = new UpdateAccountCommand(userPayload.sub, dto.name, dto.image);
 
-		await this.updateAccountUseCase.execute(command);
+		return await this.updateAccountUseCase.execute(command);
 	}
 
 	@Patch("change-password")
