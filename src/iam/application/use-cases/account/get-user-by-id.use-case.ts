@@ -17,6 +17,7 @@ export class GetUserByIdUseCase implements GetUserByIdUseCasePort {
 			id: user.id,
 			email: user.email.getValue(),
 			name: user.name,
+			image: user.image,
 			role: user.role.code,
 			isVerified: user.isVerified,
 			createdAt: user.createdAt,
