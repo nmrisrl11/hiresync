@@ -1,6 +1,6 @@
 import { PrismaService } from "@/shared/database/prisma.service";
 import { Injectable } from "@nestjs/common";
-import { IamMapper } from "../../mappers/iam.mapper";
+import { IamMapper } from "../mappers/iam.mapper";
 import { Prisma } from "@/generated/prisma/client";
 import { Role, User } from "@/iam/domain/entities";
 import { Email } from "@/iam/domain/value-objects";
