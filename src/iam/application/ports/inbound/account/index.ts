@@ -4,3 +4,4 @@ export * from "./update-account.in-port";
 export * from "./delete-account.in-port";
 export * from "./request-email-change.in-port";
 export * from "./confirm-email-change.in-port";
+export * from "./upload-avatar.in-port";

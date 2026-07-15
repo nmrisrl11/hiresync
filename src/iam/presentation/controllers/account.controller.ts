@@ -3,14 +3,20 @@ import {
 	Body,
 	Controller,
 	Delete,
+	FileTypeValidator,
 	Get,
 	HttpCode,
 	HttpStatus,
+	MaxFileSizeValidator,
 	Param,
+	ParseFilePipe,
 	Patch,
+	Post,
+	UploadedFile,
 	UseFilters,
+	UseInterceptors,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CurrentUser } from "../decorators/current-user.decorator";
 import {
 	ChangePasswordCommand,
@@ -25,12 +31,16 @@ import {
 	RequestEmailChangeUseCasePort,
 	UpdateAccountCommand,
 	UpdateAccountUseCasePort,
+	UploadAvatarCommand,
+	UploadAvatarUseCasePort,
 } from "@/iam/application/ports/inbound/account";
 import { ChangePasswordDto, RequestEmailChangeDto, UpdateAccountDto } from "../dtos";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import { ResponseMapper } from "../mappers/response.mapper";
 import { Throttle } from "@nestjs/throttler";
 import { Public } from "../decorators/public.decorator";
+import { FileInterceptor } from "@nestjs/platform-express";
+import "multer";
 
 @UseFilters(IamExceptionFilter)
 @ApiBearerAuth()
@@ -44,6 +54,7 @@ export class AccountController {
 		private readonly deleteAccountUseCase: DeleteAccountUseCasePort,
 		private readonly requestEmailChangeUseCase: RequestEmailChangeUseCasePort,
 		private readonly confirmEmailChangeUseCase: ConfirmEmailChangeUseCasePort,
+		private readonly uploadAvatarUseCase: UploadAvatarUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -65,6 +76,39 @@ export class AccountController {
 		const command = new UpdateAccountCommand(userPayload.sub, dto.name, dto.image);
 
 		return await this.updateAccountUseCase.execute(command);
+	}
+
+	@Post("avatar")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Upload and set a new profile avatar." })
+	@ApiConsumes("multipart/form-data")
+	@ApiBody({
+		schema: {
+			type: "object",
+			properties: {
+				file: {
+					type: "string",
+					format: "binary",
+				},
+			},
+		},
+	})
+	@UseInterceptors(FileInterceptor("file"))
+	public async uploadAvatar(
+		@CurrentUser() userPayload: JwtPayload,
+		@UploadedFile(
+			new ParseFilePipe({
+				validators: [
+					new MaxFileSizeValidator({ maxSize: 2 * 1024 * 1024 }), //! 2MB max
+					new FileTypeValidator({ fileType: ".(png|jpeg|jpg|webp)" }),
+				],
+			}),
+		)
+		file: Express.Multer.File,
+	) {
+		const command = new UploadAvatarCommand(userPayload.sub, file.buffer, file.mimetype);
+
+		return await this.uploadAvatarUseCase.execute(command);
 	}
 
 	@Patch("change-password")

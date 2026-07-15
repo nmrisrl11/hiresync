@@ -23,7 +23,7 @@
 - [x] Update Email Address
   - A dual-step flow that generates a new verification token and sends it to the new email address before updating the actual database record, preventing accidental account lockouts.
 
-- [ ] Account Deletion
+- [x] Account Deletion
   - A compliance-driven feature (GDPR/CCPA) that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.
 
 - [ ] Account Lockout (Brute Force Protection)
@@ -50,15 +50,22 @@
 
 ### Role
 
-- [ ] Create Role
+- [/] Create Role
 - [x] Get Roles
-- [ ] Get Role by ID
-- [ ] Update Role
-- [ ] Delete Role
+- [/] Get Role by ID
+- [/] Update Role
+- [/] Delete Role
 
 ### Storage
 
-- [ ] Change Account Image with Amazon S3
+- [ ] Upload and set account avatar with Cloudinary
+- [ ] Removing of account avatar
+
+### Event Driven
+
+- [ ] Move email background queueing with event-driven
+
+### Schedule Tasks
 
 ### VS Code Preview
 
