@@ -43,6 +43,10 @@ export const env = createEnv({
 
 		EMAIL_PROVIDER: emailProvider,
 		FROM_EMAIL: z.string().default("onboarding@resend.dev"),
+
+		CLOUDINARY_CLOUD_NAME: z.string(),
+		CLOUDINARY_API_KEY: z.string(),
+		CLOUDINARY_API_SECRET: z.string(),
 	},
 
 	runtimeEnv: process.env,

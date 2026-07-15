@@ -4,3 +4,4 @@ export * from "./update-account.use-case";
 export * from "./delete-account.use-case";
 export * from "./request-email-change.use-case";
 export * from "./confirm-email-change.use-case";
+export * from "./upload-avatar.use-case";

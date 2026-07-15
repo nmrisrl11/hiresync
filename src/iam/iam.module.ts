@@ -8,6 +8,7 @@ import {
 	GetUserByIdUseCasePort,
 	RequestEmailChangeUseCasePort,
 	UpdateAccountUseCasePort,
+	UploadAvatarUseCasePort,
 } from "./application/ports/inbound/account";
 import {
 	ForgotPasswordUseCasePort,
@@ -30,6 +31,7 @@ import {
 	HashServicePort,
 	IamRepositoryPort,
 	IdGeneratorPort,
+	ImageStoragePort,
 	JwtServicePort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
@@ -41,6 +43,7 @@ import {
 	GetUserByIdUseCase,
 	RequestEmailChangeUseCase,
 	UpdateAccountUseCase,
+	UploadAvatarUseCase,
 } from "./application/use-cases/account";
 import {
 	ForgotPasswordUseCase,
@@ -66,6 +69,7 @@ import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
 import { RoleController } from "./presentation/controllers/role.controller";
 import { UserController } from "./presentation/controllers/user.controller";
+import { CloudinaryImageStorageAdapter } from "./infrastructure/adapters/cloudinary-image-storage.adapter";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
@@ -88,6 +92,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: DeleteAccountUseCasePort, useClass: DeleteAccountUseCase },
 		{ provide: RequestEmailChangeUseCasePort, useClass: RequestEmailChangeUseCase },
 		{ provide: ConfirmEmailChangeUseCasePort, useClass: ConfirmEmailChangeUseCase },
+		{ provide: UploadAvatarUseCasePort, useClass: UploadAvatarUseCase },
 
 		//! Users
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
@@ -104,6 +109,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: EmailQueueServicePort, useClass: BullMqEmailQueueAdapter },
 		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
 		{ provide: AuthConfigPort, useClass: EnvAuthConfigAdapter },
+		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
 	],
 })
 export class IamModule {}
