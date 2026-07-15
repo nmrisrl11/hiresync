@@ -27,6 +27,8 @@ import {
 	DeleteAccountUseCasePort,
 	GetUserByIdQuery,
 	GetUserByIdUseCasePort,
+	RemoveAvatarCommand,
+	RemoveAvatarUseCasePort,
 	RequestEmailChangeCommand,
 	RequestEmailChangeUseCasePort,
 	UpdateAccountCommand,
@@ -55,6 +57,7 @@ export class AccountController {
 		private readonly requestEmailChangeUseCase: RequestEmailChangeUseCasePort,
 		private readonly confirmEmailChangeUseCase: ConfirmEmailChangeUseCasePort,
 		private readonly uploadAvatarUseCase: UploadAvatarUseCasePort,
+		private readonly removeAvatarUseCase: RemoveAvatarUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -109,6 +112,15 @@ export class AccountController {
 		const command = new UploadAvatarCommand(userPayload.sub, file.buffer, file.mimetype);
 
 		return await this.uploadAvatarUseCase.execute(command);
+	}
+
+	@Delete("avatar")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Remove the user's profile avatar" })
+	public async removeAvatar(@CurrentUser() userPayload: JwtPayload) {
+		const command = new RemoveAvatarCommand(userPayload.sub);
+
+		return await this.removeAvatarUseCase.execute(command);
 	}
 
 	@Patch("change-password")

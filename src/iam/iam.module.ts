@@ -6,6 +6,7 @@ import {
 	ConfirmEmailChangeUseCasePort,
 	DeleteAccountUseCasePort,
 	GetUserByIdUseCasePort,
+	RemoveAvatarUseCasePort,
 	RequestEmailChangeUseCasePort,
 	UpdateAccountUseCasePort,
 	UploadAvatarUseCasePort,
@@ -41,6 +42,7 @@ import {
 	ConfirmEmailChangeUseCase,
 	DeleteAccountUseCase,
 	GetUserByIdUseCase,
+	RemoveAvatarUseCase,
 	RequestEmailChangeUseCase,
 	UpdateAccountUseCase,
 	UploadAvatarUseCase,
@@ -93,6 +95,7 @@ import { CloudinaryImageStorageAdapter } from "./infrastructure/adapters/cloudin
 		{ provide: RequestEmailChangeUseCasePort, useClass: RequestEmailChangeUseCase },
 		{ provide: ConfirmEmailChangeUseCasePort, useClass: ConfirmEmailChangeUseCase },
 		{ provide: UploadAvatarUseCasePort, useClass: UploadAvatarUseCase },
+		{ provide: RemoveAvatarUseCasePort, useClass: RemoveAvatarUseCase },
 
 		//! Users
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },

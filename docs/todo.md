@@ -58,8 +58,8 @@
 
 ### Storage
 
-- [ ] Upload and set account avatar with Cloudinary
-- [ ] Removing of account avatar
+- [x] Upload and set account avatar with Cloudinary
+- [x] Removing of account avatar
 
 ### Event Driven
 
