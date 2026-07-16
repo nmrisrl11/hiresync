@@ -2,8 +2,10 @@ import { NoAccountFoundException, NoPendingEmailChangeException } from "../excep
 import { Email } from "../value-objects";
 import { Account } from "./account.entity";
 import { Role } from "./role.entity";
+import { UserRegisteredDomainEvent } from "../events";
+import { AggregateRoot } from "@/shared/domain/entities";
 
-export class User {
+export class User extends AggregateRoot {
 	constructor(
 		public readonly id: string,
 		public email: Email,
@@ -14,7 +16,9 @@ export class User {
 		public image: string | null,
 		public readonly createdAt: Date,
 		public pendingEmail: string | null,
-	) {}
+	) {
+		super();
+	}
 
 	public static createForRegistration(
 		id: string,
@@ -38,7 +42,13 @@ export class User {
 
 		const createdAt = new Date();
 
-		return new User(id, emailVo, name, false, role, account, null, createdAt, null);
+		const user = new User(id, emailVo, name, false, role, account, null, createdAt, null);
+
+		user.addDomainEvent(
+			new UserRegisteredDomainEvent(emailString, verificationToken, verificationTokenTtlMs),
+		);
+
+		return user;
 	}
 
 	public verifyEmail(token: string): void {

@@ -12,6 +12,7 @@ import {
 	UploadAvatarUseCasePort,
 } from "./application/ports/inbound/account";
 import {
+	EnqueueVerificationEmailUseCasePort,
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
@@ -48,6 +49,7 @@ import {
 	UploadAvatarUseCase,
 } from "./application/use-cases/account";
 import {
+	EnqueueVerificationEmailUseCase,
 	ForgotPasswordUseCase,
 	LoginUseCase,
 	LogoutUseCase,
@@ -72,6 +74,9 @@ import { AuthController } from "./presentation/controllers/auth.controller";
 import { RoleController } from "./presentation/controllers/role.controller";
 import { UserController } from "./presentation/controllers/user.controller";
 import { CloudinaryImageStorageAdapter } from "./infrastructure/adapters/cloudinary-image-storage.adapter";
+import { UserRegisteredListener } from "./presentation/event-listeners";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
@@ -86,6 +91,7 @@ import { CloudinaryImageStorageAdapter } from "./infrastructure/adapters/cloudin
 		{ provide: ResetPasswordUseCasePort, useClass: ResetPasswordUseCase },
 		{ provide: RefreshTokenUseCasePort, useClass: RefreshTokenUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
+		{ provide: EnqueueVerificationEmailUseCasePort, useClass: EnqueueVerificationEmailUseCase },
 
 		//! Account
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
@@ -104,6 +110,10 @@ import { CloudinaryImageStorageAdapter } from "./infrastructure/adapters/cloudin
 		//! Roles
 		{ provide: GetRolesUseCasePort, useClass: GetRolesUseCase },
 
+		//! Event Listeners
+		UserRegisteredListener,
+
+		//! Outbound - Adapters
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
 		{ provide: JwtServicePort, useClass: NestjsJwtAdapter },
@@ -113,6 +123,7 @@ import { CloudinaryImageStorageAdapter } from "./infrastructure/adapters/cloudin
 		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
 		{ provide: AuthConfigPort, useClass: EnvAuthConfigAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
+		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },
 	],
 })
 export class IamModule {}

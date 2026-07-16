@@ -65,11 +65,40 @@
 
 - [ ] Move email background queueing with event-driven
 
+### Employers
+- [ ] Create job listing
+- [ ] Edit job listing
+- [ ] Delete job listing
+- [ ] View their posted jobs
+
+### Applicants
+- [ ] Browse available jobs
+- [ ] View job details
+- [ ] Search jobs
+- [ ] Filter jobs
+
+### Applications
+- Applicants can:
+    - [ ] Apply for jobs
+    - [ ] Upload resumes
+    - [ ] Upload cover letters
+    - [ ] View submitted applications
+- Employers can:
+    - [ ] View applicants
+    - [ ] Review uploaded resumes
+
+### File Uploading
+- [ ] Resume in PDF
+- [ ] Cover letter in PDF
+- [ ] Company logo?
+
+### Email Notifications
+- [ ] Welcome Email
+- [x] Email Verification
+- [x] Password Reset
+- [ ] Job Application Confirmation
+- [ ] Employer Notification
+- [ ] Job Expiration Reminder
+
 ### Schedule Tasks
-
-### VS Code Preview
-
-| Platform | Shortcut |
-|----------|----------|
-| Windows / Linux | `Ctrl + Shift +V` |
-| macOS | `Cmd + Shift +V` |
+- [ ] Remove expired tokens

@@ -1,14 +1,8 @@
 export class ResponseMapper {
-	public static toRegistrationMessage(verificationEmailEnqueued: boolean): { message: string } {
-		if (!verificationEmailEnqueued) {
-			return {
-				message:
-					"Account created successfully, but we encountered an issue sending the verification email. Please use the resend verification option later.",
-			};
-		}
-
+	public static toRegistrationMessage(): { message: string } {
 		return {
-			message: "Registration successful. Please check your email to verify your account.",
+			message:
+				"Registration successful. Please check your email to verify your account. If you do not receive it within a few minutes, you can use the resend verification option.",
 		};
 	}
 
