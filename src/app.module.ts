@@ -10,6 +10,7 @@ import { EmailModule } from "./shared/email/email.module";
 import { QueueModule } from "./shared/queue/queue.module";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { RolesGuard } from "./iam/presentation/guards/roles.guard";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 
 @Module({
 	imports: [
@@ -26,6 +27,7 @@ import { RolesGuard } from "./iam/presentation/guards/roles.guard";
 				limit: 20,
 			},
 		]),
+		EventEmitterModule.forRoot(),
 		DatabaseModule,
 		JwtModule.register({ global: true }),
 		SharedModule,

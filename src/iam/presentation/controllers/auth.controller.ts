@@ -73,9 +73,9 @@ export class AuthController {
 	public async register(@Body() dto: RegisterDto) {
 		const command = new RegisterUserCommand(dto.email, dto.name, dto.password, dto.roleCode);
 
-		const result = await this.registerUserUseCase.execute(command);
+		await this.registerUserUseCase.execute(command);
 
-		return ResponseMapper.toRegistrationMessage(result.verificationEmailEnqueued);
+		return ResponseMapper.toRegistrationMessage();
 	}
 
 	@Public()

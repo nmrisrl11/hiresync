@@ -1,5 +1,6 @@
 import { User } from "@/iam/domain/entities";
 import { Email } from "@/iam/domain/value-objects";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
 	RoleNotFoundException,
@@ -7,20 +8,18 @@ import {
 	UserAlreadyExistsException,
 } from "../../exceptions";
 import {
+	RegisterUserCommand,
+	RegisterUserResult,
+	RegisterUserUseCasePort,
+} from "../../ports/inbound/authentication";
+import {
 	AuthConfigPort,
-	EmailQueueServicePort,
 	HashServicePort,
 	IamRepositoryPort,
 	IdGeneratorPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../../ports/outbound";
-import {
-	RegisterUserCommand,
-	RegisterUserResult,
-	RegisterUserUseCasePort,
-} from "../../ports/inbound/authentication";
-import { LoggerPort } from "@/shared/logger/ports/logger.port";
 
 @Injectable()
 export class RegisterUserUseCase implements RegisterUserUseCasePort {
@@ -29,10 +28,9 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 		private readonly hashService: HashServicePort,
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly verificationTokenGenerator: VerificationTokenGeneratorPort,
-		private readonly emailQueueService: EmailQueueServicePort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
-		private readonly logger: LoggerPort,
+		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: RegisterUserCommand): Promise<RegisterUserResult> {
@@ -52,7 +50,6 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 
 		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
 		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
-		const tokenExpiresInText = this.timeFormatter.formatToHumanReadable(tokenExpiresInMs);
 
 		const newUser = User.createForRegistration(
 			this.idGenerator.generateId(),
@@ -67,20 +64,9 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 
 		await this.iamRepository.save(newUser);
 
-		let verificationEmailEnqueued = true;
+		await this.eventDispatcher.dispatchMultiple(newUser.domainEvents);
+		newUser.clearEvents();
 
-		try {
-			await this.emailQueueService.enqueueVerificationEmail(
-				newUser.email.getValue(),
-				verificationToken,
-				tokenExpiresInText,
-			);
-		} catch {
-			this.logger.warn(`Unable to queue verification email for ${newUser.email.getValue()}`);
-
-			verificationEmailEnqueued = false;
-		}
-
-		return { verificationEmailEnqueued };
+		return { userId: newUser.id };
 	}
 }
