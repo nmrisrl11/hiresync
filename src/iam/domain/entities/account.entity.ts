@@ -53,19 +53,9 @@ export class Account {
 		this.verificationTokenExpiresAt = new Date(Date.now() + tokenExpiresInMs);
 	}
 
-	public restoreVerificationToken(token: string | null, expiresAt: Date | null): void {
-		this.verificationToken = token;
-		this.verificationTokenExpiresAt = expiresAt;
-	}
-
 	public updateResetToken(token: string, tokenExpiresInMs: number): void {
 		this.resetToken = token;
 		this.resetTokenExpiresAt = new Date(Date.now() + tokenExpiresInMs);
-	}
-
-	public restoreResetToken(): void {
-		this.resetToken = null;
-		this.resetTokenExpiresAt = null;
 	}
 
 	public updateRefreshTokenHash(hash: string | null): void {
