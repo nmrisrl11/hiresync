@@ -1,32 +1,29 @@
+import { Email } from "@/iam/domain/value-objects";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
+import { UserAlreadyExistsException, UserNotFoundException } from "../../exceptions";
 import {
 	RequestEmailChangeCommand,
-	RequestEmailChangeResult,
 	RequestEmailChangeUseCasePort,
 } from "../../ports/inbound/account";
 import {
 	AuthConfigPort,
-	EmailQueueServicePort,
 	IamRepositoryPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../../ports/outbound";
-import { UserAlreadyExistsException, UserNotFoundException } from "../../exceptions";
-import { Email } from "@/iam/domain/value-objects";
-import { LoggerPort } from "@/shared/logger/ports/logger.port";
 
 @Injectable()
 export class RequestEmailChangeUseCase implements RequestEmailChangeUseCasePort {
 	constructor(
 		private readonly iamRepository: IamRepositoryPort,
 		private readonly verificationTokenGenerator: VerificationTokenGeneratorPort,
-		private readonly emailQueueService: EmailQueueServicePort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
-		private readonly logger: LoggerPort,
+		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
-	public async execute(command: RequestEmailChangeCommand): Promise<RequestEmailChangeResult> {
+	public async execute(command: RequestEmailChangeCommand): Promise<void> {
 		const user = await this.iamRepository.findById(command.userId);
 		if (!user) throw new UserNotFoundException();
 
@@ -41,26 +38,12 @@ export class RequestEmailChangeUseCase implements RequestEmailChangeUseCasePort 
 		//! Generate new verification token expiration
 		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
 		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
-		const tokenExpiresInText = this.timeFormatter.formatToHumanReadable(tokenExpiresInMs);
 
 		user.requestEmailChange(command.newEmail, verificationToken, tokenExpiresInMs);
 
 		await this.iamRepository.save(user);
 
-		let changeEmailRequestEnqueued = true;
-
-		try {
-			await this.emailQueueService.enqueueChangeEmailRequestEmail(
-				command.newEmail,
-				verificationToken,
-				tokenExpiresInText,
-			);
-		} catch {
-			this.logger.warn(`Unable to queue change email request for ${user.email.getValue()}`);
-
-			changeEmailRequestEnqueued = false;
-		}
-
-		return { changeEmailRequestEnqueued };
+		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		user.clearEvents();
 	}
 }

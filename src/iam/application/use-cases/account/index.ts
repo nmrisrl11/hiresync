@@ -6,3 +6,5 @@ export * from "./request-email-change.use-case";
 export * from "./confirm-email-change.use-case";
 export * from "./upload-avatar.use-case";
 export * from "./remove-avatar.use-case";
+
+export * from "./enqueue-change-email-request.use-case";

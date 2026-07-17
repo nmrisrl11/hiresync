@@ -5,10 +5,6 @@ export class RequestEmailChangeCommand {
 	) {}
 }
 
-export type RequestEmailChangeResult = {
-	changeEmailRequestEnqueued: boolean;
-};
-
 export abstract class RequestEmailChangeUseCasePort {
-	abstract execute(command: RequestEmailChangeCommand): Promise<RequestEmailChangeResult>;
+	abstract execute(command: RequestEmailChangeCommand): Promise<void>;
 }

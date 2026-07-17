@@ -1,6 +1,11 @@
 import { Email } from "@/iam/domain/value-objects";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
-import { EmailDispatchFailedException } from "../../exceptions";
+import {
+	ResendVerificationCommand,
+	ResendVerificationResult,
+	ResendVerificationUseCasePort,
+} from "../../ports/inbound/authentication";
 import {
 	AuthConfigPort,
 	EmailQueueServicePort,
@@ -8,22 +13,15 @@ import {
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../../ports/outbound";
-import {
-	ResendVerificationCommand,
-	ResendVerificationResult,
-	ResendVerificationUseCasePort,
-} from "../../ports/inbound/authentication";
-import { LoggerPort } from "@/shared/logger/ports/logger.port";
 
 @Injectable()
 export class ResendVerificationUsecase implements ResendVerificationUseCasePort {
 	constructor(
 		private readonly iamRepository: IamRepositoryPort,
-		private readonly emailQueueService: EmailQueueServicePort,
 		private readonly tokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
-		private readonly logger: LoggerPort,
+		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: ResendVerificationCommand): Promise<ResendVerificationResult> {
@@ -37,34 +35,16 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 			};
 		}
 
-		const previousToken = user.account?.getVerificationToken() ?? null;
-		const previousExpiresAt = user.account?.getVerificationTokenExpiresAt() ?? null;
-
 		const newVerificationToken = this.tokenGenerator.generateHexToken(32);
 
 		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
 		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
-		const tokenExpiresInText = this.timeFormatter.formatToHumanReadable(tokenExpiresInMs);
 
 		user.refreshVerificationToken(newVerificationToken, tokenExpiresInMs);
 		await this.iamRepository.save(user);
 
-		try {
-			await this.emailQueueService.enqueueVerificationEmail(
-				user.email.getValue(),
-				newVerificationToken,
-				tokenExpiresInText,
-			);
-		} catch {
-			this.logger.error(
-				`Queue failed. Restoring previous verification token for: ${command.email}`,
-			);
-
-			user.rollbackVerificationToken(previousToken, previousExpiresAt);
-			await this.iamRepository.save(user);
-
-			throw new EmailDispatchFailedException();
-		}
+		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		user.clearEvents();
 
 		return { message: "A new verification email has been sent." };
 	}
