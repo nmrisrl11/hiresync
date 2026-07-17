@@ -6,12 +6,14 @@ import {
 	ResetPasswordResult,
 	ResetPasswordUseCasePort,
 } from "../../ports/inbound/authentication";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 
 @Injectable()
 export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 	constructor(
 		private readonly iamRepository: IamRepositoryPort,
 		private readonly hashService: HashServicePort,
+		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: ResetPasswordCommand): Promise<ResetPasswordResult> {
@@ -25,6 +27,9 @@ export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 		user.changePassword(command.token, passwordHash);
 
 		await this.iamRepository.save(user);
+
+		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		user.clearEvents();
 
 		return { message: "Password reset successful. You can now login." };
 	}

@@ -2,12 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { ChangePasswordCommand, ChangePasswordUseCasePort } from "../../ports/inbound/account";
 import { HashServicePort, IamRepositoryPort } from "../../ports/outbound";
 import { InvalidPasswordException, UserNotFoundException } from "../../exceptions";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 
 @Injectable()
 export class ChangePasswordUseCase implements ChangePasswordUseCasePort {
 	constructor(
 		private readonly iamRepository: IamRepositoryPort,
 		private readonly hashService: HashServicePort,
+		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: ChangePasswordCommand): Promise<void> {
@@ -28,5 +30,8 @@ export class ChangePasswordUseCase implements ChangePasswordUseCasePort {
 		user.updatePassword(newPasswordHash);
 
 		await this.iamRepository.save(user);
+
+		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		user.clearEvents();
 	}
 }

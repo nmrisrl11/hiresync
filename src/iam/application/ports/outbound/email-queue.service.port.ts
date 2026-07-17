@@ -16,4 +16,8 @@ export abstract class EmailQueueServicePort {
 		token: string,
 		expiresInText: string,
 	): Promise<void>;
+
+	abstract enqueuePasswordChangedAlertEmail(email: string): Promise<void>;
+
+	abstract enqueueEmailChangedAlertEmail(oldEmail: string, newEmail: string): Promise<void>;
 }
