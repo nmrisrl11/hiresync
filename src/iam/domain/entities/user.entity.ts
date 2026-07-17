@@ -5,6 +5,8 @@ import { Role } from "./role.entity";
 import {
 	EmailChangeRequestedDomainEvent,
 	PasswordResetRequestedDomainEvent,
+	UserEmailChangedDomainEvent,
+	UserPasswordChangedDomainEvent,
 	UserRegisteredDomainEvent,
 	VerificationEmailResentDomainEvent,
 } from "../events";
@@ -89,11 +91,15 @@ export class User extends AggregateRoot {
 	public changePassword(token: string, password: string): void {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.updatePasswordHash(token, password);
+
+		this.addDomainEvent(new UserPasswordChangedDomainEvent(this.email.getValue()));
 	}
 
 	public updatePassword(newHash: string): void {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.setPasswordHash(newHash);
+
+		this.addDomainEvent(new UserPasswordChangedDomainEvent(this.email.getValue()));
 	}
 
 	public updateProfile(name?: string, image?: string | null): void {
@@ -118,11 +124,15 @@ export class User extends AggregateRoot {
 		if (!this.account) throw new NoAccountFoundException();
 		if (!this.pendingEmail) throw new NoPendingEmailChangeException();
 
+		const oldEmail = this.email.getValue();
+
 		//! Verify the token
 		this.account.verify(token);
 
 		//! Apply the new email and clear the pending state
 		this.email = new Email(this.pendingEmail);
 		this.pendingEmail = null;
+
+		this.addDomainEvent(new UserEmailChangedDomainEvent(oldEmail, this.email.getValue()));
 	}
 }

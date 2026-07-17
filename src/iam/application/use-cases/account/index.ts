@@ -8,3 +8,4 @@ export * from "./upload-avatar.use-case";
 export * from "./remove-avatar.use-case";
 
 export * from "./enqueue-change-email-request.use-case";
+export * from "./enqueue-security-alerts.use-case";

@@ -42,4 +42,20 @@ export class BullMqEmailQueueAdapter implements EmailQueueServicePort {
 			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
 		);
 	}
+
+	public async enqueuePasswordChangedAlertEmail(email: string): Promise<void> {
+		await this.emailQueue.add(
+			"send-password-changed-alert",
+			{ email },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
+
+	public async enqueueEmailChangedAlertEmail(oldEmail: string, newEmail: string): Promise<void> {
+		await this.emailQueue.add(
+			"send-email-changed-alert",
+			{ oldEmail, newEmail },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
 }

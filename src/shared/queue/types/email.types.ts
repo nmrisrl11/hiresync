@@ -1,9 +1,35 @@
-import z from "zod";
+import { z } from "zod";
 
-export const EmailJobPayloadSchema = z.object({
-	email: z.email("Invalid email format").trim(),
-	token: z.string().trim().min(1, "Token cannot be empty"),
-	expiresInText: z.string().optional(),
+export const SendVerificationSchema = z.object({
+	email: z.email().trim(),
+	token: z.string().trim(),
+	expiresInText: z.string(),
 });
 
-export type EmailJobPayload = z.infer<typeof EmailJobPayloadSchema>;
+export const SendPasswordResetSchema = z.object({
+	email: z.email().trim(),
+	token: z.string().trim(),
+	expiresInText: z.string(),
+});
+
+export const SendChangeEmailRequestSchema = z.object({
+	email: z.email().trim(),
+	token: z.string().trim(),
+	expiresInText: z.string(),
+});
+
+export const PasswordChangedAlertSchema = z.object({
+	email: z.email().trim(),
+});
+
+export const EmailChangedAlertSchema = z.object({
+	oldEmail: z.email().trim(),
+	newEmail: z.email().trim(),
+});
+
+export type EmailJobPayload =
+	| z.infer<typeof SendVerificationSchema>
+	| z.infer<typeof SendPasswordResetSchema>
+	| z.infer<typeof SendChangeEmailRequestSchema>
+	| z.infer<typeof PasswordChangedAlertSchema>
+	| z.infer<typeof EmailChangedAlertSchema>;

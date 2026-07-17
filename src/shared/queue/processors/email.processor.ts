@@ -2,7 +2,14 @@ import { EmailService } from "@/shared/email/email.service";
 import { Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
-import { EmailJobPayload, EmailJobPayloadSchema } from "../types/email.types";
+import {
+	EmailChangedAlertSchema,
+	EmailJobPayload,
+	PasswordChangedAlertSchema,
+	SendChangeEmailRequestSchema,
+	SendPasswordResetSchema,
+	SendVerificationSchema,
+} from "../types/email.types";
 
 @Processor("email")
 export class EmailProcessor extends WorkerHost {
@@ -14,32 +21,57 @@ export class EmailProcessor extends WorkerHost {
 
 	//! This method automatically triggers when a new job hits the "email" queue
 	async process(job: Job<EmailJobPayload>): Promise<void> {
-		const result = EmailJobPayloadSchema.safeParse(job.data);
-
-		if (!result.success) {
-			this.logger.error(`Invalid payload for job ${job.id}: ${result.error.message}`);
-			throw new Error("Invalid job payload");
-		}
-
-		const { email, token, expiresInText } = result.data;
-
-		this.logger.log(`Processing job ${job.id} of type ${job.name} for ${email}...`);
+		this.logger.log(`Processing job ${job.id} of type ${job.name}...`);
 
 		try {
 			switch (job.name) {
-				case "send-verification":
-					await this.emailService.sendVerificationEmail(email, token, expiresInText ?? "24 hours");
-					break;
-				case "send-password-reset":
-					await this.emailService.sendPasswordResetEmail(email, token, expiresInText ?? "1 hour");
-					break;
-				case "send-change-email":
-					await this.emailService.sendChangeEmailRequestEmail(
-						email,
-						token,
-						expiresInText ?? "24 hours",
+				case "send-verification": {
+					const payload = SendVerificationSchema.parse(job.data);
+
+					await this.emailService.sendVerificationEmail(
+						payload.email,
+						payload.token,
+						payload.expiresInText ?? "24 hours",
 					);
+
 					break;
+				}
+				case "send-password-reset": {
+					const payload = SendPasswordResetSchema.parse(job.data);
+
+					await this.emailService.sendPasswordResetEmail(
+						payload.email,
+						payload.token,
+						payload.expiresInText,
+					);
+
+					break;
+				}
+				case "send-change-email": {
+					const payload = SendChangeEmailRequestSchema.parse(job.data);
+
+					await this.emailService.sendChangeEmailRequestEmail(
+						payload.email,
+						payload.token,
+						payload.expiresInText,
+					);
+
+					break;
+				}
+				case "send-password-changed-alert": {
+					const payload = PasswordChangedAlertSchema.parse(job.data);
+
+					await this.emailService.sendPasswordChangedAlertEmail(payload.email);
+
+					break;
+				}
+				case "send-email-changed-alert": {
+					const payload = EmailChangedAlertSchema.parse(job.data);
+
+					await this.emailService.sendEmailChangedAlertEmail(payload.oldEmail, payload.newEmail);
+
+					break;
+				}
 				default:
 					throw new Error(`Unknown job type: ${job.name}`);
 			}

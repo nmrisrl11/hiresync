@@ -40,4 +40,26 @@ export class EmailService {
 			context: { confirmEmailChangeUrl, expiresInText },
 		});
 	}
+
+	async sendPasswordChangedAlertEmail(email: string) {
+		const loginUrl = `${this.appUrl}/login`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: "Security Alert: Your password was changed",
+			template: "password-changed-alert",
+			context: { loginUrl },
+		});
+	}
+
+	async sendEmailChangedAlertEmail(oldEmail: string, newEmail: string) {
+		const supportUrl = `${this.appUrl}/support`;
+
+		await this.mailer.sendEmail({
+			to: oldEmail,
+			subject: "Security Alert: Your account email was changed",
+			template: "email-changed-alert",
+			context: { newEmail, supportUrl },
+		});
+	}
 }

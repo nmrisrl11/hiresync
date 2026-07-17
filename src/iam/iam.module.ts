@@ -8,6 +8,8 @@ import {
 	ConfirmEmailChangeUseCasePort,
 	DeleteAccountUseCasePort,
 	EnqueueChangeEmailRequestUseCasePort,
+	EnqueueEmailChangedAlertUseCasePort,
+	EnqueuePasswordChangedAlertUseCasePort,
 	GetUserByIdUseCasePort,
 	RemoveAvatarUseCasePort,
 	RequestEmailChangeUseCasePort,
@@ -47,6 +49,8 @@ import {
 	ConfirmEmailChangeUseCase,
 	DeleteAccountUseCase,
 	EnqueueChangeEmailRequestUseCase,
+	EnqueueEmailChangedAlertUseCase,
+	EnqueuePasswordChangedAlertUseCase,
 	GetUserByIdUseCase,
 	RemoveAvatarUseCase,
 	RequestEmailChangeUseCase,
@@ -82,7 +86,11 @@ import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
 import { RoleController } from "./presentation/controllers/role.controller";
 import { UserController } from "./presentation/controllers/user.controller";
-import { CommunicationListener, UserRegisteredListener } from "./presentation/event-listeners";
+import {
+	CommunicationListener,
+	SecurityAuditListener,
+	UserRegisteredListener,
+} from "./presentation/event-listeners";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
@@ -118,9 +126,15 @@ import { CommunicationListener, UserRegisteredListener } from "./presentation/ev
 		//! Event Listeners
 		UserRegisteredListener,
 		CommunicationListener,
+		SecurityAuditListener,
 		{ provide: EnqueueVerificationEmailUseCasePort, useClass: EnqueueVerificationEmailUseCase },
 		{ provide: EnqueuePasswordResetEmailUseCasePort, useClass: EnqueuePasswordResetEmailUseCase },
 		{ provide: EnqueueChangeEmailRequestUseCasePort, useClass: EnqueueChangeEmailRequestUseCase },
+		{
+			provide: EnqueuePasswordChangedAlertUseCasePort,
+			useClass: EnqueuePasswordChangedAlertUseCase,
+		},
+		{ provide: EnqueueEmailChangedAlertUseCasePort, useClass: EnqueueEmailChangedAlertUseCase },
 
 		//! Outbound - Adapters
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
