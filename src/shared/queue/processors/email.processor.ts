@@ -5,10 +5,12 @@ import { Job } from "bullmq";
 import {
 	EmailChangedAlertSchema,
 	EmailJobPayload,
+	FarewellEmailSchema,
 	PasswordChangedAlertSchema,
 	SendChangeEmailRequestSchema,
 	SendPasswordResetSchema,
 	SendVerificationSchema,
+	WelcomeEmailSchema,
 } from "../types/email.types";
 
 @Processor("email")
@@ -27,49 +29,49 @@ export class EmailProcessor extends WorkerHost {
 			switch (job.name) {
 				case "send-verification": {
 					const payload = SendVerificationSchema.parse(job.data);
-
 					await this.emailService.sendVerificationEmail(
 						payload.email,
 						payload.token,
 						payload.expiresInText ?? "24 hours",
 					);
-
 					break;
 				}
 				case "send-password-reset": {
 					const payload = SendPasswordResetSchema.parse(job.data);
-
 					await this.emailService.sendPasswordResetEmail(
 						payload.email,
 						payload.token,
 						payload.expiresInText,
 					);
-
 					break;
 				}
 				case "send-change-email": {
 					const payload = SendChangeEmailRequestSchema.parse(job.data);
-
 					await this.emailService.sendChangeEmailRequestEmail(
 						payload.email,
 						payload.token,
 						payload.expiresInText,
 					);
-
 					break;
 				}
 				case "send-password-changed-alert": {
 					const payload = PasswordChangedAlertSchema.parse(job.data);
-
 					await this.emailService.sendPasswordChangedAlertEmail(payload.email);
-
 					break;
 				}
 				case "send-email-changed-alert": {
 					const payload = EmailChangedAlertSchema.parse(job.data);
-
 					await this.emailService.sendEmailChangedAlertEmail(payload.oldEmail, payload.newEmail);
-
+					break;
+				}
+				case "send-welcome-email": {
+					const payload = WelcomeEmailSchema.parse(job.data);
+					await this.emailService.sendWelcomeEmail(payload.email);
+					break;
+				}
+				case "send-farewell-email": {
+					const payload = FarewellEmailSchema.parse(job.data);
+					await this.emailService.sendFarewellEmail(payload.email);
 					break;
 				}
 				default:

@@ -9,3 +9,4 @@ export * from "./refresh-token.in-port.ts";
 
 export * from "./enqueue-verification-email.in-port";
 export * from "./enqueue-password-reset-email.in-port";
+export * from "./enqueue-welcome-email.in-port";
