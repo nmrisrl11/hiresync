@@ -149,9 +149,9 @@ export class AccountController {
 	) {
 		const command = new RequestEmailChangeCommand(userPayload.sub, dto.newEmail);
 
-		const result = await this.requestEmailChangeUseCase.execute(command);
+		await this.requestEmailChangeUseCase.execute(command);
 
-		return ResponseMapper.toRequestEmailChangeMessage(result.changeEmailRequestEnqueued);
+		return ResponseMapper.toRequestEmailChangeMessage();
 	}
 
 	@Public()

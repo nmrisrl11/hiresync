@@ -6,18 +6,12 @@ export class ResponseMapper {
 		};
 	}
 
-	public static toRequestEmailChangeMessage(changeEmailRequestEnqueued: boolean): {
+	public static toRequestEmailChangeMessage(): {
 		message: string;
 	} {
-		if (!changeEmailRequestEnqueued) {
-			return {
-				message:
-					"Change email requested successfully, but we encountered an issue sending the confirmation email. Please try again later.",
-			};
-		}
-
 		return {
-			message: "Change email requested successful. Please check your email to confirm.",
+			message:
+				"Change email requested successfully. Please check your new email inbox to confirm. If you do not receive it within a few minutes, you can request it again.",
 		};
 	}
 }

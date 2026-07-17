@@ -1,10 +1,13 @@
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { DatabaseModule } from "@/shared/database/database.module";
+import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
 import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
 import {
 	ChangePasswordUseCasePort,
 	ConfirmEmailChangeUseCasePort,
 	DeleteAccountUseCasePort,
+	EnqueueChangeEmailRequestUseCasePort,
 	GetUserByIdUseCasePort,
 	RemoveAvatarUseCasePort,
 	RequestEmailChangeUseCasePort,
@@ -12,6 +15,7 @@ import {
 	UploadAvatarUseCasePort,
 } from "./application/ports/inbound/account";
 import {
+	EnqueuePasswordResetEmailUseCasePort,
 	EnqueueVerificationEmailUseCasePort,
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
@@ -42,6 +46,7 @@ import {
 	ChangePasswordUseCase,
 	ConfirmEmailChangeUseCase,
 	DeleteAccountUseCase,
+	EnqueueChangeEmailRequestUseCase,
 	GetUserByIdUseCase,
 	RemoveAvatarUseCase,
 	RequestEmailChangeUseCase,
@@ -49,6 +54,7 @@ import {
 	UploadAvatarUseCase,
 } from "./application/use-cases/account";
 import {
+	EnqueuePasswordResetEmailUseCase,
 	EnqueueVerificationEmailUseCase,
 	ForgotPasswordUseCase,
 	LoginUseCase,
@@ -61,22 +67,22 @@ import {
 } from "./application/use-cases/authentication";
 import { GetRolesUseCase } from "./application/use-cases/roles";
 import { GetPublicUserProfileUseCase, GetUsersUseCase } from "./application/use-cases/users";
-import { BcryptHashAdapter } from "./infrastructure/adapters/bcrypt-hash.adapter";
-import { BullMqEmailQueueAdapter } from "./infrastructure/adapters/bullmq-email-queue.adapter";
-import { EnvAuthConfigAdapter } from "./infrastructure/adapters/env-auth-config.adapter";
-import { MsTimeFormatterAdapter } from "./infrastructure/adapters/ms-time-formatter.adapter";
-import { NestjsJwtAdapter } from "./infrastructure/adapters/nestjs-jwt.adapter";
-import { NodeCryptoAdapter } from "./infrastructure/adapters/node-crypto.adapter";
-import { PrismaIamRepository } from "./infrastructure/adapters/prisma-iam.repository";
+import {
+	BcryptHashAdapter,
+	BullMqEmailQueueAdapter,
+	CloudinaryImageStorageAdapter,
+	EnvAuthConfigAdapter,
+	MsTimeFormatterAdapter,
+	NestjsJwtAdapter,
+	NodeCryptoAdapter,
+	PrismaIamRepository,
+} from "./infrastructure/adapters";
 import { AccountController } from "./presentation/controllers/account.controller";
 import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
 import { RoleController } from "./presentation/controllers/role.controller";
 import { UserController } from "./presentation/controllers/user.controller";
-import { CloudinaryImageStorageAdapter } from "./infrastructure/adapters/cloudinary-image-storage.adapter";
-import { UserRegisteredListener } from "./presentation/event-listeners";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
-import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
+import { CommunicationListener, UserRegisteredListener } from "./presentation/event-listeners";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
@@ -91,7 +97,6 @@ import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
 		{ provide: ResetPasswordUseCasePort, useClass: ResetPasswordUseCase },
 		{ provide: RefreshTokenUseCasePort, useClass: RefreshTokenUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
-		{ provide: EnqueueVerificationEmailUseCasePort, useClass: EnqueueVerificationEmailUseCase },
 
 		//! Account
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
@@ -112,6 +117,10 @@ import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
 
 		//! Event Listeners
 		UserRegisteredListener,
+		CommunicationListener,
+		{ provide: EnqueueVerificationEmailUseCasePort, useClass: EnqueueVerificationEmailUseCase },
+		{ provide: EnqueuePasswordResetEmailUseCasePort, useClass: EnqueuePasswordResetEmailUseCase },
+		{ provide: EnqueueChangeEmailRequestUseCasePort, useClass: EnqueueChangeEmailRequestUseCase },
 
 		//! Outbound - Adapters
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },

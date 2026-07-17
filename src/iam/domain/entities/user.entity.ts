@@ -2,7 +2,12 @@ import { NoAccountFoundException, NoPendingEmailChangeException } from "../excep
 import { Email } from "../value-objects";
 import { Account } from "./account.entity";
 import { Role } from "./role.entity";
-import { UserRegisteredDomainEvent } from "../events";
+import {
+	EmailChangeRequestedDomainEvent,
+	PasswordResetRequestedDomainEvent,
+	UserRegisteredDomainEvent,
+	VerificationEmailResentDomainEvent,
+} from "../events";
 import { AggregateRoot } from "@/shared/domain/entities";
 
 export class User extends AggregateRoot {
@@ -61,6 +66,10 @@ export class User extends AggregateRoot {
 	public refreshVerificationToken(token: string, tokenExpiresInMs: number): void {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.updateVerificationToken(token, tokenExpiresInMs);
+
+		this.addDomainEvent(
+			new VerificationEmailResentDomainEvent(this.email.getValue(), token, tokenExpiresInMs),
+		);
 	}
 
 	public rollbackVerificationToken(token: string | null, expiresAt: Date | null): void {
@@ -70,6 +79,10 @@ export class User extends AggregateRoot {
 	public setResetToken(token: string, tokenExpiresInMs: number): void {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.updateResetToken(token, tokenExpiresInMs);
+
+		this.addDomainEvent(
+			new PasswordResetRequestedDomainEvent(this.email.getValue(), token, tokenExpiresInMs),
+		);
 	}
 
 	public rollbackResetToken(): void {
@@ -105,6 +118,8 @@ export class User extends AggregateRoot {
 
 		//! Generate new verification token
 		this.account.updateVerificationToken(token, tokenExpiresInMs);
+
+		this.addDomainEvent(new EmailChangeRequestedDomainEvent(newEmail, token, tokenExpiresInMs));
 	}
 
 	public confirmEmailChange(token: string): void {

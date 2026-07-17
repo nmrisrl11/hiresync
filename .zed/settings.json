@@ -1,0 +1,22 @@
+{
+	"formatter": "prettier",
+	"format_on_save": "on",
+
+	"file_scan_exclusions": [
+		"**/.git",
+		"**/.svn",
+		"**/.hg",
+		"**/.jj",
+		"**/CVS",
+		"**/.DS_Store",
+		"**/Thumbs.db",
+		"**/.classpath",
+		"**/.settings",
+
+		"**/node_modules",
+		"**/dist",
+		"**/tmp",
+		"**/.git/objects",
+		"**/.git/subtree-cache"
+	]
+}
