@@ -62,4 +62,24 @@ export class EmailService {
 			context: { newEmail, supportUrl },
 		});
 	}
+
+	async sendWelcomeEmail(email: string) {
+		const dashboardUrl = `${this.appUrl}/dashboard`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: "Welcome to our platform!",
+			template: "welcome-email",
+			context: { dashboardUrl },
+		});
+	}
+
+	async sendFarewellEmail(email: string) {
+		await this.mailer.sendEmail({
+			to: email,
+			subject: "Your account has been deleted",
+			template: "farewell-email",
+			context: {},
+		});
+	}
 }

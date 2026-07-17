@@ -5,7 +5,9 @@ import { Role } from "./role.entity";
 import {
 	EmailChangeRequestedDomainEvent,
 	PasswordResetRequestedDomainEvent,
+	UserAccountDeletedDomainEvent,
 	UserEmailChangedDomainEvent,
+	UserEmailVerifiedDomainEvent,
 	UserPasswordChangedDomainEvent,
 	UserRegisteredDomainEvent,
 	VerificationEmailResentDomainEvent,
@@ -63,6 +65,8 @@ export class User extends AggregateRoot {
 
 		this.account.verify(token);
 		this.isVerified = true;
+
+		this.addDomainEvent(new UserEmailVerifiedDomainEvent(this.email.getValue()));
 	}
 
 	public refreshVerificationToken(token: string, tokenExpiresInMs: number): void {
@@ -134,5 +138,11 @@ export class User extends AggregateRoot {
 		this.pendingEmail = null;
 
 		this.addDomainEvent(new UserEmailChangedDomainEvent(oldEmail, this.email.getValue()));
+	}
+
+	public delete(): void {
+		this.addDomainEvent(
+			new UserAccountDeletedDomainEvent(this.id, this.email.getValue(), this.image),
+		);
 	}
 }

@@ -9,3 +9,4 @@ export * from "./remove-avatar.in-port";
 
 export * from "./enqueue-change-email-request.in-port";
 export * from "./enqueue-security-alerts.in-port";
+export * from "./enqueue-farewell-email.in-port";

@@ -27,9 +27,19 @@ export const EmailChangedAlertSchema = z.object({
 	newEmail: z.email().trim(),
 });
 
+export const WelcomeEmailSchema = z.object({
+	email: z.email().trim(),
+});
+
+export const FarewellEmailSchema = z.object({
+	email: z.email().trim(),
+});
+
 export type EmailJobPayload =
 	| z.infer<typeof SendVerificationSchema>
 	| z.infer<typeof SendPasswordResetSchema>
 	| z.infer<typeof SendChangeEmailRequestSchema>
 	| z.infer<typeof PasswordChangedAlertSchema>
-	| z.infer<typeof EmailChangedAlertSchema>;
+	| z.infer<typeof EmailChangedAlertSchema>
+	| z.infer<typeof WelcomeEmailSchema>
+	| z.infer<typeof FarewellEmailSchema>;

@@ -6,6 +6,7 @@ import {
 	VerifyEmailResult,
 	VerifyEmailUseCasePort,
 } from "../../ports/inbound/authentication";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 
 @Injectable()
 export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
@@ -13,6 +14,7 @@ export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 		private readonly iamRepository: IamRepositoryPort,
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
+		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: VerifyEmailCommand): Promise<VerifyEmailResult> {
@@ -32,6 +34,9 @@ export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 		user.updateRefreshToken(refreshTokenHash);
 
 		await this.iamRepository.save(user);
+
+		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		user.clearEvents();
 
 		return {
 			message: "Email verified successfully.",

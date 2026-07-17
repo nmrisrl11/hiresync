@@ -9,6 +9,7 @@ import {
 	DeleteAccountUseCasePort,
 	EnqueueChangeEmailRequestUseCasePort,
 	EnqueueEmailChangedAlertUseCasePort,
+	EnqueueFarewellEmailUseCasePort,
 	EnqueuePasswordChangedAlertUseCasePort,
 	GetUserByIdUseCasePort,
 	RemoveAvatarUseCasePort,
@@ -19,6 +20,7 @@ import {
 import {
 	EnqueuePasswordResetEmailUseCasePort,
 	EnqueueVerificationEmailUseCasePort,
+	EnqueueWelcomeEmailUseCasePort,
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
@@ -50,6 +52,7 @@ import {
 	DeleteAccountUseCase,
 	EnqueueChangeEmailRequestUseCase,
 	EnqueueEmailChangedAlertUseCase,
+	EnqueueFarewellEmailUseCase,
 	EnqueuePasswordChangedAlertUseCase,
 	GetUserByIdUseCase,
 	RemoveAvatarUseCase,
@@ -60,6 +63,7 @@ import {
 import {
 	EnqueuePasswordResetEmailUseCase,
 	EnqueueVerificationEmailUseCase,
+	EnqueueWelcomeEmailUseCase,
 	ForgotPasswordUseCase,
 	LoginUseCase,
 	LogoutUseCase,
@@ -88,6 +92,7 @@ import { RoleController } from "./presentation/controllers/role.controller";
 import { UserController } from "./presentation/controllers/user.controller";
 import {
 	CommunicationListener,
+	LifecycleCleanupListener,
 	SecurityAuditListener,
 	UserRegisteredListener,
 } from "./presentation/event-listeners";
@@ -127,6 +132,7 @@ import {
 		UserRegisteredListener,
 		CommunicationListener,
 		SecurityAuditListener,
+		LifecycleCleanupListener,
 		{ provide: EnqueueVerificationEmailUseCasePort, useClass: EnqueueVerificationEmailUseCase },
 		{ provide: EnqueuePasswordResetEmailUseCasePort, useClass: EnqueuePasswordResetEmailUseCase },
 		{ provide: EnqueueChangeEmailRequestUseCasePort, useClass: EnqueueChangeEmailRequestUseCase },
@@ -135,6 +141,8 @@ import {
 			useClass: EnqueuePasswordChangedAlertUseCase,
 		},
 		{ provide: EnqueueEmailChangedAlertUseCasePort, useClass: EnqueueEmailChangedAlertUseCase },
+		{ provide: EnqueueWelcomeEmailUseCasePort, useClass: EnqueueWelcomeEmailUseCase },
+		{ provide: EnqueueFarewellEmailUseCasePort, useClass: EnqueueFarewellEmailUseCase },
 
 		//! Outbound - Adapters
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
