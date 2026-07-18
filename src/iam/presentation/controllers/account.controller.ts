@@ -83,6 +83,7 @@ export class AccountController {
 
 	@Post("avatar")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Upload and set a new profile avatar." })
 	@ApiConsumes("multipart/form-data")
 	@ApiBody({
@@ -125,6 +126,7 @@ export class AccountController {
 
 	@Patch("change-password")
 	@HttpCode(HttpStatus.NO_CONTENT)
+	@Throttle({ default: { ttl: 60000, limit: 3 } })
 	@ApiOperation({ summary: "Change the password for the current authenticated user." })
 	public async changePassword(
 		@CurrentUser() userPayload: JwtPayload,
@@ -157,6 +159,7 @@ export class AccountController {
 	@Public()
 	@Patch("change-email/confirm/:token")
 	@HttpCode(HttpStatus.NO_CONTENT)
+	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Confirm an email change using the verification token." })
 	public async confirmEmailChange(@Param("token") token: string): Promise<void> {
 		const command = new ConfirmEmailChangeCommand(token);
@@ -165,6 +168,7 @@ export class AccountController {
 
 	@Delete()
 	@HttpCode(HttpStatus.NO_CONTENT)
+	@Throttle({ default: { ttl: 60000, limit: 3 } })
 	@ApiOperation({ summary: "Delete the current authenticated user's account permanently." })
 	public async deleteAccount(@CurrentUser() userPayload: JwtPayload): Promise<void> {
 		const command = new DeleteAccountCommand(userPayload.sub);
