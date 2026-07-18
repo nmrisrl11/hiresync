@@ -1,16 +1,17 @@
-import { SharedModule } from "./shared/shared.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 import { JwtModule } from "@nestjs/jwt";
+import { ThrottlerModule } from "@nestjs/throttler";
 import { IamModule } from "./iam/iam.module";
 import { JwtAuthGuard } from "./iam/presentation/guards/jwt-auth.guard";
+import { RolesGuard } from "./iam/presentation/guards/roles.guard";
+import { UserThrottlerGuard } from "./iam/presentation/guards/user-throttler.guard";
 import { DatabaseModule } from "./shared/database/database.module";
 import { EmailModule } from "./shared/email/email.module";
 import { QueueModule } from "./shared/queue/queue.module";
-import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
-import { RolesGuard } from "./iam/presentation/guards/roles.guard";
-import { EventEmitterModule } from "@nestjs/event-emitter";
+import { SharedModule } from "./shared/shared.module";
 
 @Module({
 	imports: [
@@ -36,8 +37,8 @@ import { EventEmitterModule } from "@nestjs/event-emitter";
 		QueueModule,
 	],
 	providers: [
-		{ provide: APP_GUARD, useClass: ThrottlerGuard },
 		{ provide: APP_GUARD, useClass: JwtAuthGuard },
+		{ provide: APP_GUARD, useClass: UserThrottlerGuard },
 		{ provide: APP_GUARD, useClass: RolesGuard },
 	],
 })
