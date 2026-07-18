@@ -29,6 +29,7 @@ mkdir -p "$TARGET_DIR/application/use-cases"
 mkdir -p "$TARGET_DIR/domain/entities"
 mkdir -p "$TARGET_DIR/domain/events"
 mkdir -p "$TARGET_DIR/domain/exceptions"
+mkdir -p "$TARGET_DIR/domain/repositories"
 mkdir -p "$TARGET_DIR/domain/value-objects"
 
 mkdir -p "$TARGET_DIR/infrastructure/adapters"
@@ -62,6 +63,7 @@ echo "- domain"
 echo "    - entities"
 echo "    - events"
 echo "    - exceptions"
+echo "    - repositories"
 echo "    - value-objects"
 echo "- infrastructure"
 echo "    - adapters"
@@ -121,6 +123,7 @@ recruitment
     - entities
     - events
     - exceptions
+    - repositories
     - value-objects
 - infrastructure
     - adapters
