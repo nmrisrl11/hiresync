@@ -1,6 +1,5 @@
 import {
 	ApplicationException,
-	EmailDispatchFailedException,
 	InvalidTokenException as InvalidApplicationTokenException,
 	InvalidLoginException,
 	InvalidPasswordException,
@@ -48,7 +47,6 @@ export class IamExceptionFilter implements ExceptionFilter<ApplicationException 
 				return HttpStatus.CONFLICT;
 			case UserNotFoundException:
 				return HttpStatus.NOT_FOUND;
-			case EmailDispatchFailedException:
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;
 		}

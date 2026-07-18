@@ -7,10 +7,6 @@ import {
 	ChangePasswordUseCasePort,
 	ConfirmEmailChangeUseCasePort,
 	DeleteAccountUseCasePort,
-	EnqueueChangeEmailRequestUseCasePort,
-	EnqueueEmailChangedAlertUseCasePort,
-	EnqueueFarewellEmailUseCasePort,
-	EnqueuePasswordChangedAlertUseCasePort,
 	GetUserByIdUseCasePort,
 	RemoveAvatarUseCasePort,
 	RequestEmailChangeUseCasePort,
@@ -18,9 +14,6 @@ import {
 	UploadAvatarUseCasePort,
 } from "./application/ports/inbound/account";
 import {
-	EnqueuePasswordResetEmailUseCasePort,
-	EnqueueVerificationEmailUseCasePort,
-	EnqueueWelcomeEmailUseCasePort,
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
@@ -50,10 +43,6 @@ import {
 	ChangePasswordUseCase,
 	ConfirmEmailChangeUseCase,
 	DeleteAccountUseCase,
-	EnqueueChangeEmailRequestUseCase,
-	EnqueueEmailChangedAlertUseCase,
-	EnqueueFarewellEmailUseCase,
-	EnqueuePasswordChangedAlertUseCase,
 	GetUserByIdUseCase,
 	RemoveAvatarUseCase,
 	RequestEmailChangeUseCase,
@@ -61,9 +50,6 @@ import {
 	UploadAvatarUseCase,
 } from "./application/use-cases/account";
 import {
-	EnqueuePasswordResetEmailUseCase,
-	EnqueueVerificationEmailUseCase,
-	EnqueueWelcomeEmailUseCase,
 	ForgotPasswordUseCase,
 	LoginUseCase,
 	LogoutUseCase,
@@ -91,11 +77,37 @@ import { AuthController } from "./presentation/controllers/auth.controller";
 import { RoleController } from "./presentation/controllers/role.controller";
 import { UserController } from "./presentation/controllers/user.controller";
 import {
-	CommunicationListener,
-	LifecycleCleanupListener,
-	SecurityAuditListener,
+	EmailChangeRequestedListener,
+	PasswordResetRequestedListener,
+	UserAccountDeletedListener,
+	UserEmailChangedListener,
+	UserEmailVerifiedListener,
+	UserPasswordChangedListener,
 	UserRegisteredListener,
+	VerificationEmailResentListener,
 } from "./presentation/event-listeners";
+import {
+	EnqueuePasswordResetEmailUseCasePort,
+	EnqueueVerificationEmailUseCasePort,
+	EnqueueWelcomeEmailUseCasePort,
+} from "./application/ports/inbound/authentication/notifications";
+import {
+	EnqueuePasswordResetEmailUseCase,
+	EnqueueVerificationEmailUseCase,
+	EnqueueWelcomeEmailUseCase,
+} from "./application/use-cases/authentication/notifications";
+import {
+	EnqueueChangeEmailRequestUseCasePort,
+	EnqueueEmailChangedAlertUseCasePort,
+	EnqueueFarewellEmailUseCasePort,
+	EnqueuePasswordChangedAlertUseCasePort,
+} from "./application/ports/inbound/account/notifications";
+import {
+	EnqueueChangeEmailRequestUseCase,
+	EnqueueEmailChangedAlertUseCase,
+	EnqueueFarewellEmailUseCase,
+	EnqueuePasswordChangedAlertUseCase,
+} from "./application/use-cases/account/notifications";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
@@ -128,22 +140,6 @@ import {
 		//! Roles
 		{ provide: GetRolesUseCasePort, useClass: GetRolesUseCase },
 
-		//! Event Listeners
-		UserRegisteredListener,
-		CommunicationListener,
-		SecurityAuditListener,
-		LifecycleCleanupListener,
-		{ provide: EnqueueVerificationEmailUseCasePort, useClass: EnqueueVerificationEmailUseCase },
-		{ provide: EnqueuePasswordResetEmailUseCasePort, useClass: EnqueuePasswordResetEmailUseCase },
-		{ provide: EnqueueChangeEmailRequestUseCasePort, useClass: EnqueueChangeEmailRequestUseCase },
-		{
-			provide: EnqueuePasswordChangedAlertUseCasePort,
-			useClass: EnqueuePasswordChangedAlertUseCase,
-		},
-		{ provide: EnqueueEmailChangedAlertUseCasePort, useClass: EnqueueEmailChangedAlertUseCase },
-		{ provide: EnqueueWelcomeEmailUseCasePort, useClass: EnqueueWelcomeEmailUseCase },
-		{ provide: EnqueueFarewellEmailUseCasePort, useClass: EnqueueFarewellEmailUseCase },
-
 		//! Outbound - Adapters
 		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
@@ -155,6 +151,26 @@ import {
 		{ provide: AuthConfigPort, useClass: EnvAuthConfigAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
 		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },
+
+		//! Domain Event and Event Listeners
+		EmailChangeRequestedListener,
+		PasswordResetRequestedListener,
+		UserAccountDeletedListener,
+		UserEmailChangedListener,
+		UserEmailVerifiedListener,
+		UserPasswordChangedListener,
+		VerificationEmailResentListener,
+		UserRegisteredListener,
+		{ provide: EnqueueVerificationEmailUseCasePort, useClass: EnqueueVerificationEmailUseCase },
+		{ provide: EnqueuePasswordResetEmailUseCasePort, useClass: EnqueuePasswordResetEmailUseCase },
+		{ provide: EnqueueChangeEmailRequestUseCasePort, useClass: EnqueueChangeEmailRequestUseCase },
+		{
+			provide: EnqueuePasswordChangedAlertUseCasePort,
+			useClass: EnqueuePasswordChangedAlertUseCase,
+		},
+		{ provide: EnqueueEmailChangedAlertUseCasePort, useClass: EnqueueEmailChangedAlertUseCase },
+		{ provide: EnqueueWelcomeEmailUseCasePort, useClass: EnqueueWelcomeEmailUseCase },
+		{ provide: EnqueueFarewellEmailUseCasePort, useClass: EnqueueFarewellEmailUseCase },
 	],
 })
 export class IamModule {}

@@ -63,7 +63,7 @@
 
 ### Event Driven
 
-- [ ] Move email background queueing with event-driven
+- [x] Move email background queueing with event-driven
 
 ### Employers
 - [ ] Create job listing
@@ -93,9 +93,11 @@
 - [ ] Company logo?
 
 ### Email Notifications
-- [ ] Welcome Email
-- [x] Email Verification
-- [x] Password Reset
+- [x] Welcome Email
+- [x] Farewell (Deleted Account) Email
+- [x] Send and Resend Verification Email
+- [x] Forgot and Change Password
+- [x] Request and Confirmation of Changing Email
 - [ ] Job Application Confirmation
 - [ ] Employer Notification
 - [ ] Job Expiration Reminder
