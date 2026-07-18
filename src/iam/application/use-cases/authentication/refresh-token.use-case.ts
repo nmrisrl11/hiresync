@@ -1,22 +1,19 @@
+import { UserRepository } from "@/iam/domain/repositories";
+import { UserId } from "@/iam/domain/value-objects";
 import { Injectable } from "@nestjs/common";
-import {
-	HashServicePort,
-	IamRepositoryPort,
-	JwtPayload,
-	JwtServicePort,
-} from "../../ports/outbound";
 import { InvalidLoginException, InvalidTokenException } from "../../exceptions";
 import {
 	RefreshTokenCommand,
 	RefreshTokenResult,
 	RefreshTokenUseCasePort,
 } from "../../ports/inbound/authentication";
+import { HashServicePort, JwtPayload, JwtServicePort } from "../../ports/outbound";
 
 @Injectable()
 export class RefreshTokenUseCase implements RefreshTokenUseCasePort {
 	constructor(
 		private readonly jwtService: JwtServicePort,
-		private readonly iamRepository: IamRepositoryPort,
+		private readonly userRepository: UserRepository,
 		private readonly hashService: HashServicePort,
 	) {}
 
@@ -31,7 +28,8 @@ export class RefreshTokenUseCase implements RefreshTokenUseCasePort {
 		}
 
 		//! Fetch the aggregate root
-		const user = await this.iamRepository.findById(payload.sub);
+		const userIdVo = new UserId(payload.sub);
+		const user = await this.userRepository.findById(userIdVo);
 		if (!user) throw new InvalidLoginException("User no longer exists.");
 
 		//! Read the stored hash (safe querying through the root)
@@ -44,9 +42,9 @@ export class RefreshTokenUseCase implements RefreshTokenUseCasePort {
 
 		//! Generate a brand new set of tokens (Session Rotation)
 		const tokens = await this.jwtService.generateTokens({
-			sub: user.id,
+			sub: user.id.getValue(),
 			email: user.email.getValue(),
-			role: user.role.code,
+			role: user.role.code.getValue(),
 		});
 
 		//! Hash the new refresh token
@@ -56,7 +54,7 @@ export class RefreshTokenUseCase implements RefreshTokenUseCasePort {
 		user.updateRefreshToken(newRefreshTokenHash);
 
 		//! Save the mutated aggregate back to the database
-		await this.iamRepository.save(user);
+		await this.userRepository.save(user);
 
 		return {
 			accessToken: tokens.accessToken,

@@ -1,5 +1,6 @@
 import { User } from "@/iam/domain/entities";
-import { Email } from "@/iam/domain/value-objects";
+import { RoleRepository, UserRepository } from "@/iam/domain/repositories";
+import { Email, RoleCode } from "@/iam/domain/value-objects";
 import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
@@ -15,7 +16,6 @@ import {
 import {
 	AuthConfigPort,
 	HashServicePort,
-	IamRepositoryPort,
 	IdGeneratorPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
@@ -24,7 +24,8 @@ import {
 @Injectable()
 export class RegisterUserUseCase implements RegisterUserUseCasePort {
 	constructor(
-		private readonly iamRepository: IamRepositoryPort,
+		private readonly userRepository: UserRepository,
+		private readonly roleRepository: RoleRepository,
 		private readonly hashService: HashServicePort,
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly verificationTokenGenerator: VerificationTokenGeneratorPort,
@@ -36,10 +37,11 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 	public async execute(command: RegisterUserCommand): Promise<RegisterUserResult> {
 		const emailVo = new Email(command.email);
 
-		const existingUser = await this.iamRepository.findByEmail(emailVo);
+		const existingUser = await this.userRepository.findByEmail(emailVo);
 		if (existingUser) throw new UserAlreadyExistsException();
 
-		const role = await this.iamRepository.findRoleByCode(command.roleCode);
+		const roleVo = new RoleCode(command.roleCode);
+		const role = await this.roleRepository.findByCode(roleVo);
 		if (!role) throw new RoleNotFoundException();
 
 		if (role.isAdmin()) throw new UnauthorizedRoleException();
@@ -62,11 +64,11 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 			tokenExpiresInMs,
 		);
 
-		await this.iamRepository.save(newUser);
+		await this.userRepository.save(newUser);
 
 		await this.eventDispatcher.dispatchMultiple(newUser.domainEvents);
 		newUser.clearEvents();
 
-		return { userId: newUser.id };
+		return { userId: newUser.id.getValue() };
 	}
 }

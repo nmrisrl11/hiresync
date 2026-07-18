@@ -1,11 +1,13 @@
+import { RoleCode, RoleId } from "../value-objects";
+
 export class Role {
 	constructor(
-		public readonly id: string,
-		public readonly code: string,
+		public readonly id: RoleId,
+		public readonly code: RoleCode,
 		public readonly description: string | null,
 	) {}
 
 	public isAdmin(): boolean {
-		return this.code === "ADMIN";
+		return this.code.getValue() === "ADMIN";
 	}
 }

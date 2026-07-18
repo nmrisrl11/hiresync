@@ -1,3 +1,4 @@
+import { UserRepository } from "@/iam/domain/repositories";
 import { Injectable } from "@nestjs/common";
 import {
 	GetUsersQuery,
@@ -5,24 +6,23 @@ import {
 	PaginatedUserResult,
 	UserResult,
 } from "../../ports/inbound/users";
-import { IamRepositoryPort } from "../../ports/outbound";
 
 @Injectable()
 export class GetUsersUseCase implements GetUsersUseCasePort {
-	constructor(private readonly iamRepository: IamRepositoryPort) {}
+	constructor(private readonly userRepository: UserRepository) {}
 
 	public async execute(query: GetUsersQuery): Promise<PaginatedUserResult> {
 		const [users, total] = await Promise.all([
-			this.iamRepository.findAll(query.limit, query.offset),
-			this.iamRepository.countAll(),
+			this.userRepository.findAll(query.limit, query.offset),
+			this.userRepository.countAll(),
 		]);
 
 		const mappedUsers = users.map((user): UserResult => ({
-			id: user.id,
+			id: user.id.getValue(),
 			email: user.email.getValue(),
 			name: user.name,
 			image: user.image,
-			role: user.role.code,
+			role: user.role.code.getValue(),
 			isVerified: user.isVerified,
 			createdAt: user.createdAt,
 		}));

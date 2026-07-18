@@ -1,5 +1,5 @@
 import { NoAccountFoundException, NoPendingEmailChangeException } from "../exceptions";
-import { Email } from "../value-objects";
+import { AccountId, Email, UserId } from "../value-objects";
 import { Account } from "./account.entity";
 import { Role } from "./role.entity";
 import {
@@ -16,7 +16,7 @@ import { AggregateRoot } from "@/shared/domain/entities";
 
 export class User extends AggregateRoot {
 	constructor(
-		public readonly id: string,
+		public readonly id: UserId,
 		public email: Email,
 		public name: string,
 		public isVerified: boolean,
@@ -39,11 +39,13 @@ export class User extends AggregateRoot {
 		verificationToken: string,
 		verificationTokenTtlMs: number,
 	): User {
+		const idVo = new UserId(id);
+		const accountIdVo = new AccountId(accountId);
 		const emailVo = new Email(emailString);
 		const verificationTokenExpiration = new Date(Date.now() + verificationTokenTtlMs);
 
 		const account = new Account(
-			accountId,
+			accountIdVo,
 			passwordHash,
 			verificationToken,
 			verificationTokenExpiration,
@@ -51,7 +53,7 @@ export class User extends AggregateRoot {
 
 		const createdAt = new Date();
 
-		const user = new User(id, emailVo, name, false, role, account, null, createdAt, null);
+		const user = new User(idVo, emailVo, name, false, role, account, null, createdAt, null);
 
 		user.addDomainEvent(
 			new UserRegisteredDomainEvent(emailString, verificationToken, verificationTokenTtlMs),
@@ -142,7 +144,7 @@ export class User extends AggregateRoot {
 
 	public delete(): void {
 		this.addDomainEvent(
-			new UserAccountDeletedDomainEvent(this.id, this.email.getValue(), this.image),
+			new UserAccountDeletedDomainEvent(this.id.getValue(), this.email.getValue(), this.image),
 		);
 	}
 }

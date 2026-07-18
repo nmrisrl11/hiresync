@@ -1,39 +1,40 @@
+import { UserRepository } from "@/iam/domain/repositories";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { InvalidTokenException } from "../../exceptions";
-import { HashServicePort, IamRepositoryPort, JwtServicePort } from "../../ports/outbound";
 import {
 	VerifyEmailCommand,
 	VerifyEmailResult,
 	VerifyEmailUseCasePort,
 } from "../../ports/inbound/authentication";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { HashServicePort, JwtServicePort } from "../../ports/outbound";
 
 @Injectable()
 export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 	constructor(
-		private readonly iamRepository: IamRepositoryPort,
+		private readonly userRepository: UserRepository,
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
 		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: VerifyEmailCommand): Promise<VerifyEmailResult> {
-		const user = await this.iamRepository.findByVerificationToken(command.token);
+		const user = await this.userRepository.findByVerificationToken(command.token);
 
 		if (!user) throw new InvalidTokenException("Verification token not found or invalid.");
 
 		user.verifyEmail(command.token);
 
 		const tokens = await this.jwtService.generateTokens({
-			sub: user.id,
+			sub: user.id.getValue(),
 			email: user.email.getValue(),
-			role: user.role.code,
+			role: user.role.code.getValue(),
 		});
 
 		const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
 		user.updateRefreshToken(refreshTokenHash);
 
-		await this.iamRepository.save(user);
+		await this.userRepository.save(user);
 
 		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
 		user.clearEvents();
@@ -43,10 +44,10 @@ export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 			accessToken: tokens.accessToken,
 			refreshToken: tokens.refreshToken,
 			user: {
-				id: user.id,
+				id: user.id.getValue(),
 				email: user.email.getValue(),
 				name: user.name,
-				role: user.role.code,
+				role: user.role.code.getValue(),
 			},
 		};
 	}

@@ -1,15 +1,13 @@
-import { Role, User } from "@/iam/domain/entities";
-import { Email } from "@/iam/domain/value-objects";
+import { User } from "../entities";
+import { Email, UserId } from "../value-objects";
 
-export abstract class IamRepositoryPort {
+export abstract class UserRepository {
 	abstract findAll(limit: number, offset: number): Promise<User[]>;
 	abstract countAll(): Promise<number>;
-	abstract findById(id: string): Promise<User | null>;
+	abstract findById(id: UserId): Promise<User | null>;
 	abstract findByEmail(email: Email): Promise<User | null>;
 	abstract findByVerificationToken(verificationToken: string): Promise<User | null>;
 	abstract findByResetToken(resetToken: string): Promise<User | null>;
-	abstract findRoleByCode(code: string): Promise<Role | null>;
-	abstract findAllRoles(): Promise<Role[]>;
-	abstract delete(id: string): Promise<void>;
+	abstract delete(id: UserId): Promise<void>;
 	abstract save(user: User): Promise<void>;
 }
