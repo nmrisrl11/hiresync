@@ -14,6 +14,12 @@ import {
 	UploadAvatarUseCasePort,
 } from "./application/ports/inbound/account";
 import {
+	EnqueueChangeEmailRequestUseCasePort,
+	EnqueueEmailChangedAlertUseCasePort,
+	EnqueueFarewellEmailUseCasePort,
+	EnqueuePasswordChangedAlertUseCasePort,
+} from "./application/ports/inbound/account/notifications";
+import {
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
@@ -23,6 +29,11 @@ import {
 	ResetPasswordUseCasePort,
 	VerifyEmailUseCasePort,
 } from "./application/ports/inbound/authentication";
+import {
+	EnqueuePasswordResetEmailUseCasePort,
+	EnqueueVerificationEmailUseCasePort,
+	EnqueueWelcomeEmailUseCasePort,
+} from "./application/ports/inbound/authentication/notifications";
 import { GetRolesUseCasePort } from "./application/ports/inbound/roles";
 import {
 	GetPublicUserProfileUseCasePort,
@@ -32,7 +43,6 @@ import {
 	AuthConfigPort,
 	EmailQueueServicePort,
 	HashServicePort,
-	IamRepositoryPort,
 	IdGeneratorPort,
 	ImageStoragePort,
 	JwtServicePort,
@@ -50,6 +60,12 @@ import {
 	UploadAvatarUseCase,
 } from "./application/use-cases/account";
 import {
+	EnqueueChangeEmailRequestUseCase,
+	EnqueueEmailChangedAlertUseCase,
+	EnqueueFarewellEmailUseCase,
+	EnqueuePasswordChangedAlertUseCase,
+} from "./application/use-cases/account/notifications";
+import {
 	ForgotPasswordUseCase,
 	LoginUseCase,
 	LogoutUseCase,
@@ -59,8 +75,14 @@ import {
 	ResetPasswordUseCase,
 	VerifyEmailUseCase,
 } from "./application/use-cases/authentication";
+import {
+	EnqueuePasswordResetEmailUseCase,
+	EnqueueVerificationEmailUseCase,
+	EnqueueWelcomeEmailUseCase,
+} from "./application/use-cases/authentication/notifications";
 import { GetRolesUseCase } from "./application/use-cases/roles";
 import { GetPublicUserProfileUseCase, GetUsersUseCase } from "./application/use-cases/users";
+import { RoleRepository, UserRepository } from "./domain/repositories";
 import {
 	BcryptHashAdapter,
 	BullMqEmailQueueAdapter,
@@ -69,8 +91,8 @@ import {
 	MsTimeFormatterAdapter,
 	NestjsJwtAdapter,
 	NodeCryptoAdapter,
-	PrismaIamRepository,
 } from "./infrastructure/adapters";
+import { PrismaRoleRepository, PrismaUserRepository } from "./infrastructure/adapters/persistence";
 import { AccountController } from "./presentation/controllers/account.controller";
 import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
@@ -86,28 +108,6 @@ import {
 	UserRegisteredListener,
 	VerificationEmailResentListener,
 } from "./presentation/event-listeners";
-import {
-	EnqueuePasswordResetEmailUseCasePort,
-	EnqueueVerificationEmailUseCasePort,
-	EnqueueWelcomeEmailUseCasePort,
-} from "./application/ports/inbound/authentication/notifications";
-import {
-	EnqueuePasswordResetEmailUseCase,
-	EnqueueVerificationEmailUseCase,
-	EnqueueWelcomeEmailUseCase,
-} from "./application/use-cases/authentication/notifications";
-import {
-	EnqueueChangeEmailRequestUseCasePort,
-	EnqueueEmailChangedAlertUseCasePort,
-	EnqueueFarewellEmailUseCasePort,
-	EnqueuePasswordChangedAlertUseCasePort,
-} from "./application/ports/inbound/account/notifications";
-import {
-	EnqueueChangeEmailRequestUseCase,
-	EnqueueEmailChangedAlertUseCase,
-	EnqueueFarewellEmailUseCase,
-	EnqueuePasswordChangedAlertUseCase,
-} from "./application/use-cases/account/notifications";
 
 @Module({
 	imports: [DatabaseModule, QueueModule],
@@ -141,7 +141,6 @@ import {
 		{ provide: GetRolesUseCasePort, useClass: GetRolesUseCase },
 
 		//! Outbound - Adapters
-		{ provide: IamRepositoryPort, useClass: PrismaIamRepository },
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
 		{ provide: JwtServicePort, useClass: NestjsJwtAdapter },
 		{ provide: IdGeneratorPort, useClass: NodeCryptoAdapter },
@@ -151,6 +150,10 @@ import {
 		{ provide: AuthConfigPort, useClass: EnvAuthConfigAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
 		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },
+
+		//! Persistence
+		{ provide: UserRepository, useClass: PrismaUserRepository },
+		{ provide: RoleRepository, useClass: PrismaRoleRepository },
 
 		//! Domain Event and Event Listeners
 		EmailChangeRequestedListener,

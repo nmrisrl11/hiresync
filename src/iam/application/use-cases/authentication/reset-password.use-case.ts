@@ -1,23 +1,24 @@
+import { UserRepository } from "@/iam/domain/repositories";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { InvalidTokenException } from "../../exceptions";
-import { HashServicePort, IamRepositoryPort } from "../../ports/outbound";
 import {
 	ResetPasswordCommand,
 	ResetPasswordResult,
 	ResetPasswordUseCasePort,
 } from "../../ports/inbound/authentication";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { HashServicePort } from "../../ports/outbound";
 
 @Injectable()
 export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 	constructor(
-		private readonly iamRepository: IamRepositoryPort,
+		private readonly userRepository: UserRepository,
 		private readonly hashService: HashServicePort,
 		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: ResetPasswordCommand): Promise<ResetPasswordResult> {
-		const user = await this.iamRepository.findByResetToken(command.token);
+		const user = await this.userRepository.findByResetToken(command.token);
 
 		if (!user || !user.account?.getResetToken())
 			throw new InvalidTokenException("Reset token not found or invalid.");
@@ -26,7 +27,7 @@ export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 
 		user.changePassword(command.token, passwordHash);
 
-		await this.iamRepository.save(user);
+		await this.userRepository.save(user);
 
 		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
 		user.clearEvents();

@@ -1,19 +1,22 @@
-import { Injectable } from "@nestjs/common";
-import { ChangePasswordCommand, ChangePasswordUseCasePort } from "../../ports/inbound/account";
-import { HashServicePort, IamRepositoryPort } from "../../ports/outbound";
-import { InvalidPasswordException, UserNotFoundException } from "../../exceptions";
+import { UserRepository } from "@/iam/domain/repositories";
+import { UserId } from "@/iam/domain/value-objects";
 import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { Injectable } from "@nestjs/common";
+import { InvalidPasswordException, UserNotFoundException } from "../../exceptions";
+import { ChangePasswordCommand, ChangePasswordUseCasePort } from "../../ports/inbound/account";
+import { HashServicePort } from "../../ports/outbound";
 
 @Injectable()
 export class ChangePasswordUseCase implements ChangePasswordUseCasePort {
 	constructor(
-		private readonly iamRepository: IamRepositoryPort,
+		private readonly userRepository: UserRepository,
 		private readonly hashService: HashServicePort,
 		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: ChangePasswordCommand): Promise<void> {
-		const user = await this.iamRepository.findById(command.userId);
+		const userIdVo = new UserId(command.userId);
+		const user = await this.userRepository.findById(userIdVo);
 
 		if (!user || !user.account) throw new UserNotFoundException();
 
@@ -29,7 +32,7 @@ export class ChangePasswordUseCase implements ChangePasswordUseCasePort {
 		const newPasswordHash = await this.hashService.hash(command.newPassword, 12);
 		user.updatePassword(newPasswordHash);
 
-		await this.iamRepository.save(user);
+		await this.userRepository.save(user);
 
 		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
 		user.clearEvents();

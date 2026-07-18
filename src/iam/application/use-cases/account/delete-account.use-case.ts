@@ -1,24 +1,26 @@
-import { Injectable } from "@nestjs/common";
-import { DeleteAccountCommand, DeleteAccountUseCasePort } from "../../ports/inbound/account";
-import { IamRepositoryPort } from "../../ports/outbound";
-import { UserNotFoundException } from "../../exceptions";
+import { UserRepository } from "@/iam/domain/repositories";
+import { UserId } from "@/iam/domain/value-objects";
 import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { Injectable } from "@nestjs/common";
+import { UserNotFoundException } from "../../exceptions";
+import { DeleteAccountCommand, DeleteAccountUseCasePort } from "../../ports/inbound/account";
 
 @Injectable()
 export class DeleteAccountUseCase implements DeleteAccountUseCasePort {
 	constructor(
-		private readonly iamRepository: IamRepositoryPort,
+		private readonly userRepository: UserRepository,
 		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: DeleteAccountCommand): Promise<void> {
-		const user = await this.iamRepository.findById(command.userId);
+		const userIdVo = new UserId(command.userId);
+		const user = await this.userRepository.findById(userIdVo);
 
 		if (!user) throw new UserNotFoundException();
 
 		user.delete();
 
-		await this.iamRepository.delete(command.userId);
+		await this.userRepository.delete(userIdVo);
 
 		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
 		user.clearEvents();

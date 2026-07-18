@@ -1,3 +1,4 @@
+import { UserRepository } from "@/iam/domain/repositories";
 import { Email } from "@/iam/domain/value-objects";
 import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
@@ -8,7 +9,6 @@ import {
 } from "../../ports/inbound/authentication";
 import {
 	AuthConfigPort,
-	IamRepositoryPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../../ports/outbound";
@@ -16,7 +16,7 @@ import {
 @Injectable()
 export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 	constructor(
-		private readonly iamRepository: IamRepositoryPort,
+		private readonly userRepository: UserRepository,
 		private readonly tokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
@@ -25,7 +25,7 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 
 	public async execute(command: ForgotPasswordCommand): Promise<ForgotPasswordResult> {
 		const emailVo = new Email(command.email);
-		const user = await this.iamRepository.findByEmail(emailVo);
+		const user = await this.userRepository.findByEmail(emailVo);
 
 		if (!user)
 			return {
@@ -38,7 +38,7 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 
 		user.setResetToken(resetToken, tokenExpiresInMs);
-		await this.iamRepository.save(user);
+		await this.userRepository.save(user);
 
 		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
 		user.clearEvents();

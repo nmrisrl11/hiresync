@@ -1,8 +1,9 @@
 import { InvalidTokenException } from "../exceptions";
+import { AccountId } from "../value-objects";
 
 export class Account {
 	constructor(
-		public readonly id: string,
+		public readonly id: AccountId,
 		private passwordHash: string,
 		private verificationToken: string | null,
 		private verificationTokenExpiresAt: Date | null,

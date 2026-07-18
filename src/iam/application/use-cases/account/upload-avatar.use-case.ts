@@ -1,21 +1,24 @@
+import { UserRepository } from "@/iam/domain/repositories";
+import { UserId } from "@/iam/domain/value-objects";
 import { Injectable } from "@nestjs/common";
+import { UserNotFoundException } from "../../exceptions";
 import {
 	UpdateAccountResult,
 	UploadAvatarCommand,
 	UploadAvatarUseCasePort,
 } from "../../ports/inbound/account";
-import { IamRepositoryPort, ImageStoragePort } from "../../ports/outbound";
-import { UserNotFoundException } from "../../exceptions";
+import { ImageStoragePort } from "../../ports/outbound";
 
 @Injectable()
 export class UploadAvatarUseCase implements UploadAvatarUseCasePort {
 	constructor(
-		private readonly iamRepository: IamRepositoryPort,
+		private readonly userRepository: UserRepository,
 		private readonly imageStorage: ImageStoragePort,
 	) {}
 
 	public async execute(command: UploadAvatarCommand): Promise<UpdateAccountResult> {
-		const user = await this.iamRepository.findById(command.userId);
+		const userIdVo = new UserId(command.userId);
+		const user = await this.userRepository.findById(userIdVo);
 		if (!user) throw new UserNotFoundException();
 
 		//! For now if the user already has an image, delete the old one from Cloudinary to save space
@@ -25,18 +28,21 @@ export class UploadAvatarUseCase implements UploadAvatarUseCasePort {
 			});
 		}
 
-		const publicId = await this.imageStorage.uploadAvatar(command.fileBuffer, `user_${user.id}`);
+		const publicId = await this.imageStorage.uploadAvatar(
+			command.fileBuffer,
+			`user_${user.id.getValue()}`,
+		);
 
 		user.updateProfile(undefined, publicId);
 
-		await this.iamRepository.save(user);
+		await this.userRepository.save(user);
 
 		return {
-			id: user.id,
+			id: user.id.getValue(),
 			email: user.email.getValue(),
 			name: user.name,
 			image: user.image,
-			role: user.role.code,
+			role: user.role.code.getValue(),
 			isVerified: user.isVerified,
 			createdAt: user.createdAt,
 		};
