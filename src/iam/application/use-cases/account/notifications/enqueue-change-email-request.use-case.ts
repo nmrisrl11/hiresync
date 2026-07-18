@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
+import { EmailQueueServicePort, TimeFormatterPort } from "../../../ports/outbound";
 import {
 	EnqueueChangeEmailRequestCommand,
 	EnqueueChangeEmailRequestUseCasePort,
-} from "../../ports/inbound/account";
-import { EmailQueueServicePort, TimeFormatterPort } from "../../ports/outbound";
+} from "@/iam/application/ports/inbound/account/notifications";
 
 @Injectable()
 export class EnqueueChangeEmailRequestUseCase implements EnqueueChangeEmailRequestUseCasePort {

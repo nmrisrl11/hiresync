@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
 import {
 	EnqueuePasswordResetEmailCommand,
 	EnqueuePasswordResetEmailUseCasePort,
-} from "../../ports/inbound/authentication";
-import { EmailQueueServicePort, TimeFormatterPort } from "../../ports/outbound";
+} from "@/iam/application/ports/inbound/authentication/notifications";
+import { Injectable } from "@nestjs/common";
+import { EmailQueueServicePort, TimeFormatterPort } from "../../../ports/outbound";
 
 @Injectable()
 export class EnqueuePasswordResetEmailUseCase implements EnqueuePasswordResetEmailUseCasePort {

@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
 import {
 	EnqueueFarewellEmailCommand,
 	EnqueueFarewellEmailUseCasePort,
-} from "../../ports/inbound/account";
-import { EmailQueueServicePort } from "../../ports/outbound";
+} from "@/iam/application/ports/inbound/account/notifications";
+import { EmailQueueServicePort } from "@/iam/application/ports/outbound";
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class EnqueueFarewellEmailUseCase implements EnqueueFarewellEmailUseCasePort {
