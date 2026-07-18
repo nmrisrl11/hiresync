@@ -81,6 +81,7 @@ export class AuthController {
 	@Public()
 	@Post("verify-email")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Verify email address and auto login." })
 	public async verifyEmail(@Body() dto: VerifyEmailDto, @Res({ passthrough: true }) res: Response) {
 		const command = new VerifyEmailCommand(dto.token);
@@ -143,6 +144,7 @@ export class AuthController {
 	@Post("refresh")
 	@HttpCode(HttpStatus.OK)
 	@ApiCookieAuth()
+	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Refresh access token using the refresh token cookie." })
 	public async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
 		const cookies = req.cookies as Record<string, string>;
