@@ -8,10 +8,12 @@ import {
 import {
 	CreateEmployerProfileUseCasePort,
 	CreateJobListingUseCasePort,
+	EditJobListingUseCasePort,
 } from "./application/ports/inbound/employers";
 import {
 	CreateEmployerProfileUseCase,
 	CreateJobListingUseCase,
+	EditJobListingUseCase,
 } from "./application/use-cases/employers";
 import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
@@ -27,6 +29,7 @@ import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
 		//! Use Cases
 		{ provide: CreateEmployerProfileUseCasePort, useClass: CreateEmployerProfileUseCase },
 		{ provide: CreateJobListingUseCasePort, useClass: CreateJobListingUseCase },
+		{ provide: EditJobListingUseCasePort, useClass: EditJobListingUseCase },
 
 		//! Shared
 		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },
