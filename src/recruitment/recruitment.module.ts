@@ -6,11 +6,13 @@ import {
 	PrismaJobListingRepository,
 } from "./infrastructure/adapters/persistence";
 import {
+	CloseJobListingUseCasePort,
 	CreateEmployerProfileUseCasePort,
 	CreateJobListingUseCasePort,
 	EditJobListingUseCasePort,
 } from "./application/ports/inbound/employers";
 import {
+	CloseJobListingUseCase,
 	CreateEmployerProfileUseCase,
 	CreateJobListingUseCase,
 	EditJobListingUseCase,
@@ -30,6 +32,7 @@ import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
 		{ provide: CreateEmployerProfileUseCasePort, useClass: CreateEmployerProfileUseCase },
 		{ provide: CreateJobListingUseCasePort, useClass: CreateJobListingUseCase },
 		{ provide: EditJobListingUseCasePort, useClass: EditJobListingUseCase },
+		{ provide: CloseJobListingUseCasePort, useClass: CloseJobListingUseCase },
 
 		//! Shared
 		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },
