@@ -12,6 +12,7 @@ import { DatabaseModule } from "./shared/database/database.module";
 import { EmailModule } from "./shared/email/email.module";
 import { QueueModule } from "./shared/queue/queue.module";
 import { SharedModule } from "./shared/shared.module";
+import { RecruitmentModule } from "./recruitment/recruitment.module";
 
 @Module({
 	imports: [
@@ -33,6 +34,7 @@ import { SharedModule } from "./shared/shared.module";
 		JwtModule.register({ global: true }),
 		SharedModule,
 		IamModule,
+		RecruitmentModule,
 		EmailModule,
 		QueueModule,
 	],

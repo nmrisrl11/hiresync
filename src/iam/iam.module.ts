@@ -43,7 +43,6 @@ import {
 	AuthConfigPort,
 	EmailQueueServicePort,
 	HashServicePort,
-	IdGeneratorPort,
 	ImageStoragePort,
 	JwtServicePort,
 	TimeFormatterPort,
@@ -143,7 +142,6 @@ import {
 		//! Outbound - Adapters
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
 		{ provide: JwtServicePort, useClass: NestjsJwtAdapter },
-		{ provide: IdGeneratorPort, useClass: NodeCryptoAdapter },
 		{ provide: VerificationTokenGeneratorPort, useClass: NodeCryptoAdapter },
 		{ provide: EmailQueueServicePort, useClass: BullMqEmailQueueAdapter },
 		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
