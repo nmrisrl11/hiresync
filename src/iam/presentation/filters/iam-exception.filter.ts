@@ -14,13 +14,11 @@ import {
 	NoPendingEmailChangeException,
 } from "@/iam/domain/exceptions";
 import { ApplicationBaseException, DomainBaseException } from "@/shared/exceptions/base.exception";
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from "@nestjs/common";
-import { Response } from "express";
+import { BaseExceptionFilter } from "@/shared/presentation/filters/base-exception.filter";
+import { Catch, HttpStatus } from "@nestjs/common";
 
 @Catch(ApplicationBaseException, DomainBaseException)
-export class IamExceptionFilter implements ExceptionFilter<
-	ApplicationBaseException | DomainBaseException
-> {
+export class IamExceptionFilter extends BaseExceptionFilter {
 	private getDomainStatus(exception: DomainBaseException): HttpStatus {
 		switch (exception.constructor) {
 			case InvalidEmailFormatException:
@@ -53,23 +51,11 @@ export class IamExceptionFilter implements ExceptionFilter<
 		}
 	}
 
-	private getStatus(exception: ApplicationBaseException | DomainBaseException): HttpStatus {
+	protected getStatus(exception: ApplicationBaseException | DomainBaseException): HttpStatus {
 		if (exception instanceof DomainBaseException) {
 			return this.getDomainStatus(exception);
 		}
 
 		return this.getApplicationStatus(exception);
-	}
-
-	catch(exception: ApplicationBaseException | DomainBaseException, host: ArgumentsHost): void {
-		const response = host.switchToHttp().getResponse<Response>();
-		const status = this.getStatus(exception);
-
-		response.status(status).json({
-			statusCode: status,
-			message: exception.message,
-			error: exception.name,
-			timestamp: new Date().toISOString(),
-		});
 	}
 }
