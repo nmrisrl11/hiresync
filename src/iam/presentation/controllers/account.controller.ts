@@ -1,23 +1,3 @@
-import { type JwtPayload } from "@/iam/application/ports/outbound";
-import {
-	Body,
-	Controller,
-	Delete,
-	FileTypeValidator,
-	Get,
-	HttpCode,
-	HttpStatus,
-	MaxFileSizeValidator,
-	Param,
-	ParseFilePipe,
-	Patch,
-	Post,
-	UploadedFile,
-	UseFilters,
-	UseInterceptors,
-} from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { CurrentUser } from "../decorators/current-user.decorator";
 import {
 	ChangePasswordCommand,
 	ChangePasswordUseCasePort,
@@ -36,13 +16,33 @@ import {
 	UploadAvatarCommand,
 	UploadAvatarUseCasePort,
 } from "@/iam/application/ports/inbound/account";
+import { type JwtPayload } from "@/shared/application/types";
+import {
+	Body,
+	Controller,
+	Delete,
+	FileTypeValidator,
+	Get,
+	HttpCode,
+	HttpStatus,
+	MaxFileSizeValidator,
+	Param,
+	ParseFilePipe,
+	Patch,
+	Post,
+	UploadedFile,
+	UseFilters,
+	UseInterceptors,
+} from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
+import "multer";
+import { CurrentUser } from "../decorators/current-user.decorator";
+import { Public } from "../decorators/public.decorator";
 import { ChangePasswordDto, RequestEmailChangeDto, UpdateAccountDto } from "../dtos";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import { ResponseMapper } from "../mappers/response.mapper";
-import { Throttle } from "@nestjs/throttler";
-import { Public } from "../decorators/public.decorator";
-import { FileInterceptor } from "@nestjs/platform-express";
-import "multer";
 
 @UseFilters(IamExceptionFilter)
 @ApiBearerAuth()

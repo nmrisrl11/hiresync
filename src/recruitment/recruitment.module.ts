@@ -21,10 +21,11 @@ import {
 } from "./application/use-cases/employers";
 import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
+import { EmployerController } from "./presentation/controllers/employer.controller";
 
 @Module({
 	imports: [DatabaseModule],
-	controllers: [],
+	controllers: [EmployerController],
 	providers: [
 		//! Repositories and Persistence
 		{ provide: EmployerProfileRepository, useClass: PrismaEmployerProfileRepository },

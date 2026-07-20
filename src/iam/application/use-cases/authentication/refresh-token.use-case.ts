@@ -1,5 +1,6 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { UserId } from "@/iam/domain/value-objects";
+import { JwtPayload } from "@/shared/application/types";
 import { Injectable } from "@nestjs/common";
 import { InvalidLoginException, InvalidTokenException } from "../../exceptions";
 import {
@@ -7,7 +8,7 @@ import {
 	RefreshTokenResult,
 	RefreshTokenUseCasePort,
 } from "../../ports/inbound/authentication";
-import { HashServicePort, JwtPayload, JwtServicePort } from "../../ports/outbound";
+import { HashServicePort, JwtServicePort } from "../../ports/outbound";
 
 @Injectable()
 export class RefreshTokenUseCase implements RefreshTokenUseCasePort {
