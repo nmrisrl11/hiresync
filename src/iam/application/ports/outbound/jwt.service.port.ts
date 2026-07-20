@@ -1,8 +1,4 @@
-export type JwtPayload = {
-	sub: string;
-	email: string;
-	role: string;
-};
+import { JwtPayload } from "@/shared/application/types";
 
 export type JwtTokens = {
 	accessToken: string;

@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { JwtPayload } from "@/iam/application/ports/outbound/jwt.service.port";
+import { JwtPayload } from "@/shared/application/types";
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";

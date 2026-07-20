@@ -1,4 +1,4 @@
-import { JwtPayload } from "@/iam/application/ports/outbound";
+import { JwtPayload } from "@/shared/application/types";
 import { Injectable } from "@nestjs/common";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { Request } from "express";

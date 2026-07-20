@@ -17,7 +17,7 @@ import {
 	VerifyEmailCommand,
 	VerifyEmailUseCasePort,
 } from "@/iam/application/ports/inbound/authentication";
-import { type JwtPayload } from "@/iam/application/ports/outbound";
+import { type JwtPayload } from "@/shared/application/types";
 import {
 	Body,
 	Controller,
