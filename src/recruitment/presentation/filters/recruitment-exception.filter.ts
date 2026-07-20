@@ -1,34 +1,20 @@
 import {
-	InvalidTokenException as InvalidApplicationTokenException,
-	InvalidLoginException,
-	InvalidPasswordException,
-	RoleNotFoundException,
-	UnauthorizedRoleException,
-	UserAlreadyExistsException,
-	UserNotFoundException,
-} from "@/iam/application/exceptions";
-import {
-	InvalidTokenException as InvalidDomainTokenException,
-	InvalidEmailFormatException,
-	NoAccountFoundException,
-	NoPendingEmailChangeException,
-} from "@/iam/domain/exceptions";
+	EmployerProfileAlreadyExistsException,
+	EmployerProfileNotFoundException,
+	JobListingNotFoundException,
+	UnauthorizedJobListingException,
+} from "@/recruitment/application/exceptions";
 import { ApplicationBaseException, DomainBaseException } from "@/shared/exceptions/base.exception";
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from "@nestjs/common";
 import { Response } from "express";
 
 @Catch(ApplicationBaseException, DomainBaseException)
-export class IamExceptionFilter implements ExceptionFilter<
+export class RecruitmentExceptionFilter implements ExceptionFilter<
 	ApplicationBaseException | DomainBaseException
 > {
 	private getDomainStatus(exception: DomainBaseException): HttpStatus {
+		//! TODO: Add Domain Exceptions here for Recruitment
 		switch (exception.constructor) {
-			case InvalidEmailFormatException:
-			case InvalidDomainTokenException:
-			case NoPendingEmailChangeException:
-				return HttpStatus.BAD_REQUEST;
-			case NoAccountFoundException:
-				return HttpStatus.NOT_FOUND;
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;
 		}
@@ -36,17 +22,12 @@ export class IamExceptionFilter implements ExceptionFilter<
 
 	private getApplicationStatus(exception: ApplicationBaseException): HttpStatus {
 		switch (exception.constructor) {
-			case InvalidLoginException:
-				return HttpStatus.UNAUTHORIZED;
-			case InvalidApplicationTokenException:
-			case RoleNotFoundException:
-			case InvalidPasswordException:
-				return HttpStatus.BAD_REQUEST;
-			case UnauthorizedRoleException:
+			case UnauthorizedJobListingException:
 				return HttpStatus.FORBIDDEN;
-			case UserAlreadyExistsException:
+			case EmployerProfileAlreadyExistsException:
 				return HttpStatus.CONFLICT;
-			case UserNotFoundException:
+			case EmployerProfileNotFoundException:
+			case JobListingNotFoundException:
 				return HttpStatus.NOT_FOUND;
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;
