@@ -1,8 +1,8 @@
+import { GetRolesUseCasePort } from "@/iam/application/ports/inbound/roles";
+import { ROLES } from "@/shared/domain/types/role.type";
+import { Roles } from "@/shared/presentation/decorators/roles.decorator";
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Roles } from "../decorators/roles.decorator";
-import { ROLES } from "@/shared/domain/types/role.type";
-import { GetRolesUseCasePort } from "@/iam/application/ports/inbound/roles";
 
 @ApiBearerAuth()
 @ApiTags("Roles")

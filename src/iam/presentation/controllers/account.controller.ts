@@ -17,6 +17,8 @@ import {
 	UploadAvatarUseCasePort,
 } from "@/iam/application/ports/inbound/account";
 import { type JwtPayload } from "@/shared/application/types";
+import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
+import { Public } from "@/shared/presentation/decorators/public.decorator";
 import {
 	Body,
 	Controller,
@@ -38,8 +40,6 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
 import "multer";
-import { CurrentUser } from "../decorators/current-user.decorator";
-import { Public } from "../decorators/public.decorator";
 import { ChangePasswordDto, RequestEmailChangeDto, UpdateAccountDto } from "../dtos";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import { ResponseMapper } from "../mappers/response.mapper";

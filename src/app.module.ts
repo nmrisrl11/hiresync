@@ -6,13 +6,13 @@ import { JwtModule } from "@nestjs/jwt";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { IamModule } from "./iam/iam.module";
 import { JwtAuthGuard } from "./iam/presentation/guards/jwt-auth.guard";
-import { RolesGuard } from "./iam/presentation/guards/roles.guard";
-import { UserThrottlerGuard } from "./iam/presentation/guards/user-throttler.guard";
+import { RecruitmentModule } from "./recruitment/recruitment.module";
 import { DatabaseModule } from "./shared/database/database.module";
 import { EmailModule } from "./shared/email/email.module";
+import { RolesGuard } from "./shared/presentation/guards/roles.guard";
+import { UserThrottlerGuard } from "./shared/presentation/guards/user-throttler.guard";
 import { QueueModule } from "./shared/queue/queue.module";
 import { SharedModule } from "./shared/shared.module";
-import { RecruitmentModule } from "./recruitment/recruitment.module";
 
 @Module({
 	imports: [
