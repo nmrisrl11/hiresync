@@ -1,5 +1,4 @@
 import {
-	ApplicationException,
 	InvalidTokenException as InvalidApplicationTokenException,
 	InvalidLoginException,
 	InvalidPasswordException,
@@ -9,18 +8,18 @@ import {
 	UserNotFoundException,
 } from "@/iam/application/exceptions";
 import {
-	DomainException,
 	InvalidTokenException as InvalidDomainTokenException,
 	InvalidEmailFormatException,
 	NoAccountFoundException,
 	NoPendingEmailChangeException,
 } from "@/iam/domain/exceptions";
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from "@nestjs/common";
-import { Response } from "express";
+import { ApplicationBaseException, DomainBaseException } from "@/shared/exceptions/base.exception";
+import { BaseExceptionFilter } from "@/shared/presentation/filters/base-exception.filter";
+import { Catch, HttpStatus } from "@nestjs/common";
 
-@Catch(ApplicationException, DomainException)
-export class IamExceptionFilter implements ExceptionFilter<ApplicationException | DomainException> {
-	private getDomainStatus(exception: DomainException): HttpStatus {
+@Catch(ApplicationBaseException, DomainBaseException)
+export class IamExceptionFilter extends BaseExceptionFilter {
+	private getDomainStatus(exception: DomainBaseException): HttpStatus {
 		switch (exception.constructor) {
 			case InvalidEmailFormatException:
 			case InvalidDomainTokenException:
@@ -33,7 +32,7 @@ export class IamExceptionFilter implements ExceptionFilter<ApplicationException 
 		}
 	}
 
-	private getApplicationStatus(exception: ApplicationException): HttpStatus {
+	private getApplicationStatus(exception: ApplicationBaseException): HttpStatus {
 		switch (exception.constructor) {
 			case InvalidLoginException:
 				return HttpStatus.UNAUTHORIZED;
@@ -52,23 +51,11 @@ export class IamExceptionFilter implements ExceptionFilter<ApplicationException 
 		}
 	}
 
-	private getStatus(exception: ApplicationException | DomainException): HttpStatus {
-		if (exception instanceof DomainException) {
+	protected getStatus(exception: ApplicationBaseException | DomainBaseException): HttpStatus {
+		if (exception instanceof DomainBaseException) {
 			return this.getDomainStatus(exception);
 		}
 
 		return this.getApplicationStatus(exception);
-	}
-
-	catch(exception: ApplicationException | DomainException, host: ArgumentsHost): void {
-		const response = host.switchToHttp().getResponse<Response>();
-		const status = this.getStatus(exception);
-
-		response.status(status).json({
-			statusCode: status,
-			message: exception.message,
-			error: exception.name,
-			timestamp: new Date().toISOString(),
-		});
 	}
 }
