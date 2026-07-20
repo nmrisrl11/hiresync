@@ -1,10 +1,10 @@
 import { env } from "@/env";
 import { JwtPayload } from "@/shared/application/types";
+import { IS_PUBLIC_KEY } from "@/shared/presentation/decorators/public.decorator";
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
-import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

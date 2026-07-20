@@ -19,6 +19,7 @@ import {
 } from "@/iam/application/ports/inbound/authentication";
 import { type JwtPayload } from "@/shared/application/types";
 import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
+import { Public } from "@/shared/presentation/decorators/public.decorator";
 import {
 	Body,
 	Controller,
@@ -35,7 +36,6 @@ import { Throttle } from "@nestjs/throttler";
 import type { Request, Response } from "express";
 import type { StringValue } from "ms";
 import ms from "ms";
-import { Public } from "../decorators/public.decorator";
 import {
 	ForgotPasswordDto,
 	LoginDto,
