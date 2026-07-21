@@ -1,0 +1,52 @@
+// ------------------------------------------------------
+// EMPLOYER PROFILE TABLE: Company Details
+// ------------------------------------------------------
+model EmployerProfile {
+	id          String  @id @default(uuid())
+
+	// Foreign Key to User
+	userId      String  @unique
+	user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+	companyName String
+	description String
+	website     String?
+	logoUrl     String?
+	industry    String?
+
+	jobListings JobListing[]
+
+	createdAt   DateTime @default(now())
+	updatedAt   DateTime @updatedAt
+}
+
+// ------------------------------------------------------
+// JOB LISTING TABLE: Recruitment Posts
+// ------------------------------------------------------
+model JobListing {
+	id              String   @id @default(uuid())
+
+	// Foreign Key to EmployerProfile
+	employerId      String
+	employer        EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+
+	title           String
+	description     String
+	requirements    String[]
+	employmentType  EmploymentType
+
+	// Flattened JobLocation Value Object
+	locationType    LocationType
+	locationAddress String?
+
+	// Flattened SalaryRange Value Object
+	salaryMin       Float?
+	salaryMax       Float?
+	salaryCurrency  String   @default("USD")
+
+	status          JobStatus
+	expiresAt       DateTime
+
+	createdAt       DateTime @default(now())
+	updatedAt       DateTime @updatedAt
+}

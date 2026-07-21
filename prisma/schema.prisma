@@ -9,113 +9,25 @@ datasource db {
 }
 
 // ------------------------------------------------------
-// USER TABLE: Identity and Profile Information
+// ENUMS: PostgreSQL Native Types
 // ------------------------------------------------------
-model User {
-    id           String  @id @default(uuid())
-    email        String  @unique
-    pendingEmail String?
-    name         String
-    image        String?
-    isVerified   Boolean @default(false)
-
-    // Foreign Keys & Relationships
-    roleId String
-    role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict)
-
-    account Account? // 1:1 relationship with Account
-    employerProfile EmployerProfile? // 1:1 relationship with EmployerProfile
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+enum EmploymentType {
+	FULL_TIME
+	PART_TIME
+	CONTRACT
+	FREELANCE
+	INTERNSHIP
 }
 
-// ------------------------------------------------------
-// ACCOUNT TABLE: Authentication and Credentials
-// ------------------------------------------------------
-model Account {
-    id String @id @default(uuid())
-
-    // Foreign Key to User
-    userId String @unique
-    // Cascade delete: If a User is deleted, their Auth Account is destroyed automatically
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-    passwordHash               String
-    verificationToken          String?   @unique
-    verificationTokenExpiresAt DateTime?
-    resetToken                 String?   @unique
-    resetTokenExpiresAt        DateTime?
-    refreshTokenHash           String?
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+enum LocationType {
+	ON_SITE
+	HYBRID
+	REMOTE
 }
 
-// ------------------------------------------------------
-// ROLE TABLE: Dynamic RBAC Configuration
-// ------------------------------------------------------
-model Role {
-    id          String  @id @default(uuid())
-    code        String  @unique // Used for code checks: "ADMIN", "EMPLOYER", "APPLICANT"
-    description String? // Used for UI/Admin panels: "Can browse jobs and submit applications"
-
-    // Relationship back to Users
-    users User[]
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
-// ------------------------------------------------------
-// EMPLOYER PROFILE TABLE: Company Details
-// ------------------------------------------------------
-model EmployerProfile {
-	id          String  @id @default(uuid())
-
-	// Foreign Key to User
-	userId      String  @unique
-	user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-	companyName String
-	description String
-	website     String?
-	logoUrl     String?
-	industry    String?
-
-	jobListings JobListing[]
-
-	createdAt   DateTime @default(now())
-	updatedAt   DateTime @updatedAt
-}
-
-// ------------------------------------------------------
-// JOB LISTING TABLE: Recruitment Posts
-// ------------------------------------------------------
-model JobListing {
-	id              String   @id @default(uuid())
-
-	// Foreign Key to EmployerProfile
-	employerId      String
-	employer        EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
-
-	title           String
-	description     String
-	requirements    String[]
-	employmentType  String
-
-	// Flattened JobLocation Value Object
-	locationType    String
-	locationAddress String?
-
-	// Flattened SalaryRange Value Object
-	salaryMin       Float?
-	salaryMax       Float?
-	salaryCurrency  String   @default("USD")
-
-	status          String
-	expiresAt       DateTime
-
-	createdAt       DateTime @default(now())
-	updatedAt       DateTime @updatedAt
+enum JobStatus {
+	DRAFT
+	PUBLISHED
+	CLOSED
+	EXPIRED
 }
