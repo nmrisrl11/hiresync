@@ -3,12 +3,12 @@ import {
 	EnqueueVerificationEmailCommand,
 	EnqueueVerificationEmailUseCasePort,
 } from "@/iam/application/ports/inbound/authentication/notifications";
-import { EmailQueueServicePort, TimeFormatterPort } from "../../../ports/outbound";
+import { IamEmailQueuePort, TimeFormatterPort } from "../../../ports/outbound";
 
 @Injectable()
 export class EnqueueVerificationEmailUseCase implements EnqueueVerificationEmailUseCasePort {
 	constructor(
-		private readonly emailQueueService: EmailQueueServicePort,
+		private readonly emailQueueService: IamEmailQueuePort,
 		private readonly timeFormatter: TimeFormatterPort,
 	) {}
 
