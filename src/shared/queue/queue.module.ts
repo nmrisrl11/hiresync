@@ -5,6 +5,7 @@ import { Module } from "@nestjs/common";
 export const hasRedis = !!env.REDIS_URL;
 
 @Module({
+	//! Establish the connection to Redis (Upstash or Local)
 	imports: [...(hasRedis ? [BullModule.forRoot({ connection: { url: env.REDIS_URL } })] : [])],
 	exports: [...(hasRedis ? [BullModule] : [])],
 })

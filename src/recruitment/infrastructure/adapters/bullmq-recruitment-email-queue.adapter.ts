@@ -5,7 +5,7 @@ import { Queue } from "bullmq";
 
 @Injectable()
 export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueuePort {
-	constructor(@InjectQueue("email") private readonly emailQueue: Queue) {}
+	constructor(@InjectQueue("recruitment-email") private readonly emailQueue: Queue) {}
 
 	public async enqueueEmployerWelcomeEmail(email: string, companyName: string): Promise<void> {
 		await this.emailQueue.add(
