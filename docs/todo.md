@@ -66,10 +66,21 @@
 - [x] Move email background queueing with event-driven
 
 ### Employers
-- [ ] Create job listing
-- [ ] Edit job listing
-- [ ] Delete job listing
-- [ ] View their posted jobs
+- [x] Create company profile
+- [ ] Edit company profile
+- [ ] Upload/Remove company profile logo
+- [ ] Get/View company profile
+- [x] Create job listing
+- [x] Edit job listing
+- [x] Delete/Close job listing
+- [x] Get/View job listing
+    #### Email Notifications
+    - [x] Created company profile
+    - [ ] Updated company profile
+    - [x] Created job listing
+    - [ ] Updated job listing
+    - [ ] Closed job listing
+    - [ ] Expired job listing - with Task job using CRON?
 
 ### Applicants
 - [ ] Browse available jobs
