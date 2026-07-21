@@ -9,11 +9,11 @@ import { IamEmailService } from "./iam-email.service";
 	imports: [
 		QueueModule,
 		EmailModule,
-		...(hasRedis ? [BullModule.registerQueue({ name: "iam-email" })] : []),
+		...(hasRedis ? [BullModule.registerQueue({ name: "iam-email" })] : []), //! Register a specific queue named "iam-email"
 	],
 	providers: [
 		IamEmailService,
-		...(hasRedis ? [IamEmailProcessor] : []),
+		...(hasRedis ? [IamEmailProcessor] : []), //! Only boot the processor if we have Redis
 		...(!hasRedis
 			? [
 					{

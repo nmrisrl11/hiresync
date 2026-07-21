@@ -1,7 +1,6 @@
 import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { DatabaseModule } from "@/shared/database/database.module";
 import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
-import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
 import {
 	CloseJobListingUseCasePort,
@@ -35,6 +34,7 @@ import {
 	PrismaEmployerProfileRepository,
 	PrismaJobListingRepository,
 } from "./infrastructure/adapters/persistence";
+import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
 import { EmployerController } from "./presentation/controllers/employer.controller";
 import {
 	EmployerProfileCreatedListener,
@@ -42,7 +42,7 @@ import {
 } from "./presentation/event-listeners";
 
 @Module({
-	imports: [DatabaseModule, QueueModule],
+	imports: [DatabaseModule, RecruitmentNotificationsModule],
 	controllers: [EmployerController],
 	providers: [
 		//! Repositories and Persistence
