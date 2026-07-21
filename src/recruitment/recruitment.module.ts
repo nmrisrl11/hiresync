@@ -6,6 +6,7 @@ import {
 	CloseJobListingUseCasePort,
 	CreateEmployerProfileUseCasePort,
 	CreateJobListingUseCasePort,
+	EditEmployerProfileUseCasePort,
 	EditJobListingUseCasePort,
 	GetEmployerJobsUseCasePort,
 	GetEmployerProfileUseCasePort,
@@ -19,6 +20,7 @@ import {
 	CloseJobListingUseCase,
 	CreateEmployerProfileUseCase,
 	CreateJobListingUseCase,
+	EditEmployerProfileUseCase,
 	EditJobListingUseCase,
 	GetEmployerJobsUseCase,
 	GetEmployerProfileUseCase,
@@ -54,6 +56,7 @@ import {
 
 		//! Use Cases
 		{ provide: CreateEmployerProfileUseCasePort, useClass: CreateEmployerProfileUseCase },
+		{ provide: EditEmployerProfileUseCasePort, useClass: EditEmployerProfileUseCase },
 		{ provide: GetEmployerProfileUseCasePort, useClass: GetEmployerProfileUseCase },
 		{ provide: CreateJobListingUseCasePort, useClass: CreateJobListingUseCase },
 		{ provide: EditJobListingUseCasePort, useClass: EditJobListingUseCase },

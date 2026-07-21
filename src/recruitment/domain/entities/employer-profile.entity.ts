@@ -57,13 +57,17 @@ export class EmployerProfile extends AggregateRoot {
 		this.industry = industry;
 		this.updatedAt = new Date();
 
-		this.addDomainEvent(new EmployerProfileUpdatedDomainEvent(this.id.getValue()));
+		this.addDomainEvent(
+			new EmployerProfileUpdatedDomainEvent(this.id.getValue(), this.companyName),
+		);
 	}
 
 	public updateLogo(logoUrl: string | null): void {
 		this.logoUrl = logoUrl;
 		this.updatedAt = new Date();
 
-		this.addDomainEvent(new EmployerProfileUpdatedDomainEvent(this.id.getValue()));
+		this.addDomainEvent(
+			new EmployerProfileUpdatedDomainEvent(this.id.getValue(), this.companyName),
+		);
 	}
 }

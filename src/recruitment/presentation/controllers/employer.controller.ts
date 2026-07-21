@@ -5,6 +5,8 @@ import {
 	CreateEmployerProfileUseCasePort,
 	CreateJobListingCommand,
 	CreateJobListingUseCasePort,
+	EditEmployerProfileCommand,
+	EditEmployerProfileUseCasePort,
 	EditJobListingCommand,
 	EditJobListingUseCasePort,
 	GetEmployerJobsQuery,
@@ -31,6 +33,7 @@ import {
 	CloseJobListingDto,
 	CreateEmployerProfileDto,
 	CreateJobListingDto,
+	EditEmployerProfileDto,
 	EditJobListingDto,
 	GetEmployerJobsDto,
 } from "../dtos";
@@ -43,6 +46,7 @@ export class EmployerController {
 	constructor(
 		private readonly createEmployerProfileUseCase: CreateEmployerProfileUseCasePort,
 		private readonly getEmployerProfileUseCase: GetEmployerProfileUseCasePort,
+		private readonly editEmployerProfileUseCase: EditEmployerProfileUseCasePort,
 		private readonly createJobListingUseCase: CreateJobListingUseCasePort,
 		private readonly editJobListingUseCase: EditJobListingUseCasePort,
 		private readonly closeJobListingUseCase: CloseJobListingUseCasePort,
@@ -78,6 +82,23 @@ export class EmployerController {
 		await this.createEmployerProfileUseCase.execute(command);
 
 		return { message: "Employer profile created successfully." };
+	}
+
+	@Put("profile")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Edit the employer's company profile." })
+	public async editProfile(@CurrentUser() user: JwtPayload, @Body() dto: EditEmployerProfileDto) {
+		const command = new EditEmployerProfileCommand(
+			user.sub,
+			dto.companyName,
+			dto.description,
+			dto.website ?? null,
+			dto.industry ?? null,
+		);
+
+		await this.editEmployerProfileUseCase.execute(command);
+
+		return { message: "Employer profile updated successfully." };
 	}
 
 	@Post("jobs")

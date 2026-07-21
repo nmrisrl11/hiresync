@@ -20,7 +20,10 @@ export class CreateJobListingUseCase implements CreateJobListingUseCasePort {
 
 	public async execute(command: CreateJobListingCommand): Promise<string> {
 		const employerProfile = await this.employerProfileRepository.findByUserId(command.userId);
-		if (!employerProfile) throw new EmployerProfileNotFoundException();
+		if (!employerProfile)
+			throw new EmployerProfileNotFoundException(
+				"You must create an employer profile before posting a job.",
+			);
 
 		const jobListingId = new JobListingId(this.idGenerator.generateId());
 		const locationVo = new JobLocation(command.locationType, command.locationAddress);
