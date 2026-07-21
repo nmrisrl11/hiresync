@@ -9,6 +9,8 @@ import {
 	EditJobListingUseCasePort,
 	GetEmployerJobsQuery,
 	GetEmployerJobsUseCasePort,
+	GetEmployerProfileQuery,
+	GetEmployerProfileUseCasePort,
 } from "@/recruitment/application/ports/inbound/employers";
 import { type JwtPayload } from "@/shared/application/types";
 import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
@@ -40,15 +42,27 @@ import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mappe
 export class EmployerController {
 	constructor(
 		private readonly createEmployerProfileUseCase: CreateEmployerProfileUseCasePort,
+		private readonly getEmployerProfileUseCase: GetEmployerProfileUseCasePort,
 		private readonly createJobListingUseCase: CreateJobListingUseCasePort,
 		private readonly editJobListingUseCase: EditJobListingUseCasePort,
 		private readonly closeJobListingUseCase: CloseJobListingUseCasePort,
 		private readonly getEmployerJobsUseCase: GetEmployerJobsUseCasePort,
 	) {}
 
+	@Get("profile")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Get the employer's company profile." })
+	public async getProfile(@CurrentUser() user: JwtPayload) {
+		const query = new GetEmployerProfileQuery(user.sub);
+
+		const profile = await this.getEmployerProfileUseCase.execute(query);
+
+		return { data: profile };
+	}
+
 	@Post("profile")
 	@HttpCode(HttpStatus.CREATED)
-	@ApiOperation({ summary: "Create an employer profile." })
+	@ApiOperation({ summary: "Create an employer's company profile." })
 	public async createProfile(
 		@CurrentUser() user: JwtPayload,
 		@Body() dto: CreateEmployerProfileDto,

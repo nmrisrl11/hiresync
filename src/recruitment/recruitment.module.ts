@@ -8,6 +8,7 @@ import {
 	CreateJobListingUseCasePort,
 	EditJobListingUseCasePort,
 	GetEmployerJobsUseCasePort,
+	GetEmployerProfileUseCasePort,
 } from "./application/ports/inbound/employers";
 import {
 	EnqueueEmployerWelcomeEmailUseCasePort,
@@ -20,6 +21,7 @@ import {
 	CreateJobListingUseCase,
 	EditJobListingUseCase,
 	GetEmployerJobsUseCase,
+	GetEmployerProfileUseCase,
 } from "./application/use-cases/employers";
 import {
 	EnqueueEmployerWelcomeEmailUseCase,
@@ -52,6 +54,7 @@ import {
 
 		//! Use Cases
 		{ provide: CreateEmployerProfileUseCasePort, useClass: CreateEmployerProfileUseCase },
+		{ provide: GetEmployerProfileUseCasePort, useClass: GetEmployerProfileUseCase },
 		{ provide: CreateJobListingUseCasePort, useClass: CreateJobListingUseCase },
 		{ provide: EditJobListingUseCasePort, useClass: EditJobListingUseCase },
 		{ provide: CloseJobListingUseCasePort, useClass: CloseJobListingUseCase },
