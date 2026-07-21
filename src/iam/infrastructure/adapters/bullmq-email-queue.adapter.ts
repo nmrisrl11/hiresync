@@ -5,7 +5,7 @@ import { Queue } from "bullmq";
 
 @Injectable()
 export class BullMqEmailQueueAdapter implements EmailQueueServicePort {
-	constructor(@InjectQueue("email") private readonly emailQueue: Queue) {}
+	constructor(@InjectQueue("iam-email") private readonly emailQueue: Queue) {}
 
 	public async enqueueVerificationEmail(
 		email: string,

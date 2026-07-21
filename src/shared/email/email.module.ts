@@ -1,22 +1,16 @@
 import { Module } from "@nestjs/common";
-import { EmailService } from "./email.service";
-import { EmailProviderPort } from "./ports/email-provider.port";
 import { NodemailerAdapter } from "./adapters/nodemailer.adapter";
-import { MailModule } from "./mail.module";
 import { ResendAdapter } from "./adapters/resend.adapter";
-// Import ResendAdapter when you implement it
+import { MailModule } from "./mail.module";
+import { EmailProviderPort } from "./ports/email-provider.port";
 
 const isNodemailer = process.env.EMAIL_PROVIDER === "nodemailer";
 
 @Module({
 	imports: isNodemailer ? [MailModule] : [],
 	providers: [
-		EmailService,
-		{
-			provide: EmailProviderPort,
-			useClass: isNodemailer ? NodemailerAdapter : ResendAdapter,
-		},
+		{ provide: EmailProviderPort, useClass: isNodemailer ? NodemailerAdapter : ResendAdapter },
 	],
-	exports: [EmailService],
+	exports: [EmailProviderPort],
 })
 export class EmailModule {}

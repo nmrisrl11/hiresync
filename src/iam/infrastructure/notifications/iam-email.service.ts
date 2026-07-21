@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { EmailProviderPort } from "./ports/email-provider.port";
 import { env } from "@/env";
+import { EmailProviderPort } from "@/shared/email/ports/email-provider.port";
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
-export class EmailService {
+export class IamEmailService {
 	constructor(private readonly mailer: EmailProviderPort) {}
 
 	private readonly appUrl = env.APP_URL;
@@ -14,7 +14,7 @@ export class EmailService {
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Verify your email address",
-			template: "verify-email",
+			template: "iam/verify-email",
 			context: { verificationUrl, expiresInText },
 		});
 	}
@@ -25,7 +25,7 @@ export class EmailService {
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Reset your password",
-			template: "reset-password",
+			template: "iam/reset-password",
 			context: { resetUrl, expiresInText },
 		});
 	}
@@ -36,7 +36,7 @@ export class EmailService {
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Change your email address",
-			template: "change-email",
+			template: "iam/change-email",
 			context: { confirmEmailChangeUrl, expiresInText },
 		});
 	}
@@ -47,7 +47,7 @@ export class EmailService {
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Security Alert: Your password was changed",
-			template: "password-changed-alert",
+			template: "iam/password-changed-alert",
 			context: { loginUrl },
 		});
 	}
@@ -58,7 +58,7 @@ export class EmailService {
 		await this.mailer.sendEmail({
 			to: oldEmail,
 			subject: "Security Alert: Your account email was changed",
-			template: "email-changed-alert",
+			template: "iam/email-changed-alert",
 			context: { newEmail, supportUrl },
 		});
 	}
@@ -69,7 +69,7 @@ export class EmailService {
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Welcome to our platform!",
-			template: "welcome-email",
+			template: "iam/welcome-email",
 			context: { dashboardUrl },
 		});
 	}
@@ -78,7 +78,7 @@ export class EmailService {
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Your account has been deleted",
-			template: "farewell-email",
+			template: "iam/farewell-email",
 			context: {},
 		});
 	}
