@@ -40,8 +40,8 @@ import {
 } from "./application/ports/inbound/users";
 import {
 	AuthConfigPort,
-	EmailQueueServicePort,
 	HashServicePort,
+	IamEmailQueuePort,
 	ImageStoragePort,
 	JwtServicePort,
 	TimeFormatterPort,
@@ -83,7 +83,7 @@ import { GetPublicUserProfileUseCase, GetUsersUseCase } from "./application/use-
 import { RoleRepository, UserRepository } from "./domain/repositories";
 import {
 	BcryptHashAdapter,
-	BullMqEmailQueueAdapter,
+	BullMqIamEmailQueueAdapter,
 	CloudinaryImageStorageAdapter,
 	EnvAuthConfigAdapter,
 	MsTimeFormatterAdapter,
@@ -143,7 +143,7 @@ import {
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
 		{ provide: JwtServicePort, useClass: NestjsJwtAdapter },
 		{ provide: VerificationTokenGeneratorPort, useClass: NodeCryptoAdapter },
-		{ provide: EmailQueueServicePort, useClass: BullMqEmailQueueAdapter },
+		{ provide: IamEmailQueuePort, useClass: BullMqIamEmailQueueAdapter },
 		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
 		{ provide: AuthConfigPort, useClass: EnvAuthConfigAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },

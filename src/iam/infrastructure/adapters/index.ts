@@ -1,5 +1,5 @@
 export * from "./bcrypt-hash.adapter";
-export * from "./bullmq-email-queue.adapter";
+export * from "./bullmq-iam-email-queue.adapter";
 export * from "./cloudinary-image-storage.adapter";
 export * from "./env-auth-config.adapter";
 export * from "./ms-time-formatter.adapter";

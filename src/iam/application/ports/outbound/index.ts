@@ -1,4 +1,4 @@
-export * from "./email-queue.service.port";
+export * from "./iam-email-queue.port";
 export * from "./hash.service.port";
 export * from "./jwt.service.port";
 export * from "./verification-token-generator.port";

@@ -1,4 +1,4 @@
-export abstract class EmailQueueServicePort {
+export abstract class IamEmailQueuePort {
 	abstract enqueueVerificationEmail(
 		email: string,
 		token: string,
