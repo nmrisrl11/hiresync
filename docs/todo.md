@@ -67,9 +67,9 @@
 
 ### Employers
 - [x] Create company profile
-- [ ] Edit company profile
+- [x] Edit company profile
 - [ ] Upload/Remove company profile logo
-- [ ] Get/View company profile
+- [x] Get/View company profile
 - [x] Create job listing
 - [x] Edit job listing
 - [x] Delete/Close job listing

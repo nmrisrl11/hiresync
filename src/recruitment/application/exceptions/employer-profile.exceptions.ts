@@ -7,7 +7,9 @@ export class EmployerProfileAlreadyExistsException extends ApplicationBaseExcept
 }
 
 export class EmployerProfileNotFoundException extends ApplicationBaseException {
-	constructor(message: string = "You must create an employer profile before posting a job.") {
+	constructor(
+		message: string = "Employer profile not found. You must create an employer profile before managing a job.",
+	) {
 		super(message);
 	}
 }
