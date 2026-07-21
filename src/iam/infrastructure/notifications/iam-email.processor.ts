@@ -1,29 +1,29 @@
-import { EmailService } from "@/shared/email/email.service";
 import { Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
+import { IamEmailService } from "./iam-email.service";
 import {
 	EmailChangedAlertSchema,
-	EmailJobPayload,
 	FarewellEmailSchema,
+	IamEmailJobPayload,
 	PasswordChangedAlertSchema,
 	SendChangeEmailRequestSchema,
 	SendPasswordResetSchema,
 	SendVerificationSchema,
 	WelcomeEmailSchema,
-} from "../types/email.types";
+} from "./iam-email.types";
 
-@Processor("email")
-export class EmailProcessor extends WorkerHost {
-	private readonly logger = new Logger(EmailProcessor.name);
+@Processor("iam-email")
+export class IamEmailProcessor extends WorkerHost {
+	private readonly logger = new Logger(IamEmailProcessor.name);
 
-	constructor(private readonly emailService: EmailService) {
+	constructor(private readonly emailService: IamEmailService) {
 		super();
 	}
 
-	//! This method automatically triggers when a new job hits the "email" queue
-	async process(job: Job<EmailJobPayload>): Promise<void> {
-		this.logger.log(`Processing job ${job.id} of type ${job.name}...`);
+	//! This method automatically triggers when a new job hits the "iam-email" queue
+	async process(job: Job<IamEmailJobPayload>): Promise<void> {
+		this.logger.log(`Processing IAM job ${job.id} of type ${job.name}...`);
 
 		try {
 			switch (job.name) {
@@ -75,12 +75,12 @@ export class EmailProcessor extends WorkerHost {
 					break;
 				}
 				default:
-					throw new Error(`Unknown job type: ${job.name}`);
+					throw new Error(`Unknown IAM job type: ${job.name}`);
 			}
 
-			this.logger.log(`Job ${job.id} completed successfully.`);
+			this.logger.log(`IAM Job ${job.id} completed successfully.`);
 		} catch (error) {
-			this.logger.error(`Failed to process job ${job.id}:`, error);
+			this.logger.error(`Failed to process IAM job ${job.id}:`, error);
 			throw error;
 		}
 	}

@@ -1,7 +1,6 @@
 import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
 import { DatabaseModule } from "@/shared/database/database.module";
 import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
-import { QueueModule } from "@/shared/queue/queue.module";
 import { Module } from "@nestjs/common";
 import {
 	ChangePasswordUseCasePort,
@@ -92,6 +91,7 @@ import {
 	NodeCryptoAdapter,
 } from "./infrastructure/adapters";
 import { PrismaRoleRepository, PrismaUserRepository } from "./infrastructure/adapters/persistence";
+import { IamNotificationsModule } from "./infrastructure/notifications/iam-notifications.module";
 import { AccountController } from "./presentation/controllers/account.controller";
 import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
@@ -109,7 +109,7 @@ import {
 } from "./presentation/event-listeners";
 
 @Module({
-	imports: [DatabaseModule, QueueModule],
+	imports: [DatabaseModule, IamNotificationsModule],
 	controllers: [AuthController, AccountController, AdminController, UserController, RoleController],
 	providers: [
 		//! Authentication

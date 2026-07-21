@@ -35,7 +35,7 @@ export const FarewellEmailSchema = z.object({
 	email: z.email().trim(),
 });
 
-export type EmailJobPayload =
+export type IamEmailJobPayload =
 	| z.infer<typeof SendVerificationSchema>
 	| z.infer<typeof SendPasswordResetSchema>
 	| z.infer<typeof SendChangeEmailRequestSchema>
