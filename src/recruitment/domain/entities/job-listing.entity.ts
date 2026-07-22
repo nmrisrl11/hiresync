@@ -1,11 +1,12 @@
 import { AggregateRoot } from "@/shared/domain/entities";
-import { EmployerId, JobListingId, JobLocation, SalaryRange } from "../value-objects";
-import { EmploymentType, JOB_STATUS, JobStatus } from "../types";
 import {
 	JobListingClosedDomainEvent,
 	JobListingCreatedDomainEvent,
 	JobListingUpdatedDomainEvent,
 } from "../events";
+import { JobAlreadyClosedException, JobNotUpdatableException } from "../exceptions";
+import { EmploymentType, JOB_STATUS, JobStatus } from "../types";
+import { EmployerId, JobListingId, JobLocation, SalaryRange } from "../value-objects";
 
 export class JobListing extends AggregateRoot {
 	constructor(
@@ -68,9 +69,8 @@ export class JobListing extends AggregateRoot {
 		location: JobLocation,
 		salaryRange: SalaryRange | null,
 	): void {
-		if (this.status === JOB_STATUS.CLOSED || this.status === JOB_STATUS.EXPIRED) {
-			throw new Error("Cannot update a closed or expired job listing.");
-		}
+		if (this.status === JOB_STATUS.CLOSED || this.status === JOB_STATUS.EXPIRED)
+			throw new JobNotUpdatableException();
 
 		this.title = title;
 		this.description = description;
@@ -86,7 +86,7 @@ export class JobListing extends AggregateRoot {
 	}
 
 	public close(reason: string = "Role filled or cancelled by employer"): void {
-		if (this.status === JOB_STATUS.CLOSED) return;
+		if (this.status === JOB_STATUS.CLOSED) throw new JobAlreadyClosedException();
 
 		this.status = JOB_STATUS.CLOSED;
 		this.updatedAt = new Date();
