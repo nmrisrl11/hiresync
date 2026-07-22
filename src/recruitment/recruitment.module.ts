@@ -14,6 +14,7 @@ import {
 	CloseJobListingUseCasePort,
 	CreateJobListingUseCasePort,
 	EditJobListingUseCasePort,
+	ExpireJobListingsUseCasePort,
 	GetEmployerJobsUseCasePort,
 	GetJobListingByIdUseCasePort,
 } from "./application/ports/inbound/jobs";
@@ -39,6 +40,7 @@ import {
 	CloseJobListingUseCase,
 	CreateJobListingUseCase,
 	EditJobListingUseCase,
+	ExpireJobListingsUseCase,
 	GetEmployerJobsUseCase,
 	GetJobListingByIdUseCase,
 } from "./application/use-cases/jobs";
@@ -65,6 +67,7 @@ import {
 	JobListingClosedListener,
 	JobListingCreatedListener,
 } from "./presentation/event-listeners";
+import { ExpireJobListingsCron } from "./infrastructure/cron/expire-job-listings.cron";
 
 @Module({
 	imports: [DatabaseModule, RecruitmentNotificationsModule],
@@ -87,6 +90,7 @@ import {
 		{ provide: CloseJobListingUseCasePort, useClass: CloseJobListingUseCase },
 		{ provide: GetEmployerJobsUseCasePort, useClass: GetEmployerJobsUseCase },
 		{ provide: GetJobListingByIdUseCasePort, useClass: GetJobListingByIdUseCase },
+		{ provide: ExpireJobListingsUseCasePort, useClass: ExpireJobListingsUseCase },
 
 		//! Outbound - Adapters
 		{ provide: UserIntegrationPort, useClass: PrismaUserIntegrationAdapter },
@@ -110,6 +114,8 @@ import {
 		JobListingCreatedListener,
 		JobListingClosedListener,
 
+		//! CRON Jobs
+		ExpireJobListingsCron,
 		//! Shared
 		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },
 	],

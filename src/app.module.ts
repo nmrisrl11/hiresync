@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { JwtModule } from "@nestjs/jwt";
+import { ScheduleModule } from "@nestjs/schedule";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { IamModule } from "./iam/iam.module";
 import { JwtAuthGuard } from "./iam/presentation/guards/jwt-auth.guard";
@@ -30,6 +31,7 @@ import { SharedModule } from "./shared/shared.module";
 			},
 		]),
 		EventEmitterModule.forRoot(),
+		ScheduleModule.forRoot(),
 		DatabaseModule,
 		JwtModule.register({ global: true }),
 		SharedModule,
