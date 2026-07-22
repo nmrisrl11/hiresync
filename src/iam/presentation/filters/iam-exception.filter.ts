@@ -1,15 +1,18 @@
 import {
-	InvalidTokenException as InvalidApplicationTokenException,
 	InvalidLoginException,
 	InvalidPasswordException,
+	InvalidTokenException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
 	UserNotFoundException,
 } from "@/iam/application/exceptions";
 import {
-	InvalidTokenException as InvalidDomainTokenException,
+	ExpiredResetTokenException,
+	ExpiredVerificationTokenException,
 	InvalidEmailFormatException,
+	InvalidResetTokenException,
+	InvalidVerificationTokenException,
 	NoAccountFoundException,
 	NoPendingEmailChangeException,
 } from "@/iam/domain/exceptions";
@@ -22,7 +25,10 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 	private getDomainStatus(exception: DomainBaseException): HttpStatus {
 		switch (exception.constructor) {
 			case InvalidEmailFormatException:
-			case InvalidDomainTokenException:
+			case InvalidVerificationTokenException:
+			case ExpiredVerificationTokenException:
+			case InvalidResetTokenException:
+			case ExpiredResetTokenException:
 			case NoPendingEmailChangeException:
 				return HttpStatus.BAD_REQUEST;
 			case NoAccountFoundException:
@@ -36,7 +42,7 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 		switch (exception.constructor) {
 			case InvalidLoginException:
 				return HttpStatus.UNAUTHORIZED;
-			case InvalidApplicationTokenException:
+			case InvalidTokenException:
 			case RoleNotFoundException:
 			case InvalidPasswordException:
 				return HttpStatus.BAD_REQUEST;

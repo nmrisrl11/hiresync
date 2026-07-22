@@ -38,6 +38,7 @@ import {
 	Put,
 	Query,
 	UploadedFile,
+	UseFilters,
 	UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -50,8 +51,10 @@ import {
 	EditJobListingDto,
 	GetEmployerJobsDto,
 } from "../dtos";
+import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.filter";
 import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mapper";
 
+@UseFilters(RecruitmentExceptionFilter)
 @ApiTags("Employers")
 @ApiBearerAuth()
 @Controller("employers")
