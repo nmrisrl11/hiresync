@@ -1,4 +1,9 @@
-import { InvalidTokenException } from "../exceptions";
+import {
+	ExpiredResetTokenException,
+	ExpiredVerificationTokenException,
+	InvalidResetTokenException,
+	InvalidVerificationTokenException,
+} from "../exceptions";
 import { AccountId } from "../value-objects";
 
 export class Account {
@@ -37,11 +42,10 @@ export class Account {
 	}
 
 	public verify(token: string): void {
-		if (this.verificationToken !== token)
-			throw new InvalidTokenException("The verification token is invalid.");
+		if (this.verificationToken !== token) throw new InvalidVerificationTokenException();
 
 		if (!this.verificationTokenExpiresAt || this.verificationTokenExpiresAt < new Date())
-			throw new InvalidTokenException(
+			throw new ExpiredVerificationTokenException(
 				"The verification token has expired. Please request a new one.",
 			);
 
@@ -64,11 +68,10 @@ export class Account {
 	}
 
 	public updatePasswordHash(token: string, password: string) {
-		if (this.resetToken !== token)
-			throw new InvalidTokenException("The password reset token is invalid.");
+		if (this.resetToken !== token) throw new InvalidResetTokenException();
 
 		if (!this.resetTokenExpiresAt || this.resetTokenExpiresAt < new Date())
-			throw new InvalidTokenException(
+			throw new ExpiredResetTokenException(
 				"The password reset token has expired. Please request a new one.",
 			);
 

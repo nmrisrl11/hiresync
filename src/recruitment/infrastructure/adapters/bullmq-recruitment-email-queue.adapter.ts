@@ -32,11 +32,11 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 		jobTitle: string,
 		reason: string,
 	): Promise<void> {
-		await this.emailQueue.add("send-job-closed", {
-			email,
-			companyName,
-			jobTitle,
-			reason,
-		});
+		console.log(email, companyName, jobTitle, reason);
+		await this.emailQueue.add(
+			"send-job-closed",
+			{ email, companyName, jobTitle, reason },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
 	}
 }

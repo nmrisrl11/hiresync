@@ -6,8 +6,26 @@ export class InvalidEmailFormatException extends DomainBaseException {
 	}
 }
 
-export class InvalidTokenException extends DomainBaseException {
-	constructor(message: string = "The token is not found, expired or invalid.") {
+export class InvalidVerificationTokenException extends DomainBaseException {
+	constructor(message: string = "The verification token is invalid.") {
+		super(message);
+	}
+}
+
+export class ExpiredVerificationTokenException extends DomainBaseException {
+	constructor(message: string = "The verification token is expired.") {
+		super(message);
+	}
+}
+
+export class InvalidResetTokenException extends DomainBaseException {
+	constructor(message: string = "The password reset token is invalid.") {
+		super(message);
+	}
+}
+
+export class ExpiredResetTokenException extends DomainBaseException {
+	constructor(message: string = "The password reset token is expired.") {
 		super(message);
 	}
 }
