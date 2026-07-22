@@ -4,6 +4,7 @@ import { Job } from "bullmq";
 import { RecruitmentEmailService } from "./recruitment-email.service";
 import {
 	EmployerWelcomeEmailSchema,
+	JobClosedEmailSchema,
 	JobCreatedEmailSchema,
 	RecruitmentEmailJobPayload,
 } from "./recruitment-email.types";
@@ -32,6 +33,16 @@ export class RecruitmentEmailProcessor extends WorkerHost {
 						payload.email,
 						payload.companyName,
 						payload.jobTitle,
+					);
+					break;
+				}
+				case "send-job-closed": {
+					const payload = JobClosedEmailSchema.parse(job.data);
+					await this.emailService.sendJobListingClosedEmail(
+						payload.email,
+						payload.companyName,
+						payload.jobTitle,
+						payload.reason,
 					);
 					break;
 				}

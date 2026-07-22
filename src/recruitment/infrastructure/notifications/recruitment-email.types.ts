@@ -11,5 +11,14 @@ export const JobCreatedEmailSchema = z.object({
 	jobTitle: z.string().trim(),
 });
 
+export const JobClosedEmailSchema = z.object({
+	email: z.email().trim(),
+	companyName: z.string().trim(),
+	jobTitle: z.string().trim(),
+	reason: z.string().trim(),
+});
+
 export type RecruitmentEmailJobPayload =
-	z.infer<typeof EmployerWelcomeEmailSchema> | z.infer<typeof JobCreatedEmailSchema>;
+	| z.infer<typeof EmployerWelcomeEmailSchema>
+	| z.infer<typeof JobCreatedEmailSchema>
+	| z.infer<typeof JobClosedEmailSchema>;
