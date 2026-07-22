@@ -1,16 +1,8 @@
 import {
-	CloseJobListingCommand,
-	CloseJobListingUseCasePort,
 	CreateEmployerProfileCommand,
 	CreateEmployerProfileUseCasePort,
-	CreateJobListingCommand,
-	CreateJobListingUseCasePort,
 	EditEmployerProfileCommand,
 	EditEmployerProfileUseCasePort,
-	EditJobListingCommand,
-	EditJobListingUseCasePort,
-	GetEmployerJobsQuery,
-	GetEmployerJobsUseCasePort,
 	GetEmployerProfileQuery,
 	GetEmployerProfileUseCasePort,
 	RemoveCompanyLogoCommand,
@@ -18,6 +10,16 @@ import {
 	UploadCompanyLogoCommand,
 	UploadCompanyLogoUseCasePort,
 } from "@/recruitment/application/ports/inbound/employers";
+import {
+	CloseJobListingCommand,
+	CloseJobListingUseCasePort,
+	CreateJobListingCommand,
+	CreateJobListingUseCasePort,
+	EditJobListingCommand,
+	EditJobListingUseCasePort,
+	GetEmployerJobsQuery,
+	GetEmployerJobsUseCasePort,
+} from "@/recruitment/application/ports/inbound/jobs";
 import { type JwtPayload } from "@/shared/application/types";
 import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
 import {
@@ -38,6 +40,7 @@ import {
 	UploadedFile,
 	UseInterceptors,
 } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import {
 	CloseJobListingDto,
@@ -48,7 +51,6 @@ import {
 	GetEmployerJobsDto,
 } from "../dtos";
 import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mapper";
-import { FileInterceptor } from "@nestjs/platform-express";
 
 @ApiTags("Employers")
 @ApiBearerAuth()

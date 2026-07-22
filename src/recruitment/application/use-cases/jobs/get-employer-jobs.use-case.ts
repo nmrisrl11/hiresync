@@ -1,12 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { GetEmployerJobsQuery, GetEmployerJobsUseCasePort } from "../../ports/inbound/employers";
+import { JobListing } from "@/recruitment/domain/entities";
 import {
 	EmployerProfileRepository,
 	FindJobsFilter,
 	JobListingRepository,
 } from "@/recruitment/domain/repositories";
+import { Injectable } from "@nestjs/common";
 import { EmployerProfileNotFoundException } from "../../exceptions";
-import { JobListing } from "@/recruitment/domain/entities";
+import { GetEmployerJobsQuery, GetEmployerJobsUseCasePort } from "../../ports/inbound/jobs";
 
 @Injectable()
 export class GetEmployerJobsUseCase implements GetEmployerJobsUseCasePort {
