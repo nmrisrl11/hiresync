@@ -82,7 +82,7 @@
     - [x] Created job listing
     - [/] Updated job listing
     - [x] Closed job listing
-    - [ ] Expired job listing - with Task job using CRON?
+    - [x] Expired job listing - with Task job using CRON?
 
 ### Applicants
 - [ ] Browse available jobs

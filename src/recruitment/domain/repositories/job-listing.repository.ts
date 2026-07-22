@@ -13,6 +13,7 @@ export interface FindJobsFilter {
 export abstract class JobListingRepository {
 	abstract findById(id: JobListingId): Promise<JobListing | null>;
 	abstract findMany(filter: FindJobsFilter): Promise<JobListing[]>;
+	abstract findExpirableListings(referenceDate: Date): Promise<JobListing[]>;
 	abstract count(filter: Omit<FindJobsFilter, "limit" | "offset">): Promise<number>;
 	abstract save(jobListing: JobListing): Promise<void>;
 	abstract delete(id: JobListingId): Promise<void>;

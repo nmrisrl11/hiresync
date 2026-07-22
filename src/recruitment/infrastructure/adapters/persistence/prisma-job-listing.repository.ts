@@ -44,6 +44,19 @@ export class PrismaJobListingRepository implements JobListingRepository {
 		return jobs.map((job) => RecruitmentMapper.toJobListingDomain(job));
 	}
 
+	async findExpirableListings(referenceDate: Date): Promise<JobListing[]> {
+		const jobs = await this.prisma.jobListing.findMany({
+			where: {
+				status: "PUBLISHED",
+				expiresAt: {
+					lt: referenceDate,
+				},
+			},
+		});
+
+		return jobs.map((job) => RecruitmentMapper.toJobListingDomain(job));
+	}
+
 	async count(filter: Omit<FindJobsFilter, "limit" | "offset">): Promise<number> {
 		return await this.prisma.jobListing.count({
 			where: this.buildWhereClause(filter),
