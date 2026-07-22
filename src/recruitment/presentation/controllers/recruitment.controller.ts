@@ -10,6 +10,7 @@ import { EMPLOYMENT_TYPE, JOB_STATUS, LOCATION_TYPE } from "@/recruitment/domain
 import { Public } from "@/shared/presentation/decorators/public.decorator";
 import { Controller, Get, HttpCode, HttpStatus, Param } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 
 @ApiTags("Recruitment")
 @Controller("recruitments")
@@ -22,6 +23,7 @@ export class RecruitmentController {
 	@Public()
 	@Get("companies/:id")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
 	@ApiOperation({ summary: "Get a company (employer) profile by ID." })
 	public async getCompanyProfile(@Param("id") companyId: string) {
 		const query = new GetEmployerProfileByIdQuery(companyId);
@@ -33,6 +35,7 @@ export class RecruitmentController {
 	@Public()
 	@Get("jobs/:id")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
 	@ApiOperation({ summary: "Get a specific job listing by ID." })
 	public async getJobListing(@Param("id") jobId: string) {
 		const query = new GetJobListingByIdQuery(jobId);
@@ -43,6 +46,7 @@ export class RecruitmentController {
 
 	@Public()
 	@Get("meta")
+	@Throttle({ default: { ttl: 60000, limit: 60 } })
 	@ApiOperation({ summary: "Get job listing constants for dropdowns and filters." })
 	public getJobConstants() {
 		return {

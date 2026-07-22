@@ -43,6 +43,7 @@ import {
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 import {
 	CloseJobListingDto,
 	CreateEmployerProfileDto,
@@ -73,6 +74,7 @@ export class EmployerController {
 
 	@Get("profile")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
 	@ApiOperation({ summary: "Get the employer's company profile." })
 	public async getProfile(@CurrentUser() user: JwtPayload) {
 		const query = new GetEmployerProfileQuery(user.sub);
@@ -84,6 +86,7 @@ export class EmployerController {
 
 	@Post("profile")
 	@HttpCode(HttpStatus.CREATED)
+	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Create an employer's company profile." })
 	public async createProfile(
 		@CurrentUser() user: JwtPayload,
@@ -104,6 +107,7 @@ export class EmployerController {
 
 	@Put("profile")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 15 } })
 	@ApiOperation({ summary: "Edit the employer's company profile." })
 	public async editProfile(@CurrentUser() user: JwtPayload, @Body() dto: EditEmployerProfileDto) {
 		const command = new EditEmployerProfileCommand(
@@ -121,6 +125,7 @@ export class EmployerController {
 
 	@Post("profile/logo")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Upload or update the company profile logo." })
 	@ApiConsumes("multipart/form-data")
 	@ApiBody({
@@ -156,6 +161,7 @@ export class EmployerController {
 
 	@Delete("profile/logo")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Remove the company profile logo." })
 	public async removeLogo(@CurrentUser() user: JwtPayload) {
 		const command = new RemoveCompanyLogoCommand(user.sub);
@@ -167,6 +173,7 @@ export class EmployerController {
 
 	@Post("jobs")
 	@HttpCode(HttpStatus.CREATED)
+	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Create a new job listing." })
 	public async createJob(@CurrentUser() user: JwtPayload, @Body() dto: CreateJobListingDto) {
 		const command = new CreateJobListingCommand(
@@ -190,6 +197,7 @@ export class EmployerController {
 
 	@Put("jobs/:id")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 15 } })
 	@ApiOperation({ summary: "Edit an existing job listing." })
 	public async editJob(
 		@CurrentUser() user: JwtPayload,
@@ -217,6 +225,7 @@ export class EmployerController {
 
 	@Patch("jobs/:id/close")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Close a job listing." })
 	public async closeJob(
 		@CurrentUser() user: JwtPayload,
@@ -232,6 +241,7 @@ export class EmployerController {
 
 	@Get("jobs")
 	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
 	@ApiOperation({ summary: "Get a paginated list of jobs posted by the employer." })
 	public async getJobs(@CurrentUser() user: JwtPayload, @Query() queryDto: GetEmployerJobsDto) {
 		const query = new GetEmployerJobsQuery(
