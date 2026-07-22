@@ -70,12 +70,12 @@
 - [x] Edit company profile
 - [x] Upload/Remove company profile logo
 - [x] Get/View company profile
-- [ ] Get company profile by ID
+- [x] Get company profile by ID
 - [x] Create job listing
 - [x] Edit job listing
 - [x] Delete/Close job listing
 - [x] Get/View job listing
-- [ ] Get job listing by ID
+- [x] Get job listing by ID
     #### Email Notifications
     - [x] Created company profile
     - [/] Updated company profile
