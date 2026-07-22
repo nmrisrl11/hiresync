@@ -4,6 +4,10 @@ import {
 	JobListingNotFoundException,
 	UnauthorizedJobListingException,
 } from "@/recruitment/application/exceptions";
+import {
+	JobAlreadyClosedException,
+	JobNotUpdatableException,
+} from "@/recruitment/domain/exceptions";
 import { ApplicationBaseException, DomainBaseException } from "@/shared/exceptions/base.exception";
 import { BaseExceptionFilter } from "@/shared/presentation/filters/base-exception.filter";
 import { Catch, HttpStatus } from "@nestjs/common";
@@ -13,6 +17,9 @@ export class RecruitmentExceptionFilter extends BaseExceptionFilter {
 	private getDomainStatus(exception: DomainBaseException): HttpStatus {
 		//! TODO: Add Domain Exceptions here for Recruitment
 		switch (exception.constructor) {
+			case JobNotUpdatableException:
+			case JobAlreadyClosedException:
+				return HttpStatus.CONFLICT;
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;
 		}

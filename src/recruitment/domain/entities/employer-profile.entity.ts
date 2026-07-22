@@ -1,6 +1,6 @@
 import { AggregateRoot } from "@/shared/domain/entities";
-import { CompanyWebsite, EmployerId } from "../value-objects";
 import { EmployerProfileCreatedDomainEvent, EmployerProfileUpdatedDomainEvent } from "../events";
+import { CompanyWebsite, EmployerId } from "../value-objects";
 
 export class EmployerProfile extends AggregateRoot {
 	constructor(
