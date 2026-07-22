@@ -3,7 +3,6 @@ import {
 	JobListing as PrismaJobListing,
 } from "@/generated/prisma/client";
 import { EmployerProfile, JobListing } from "@/recruitment/domain/entities";
-import { EmploymentType, JobStatus, LocationType } from "@/recruitment/domain/types";
 import {
 	CompanyWebsite,
 	EmployerId,
@@ -30,7 +29,7 @@ export class RecruitmentMapper {
 	}
 
 	public static toJobListingDomain(raw: PrismaJobListing): JobListing {
-		const locationVo = new JobLocation(raw.locationType as LocationType, raw.locationAddress);
+		const locationVo = new JobLocation(raw.locationType, raw.locationAddress);
 
 		let salaryVo: SalaryRange | null = null;
 		if (raw.salaryMin !== null && raw.salaryMax !== null) {
@@ -43,10 +42,10 @@ export class RecruitmentMapper {
 			raw.title,
 			raw.description,
 			raw.requirements,
-			raw.employmentType as EmploymentType,
+			raw.employmentType,
 			locationVo,
 			salaryVo,
-			raw.status as JobStatus,
+			raw.status,
 			raw.expiresAt,
 			raw.createdAt,
 			raw.updatedAt,

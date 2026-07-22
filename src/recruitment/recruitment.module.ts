@@ -9,7 +9,9 @@ import {
 	EditEmployerProfileUseCasePort,
 	EditJobListingUseCasePort,
 	GetEmployerJobsUseCasePort,
+	GetEmployerProfileByIdUseCasePort,
 	GetEmployerProfileUseCasePort,
+	GetJobListingByIdUseCasePort,
 	RemoveCompanyLogoUseCasePort,
 	UploadCompanyLogoUseCasePort,
 } from "./application/ports/inbound/employers";
@@ -29,7 +31,9 @@ import {
 	EditEmployerProfileUseCase,
 	EditJobListingUseCase,
 	GetEmployerJobsUseCase,
+	GetEmployerProfileByIdUseCase,
 	GetEmployerProfileUseCase,
+	GetJobListingByIdUseCase,
 	RemoveCompanyLogoUseCase,
 	UploadCompanyLogoUseCase,
 } from "./application/use-cases/employers";
@@ -49,7 +53,7 @@ import {
 } from "./infrastructure/adapters/persistence";
 import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
 import { EmployerController } from "./presentation/controllers/employer.controller";
-import { RecruitmentConstantsController } from "./presentation/controllers/recruitment-constants.controller";
+import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
 import {
 	EmployerProfileCreatedListener,
 	JobListingCreatedListener,
@@ -57,7 +61,7 @@ import {
 
 @Module({
 	imports: [DatabaseModule, RecruitmentNotificationsModule],
-	controllers: [EmployerController, RecruitmentConstantsController],
+	controllers: [EmployerController, RecruitmentController],
 	providers: [
 		//! Repositories and Persistence
 		{ provide: EmployerProfileRepository, useClass: PrismaEmployerProfileRepository },
@@ -69,10 +73,13 @@ import {
 		{ provide: UploadCompanyLogoUseCasePort, useClass: UploadCompanyLogoUseCase },
 		{ provide: RemoveCompanyLogoUseCasePort, useClass: RemoveCompanyLogoUseCase },
 		{ provide: GetEmployerProfileUseCasePort, useClass: GetEmployerProfileUseCase },
+		{ provide: GetEmployerProfileByIdUseCasePort, useClass: GetEmployerProfileByIdUseCase },
+
 		{ provide: CreateJobListingUseCasePort, useClass: CreateJobListingUseCase },
 		{ provide: EditJobListingUseCasePort, useClass: EditJobListingUseCase },
 		{ provide: CloseJobListingUseCasePort, useClass: CloseJobListingUseCase },
 		{ provide: GetEmployerJobsUseCasePort, useClass: GetEmployerJobsUseCase },
+		{ provide: GetJobListingByIdUseCasePort, useClass: GetJobListingByIdUseCase },
 
 		//! Outbound - Adapters
 		{ provide: UserIntegrationPort, useClass: PrismaUserIntegrationAdapter },
