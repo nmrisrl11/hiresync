@@ -3,15 +3,10 @@ import { DatabaseModule } from "@/shared/database/database.module";
 import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
 import { Module } from "@nestjs/common";
 import {
-	CloseJobListingUseCasePort,
 	CreateEmployerProfileUseCasePort,
-	CreateJobListingUseCasePort,
 	EditEmployerProfileUseCasePort,
-	EditJobListingUseCasePort,
-	GetEmployerJobsUseCasePort,
 	GetEmployerProfileByIdUseCasePort,
 	GetEmployerProfileUseCasePort,
-	GetJobListingByIdUseCasePort,
 	RemoveCompanyLogoUseCasePort,
 	UploadCompanyLogoUseCasePort,
 } from "./application/ports/inbound/employers";
@@ -25,15 +20,10 @@ import {
 	UserIntegrationPort,
 } from "./application/ports/outbound";
 import {
-	CloseJobListingUseCase,
 	CreateEmployerProfileUseCase,
-	CreateJobListingUseCase,
 	EditEmployerProfileUseCase,
-	EditJobListingUseCase,
-	GetEmployerJobsUseCase,
 	GetEmployerProfileByIdUseCase,
 	GetEmployerProfileUseCase,
-	GetJobListingByIdUseCase,
 	RemoveCompanyLogoUseCase,
 	UploadCompanyLogoUseCase,
 } from "./application/use-cases/employers";
@@ -58,6 +48,20 @@ import {
 	EmployerProfileCreatedListener,
 	JobListingCreatedListener,
 } from "./presentation/event-listeners";
+import {
+	CloseJobListingUseCasePort,
+	CreateJobListingUseCasePort,
+	EditJobListingUseCasePort,
+	GetEmployerJobsUseCasePort,
+	GetJobListingByIdUseCasePort,
+} from "./application/ports/inbound/jobs";
+import {
+	CloseJobListingUseCase,
+	CreateJobListingUseCase,
+	EditJobListingUseCase,
+	GetEmployerJobsUseCase,
+	GetJobListingByIdUseCase,
+} from "./application/use-cases/jobs";
 
 @Module({
 	imports: [DatabaseModule, RecruitmentNotificationsModule],
