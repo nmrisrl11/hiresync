@@ -38,7 +38,7 @@ import {
 	UploadedFile,
 	UseInterceptors,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import {
 	CloseJobListingDto,
 	CreateEmployerProfileDto,
@@ -116,8 +116,20 @@ export class EmployerController {
 
 	@Post("profile/logo")
 	@HttpCode(HttpStatus.OK)
-	@UseInterceptors(FileInterceptor("file"))
 	@ApiOperation({ summary: "Upload or update the company profile logo." })
+	@ApiConsumes("multipart/form-data")
+	@ApiBody({
+		schema: {
+			type: "object",
+			properties: {
+				file: {
+					type: "string",
+					format: "binary",
+				},
+			},
+		},
+	})
+	@UseInterceptors(FileInterceptor("file"))
 	public async uploadLogo(
 		@CurrentUser() user: JwtPayload,
 		@UploadedFile(
