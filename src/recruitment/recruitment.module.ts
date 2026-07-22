@@ -11,7 +11,15 @@ import {
 	UploadCompanyLogoUseCasePort,
 } from "./application/ports/inbound/employers";
 import {
+	CloseJobListingUseCasePort,
+	CreateJobListingUseCasePort,
+	EditJobListingUseCasePort,
+	GetEmployerJobsUseCasePort,
+	GetJobListingByIdUseCasePort,
+} from "./application/ports/inbound/jobs";
+import {
 	EnqueueEmployerWelcomeEmailUseCasePort,
+	EnqueueJobClosedEmailUseCasePort,
 	EnqueueJobCreatedEmailUseCasePort,
 } from "./application/ports/inbound/notifications";
 import {
@@ -28,7 +36,15 @@ import {
 	UploadCompanyLogoUseCase,
 } from "./application/use-cases/employers";
 import {
+	CloseJobListingUseCase,
+	CreateJobListingUseCase,
+	EditJobListingUseCase,
+	GetEmployerJobsUseCase,
+	GetJobListingByIdUseCase,
+} from "./application/use-cases/jobs";
+import {
 	EnqueueEmployerWelcomeEmailUseCase,
+	EnqueueJobClosedEmailUseCase,
 	EnqueueJobCreatedEmailUseCase,
 } from "./application/use-cases/notifications";
 import { EmployerProfileRepository, JobListingRepository } from "./domain/repositories";
@@ -46,22 +62,9 @@ import { EmployerController } from "./presentation/controllers/employer.controll
 import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
 import {
 	EmployerProfileCreatedListener,
+	JobListingClosedListener,
 	JobListingCreatedListener,
 } from "./presentation/event-listeners";
-import {
-	CloseJobListingUseCasePort,
-	CreateJobListingUseCasePort,
-	EditJobListingUseCasePort,
-	GetEmployerJobsUseCasePort,
-	GetJobListingByIdUseCasePort,
-} from "./application/ports/inbound/jobs";
-import {
-	CloseJobListingUseCase,
-	CreateJobListingUseCase,
-	EditJobListingUseCase,
-	GetEmployerJobsUseCase,
-	GetJobListingByIdUseCase,
-} from "./application/use-cases/jobs";
 
 @Module({
 	imports: [DatabaseModule, RecruitmentNotificationsModule],
@@ -99,8 +102,13 @@ import {
 			provide: EnqueueJobCreatedEmailUseCasePort,
 			useClass: EnqueueJobCreatedEmailUseCase,
 		},
+		{
+			provide: EnqueueJobClosedEmailUseCasePort,
+			useClass: EnqueueJobClosedEmailUseCase,
+		},
 		EmployerProfileCreatedListener,
 		JobListingCreatedListener,
+		JobListingClosedListener,
 
 		//! Shared
 		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },

@@ -33,4 +33,20 @@ export class RecruitmentEmailService {
 			context: { jobsUrl, companyName, jobTitle },
 		});
 	}
+
+	public async sendJobListingClosedEmail(
+		email: string,
+		companyName: string,
+		jobTitle: string,
+		reason: string,
+	): Promise<void> {
+		const jobsUrl = `${this.appUrl}/employer/jobs`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: `Job Closed: ${jobTitle}`,
+			template: "recruitment/job-closed",
+			context: { jobsUrl, companyName, jobTitle, reason },
+		});
+	}
 }

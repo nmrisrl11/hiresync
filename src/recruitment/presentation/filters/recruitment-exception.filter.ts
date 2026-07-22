@@ -15,7 +15,6 @@ import { Catch, HttpStatus } from "@nestjs/common";
 @Catch(ApplicationBaseException, DomainBaseException)
 export class RecruitmentExceptionFilter extends BaseExceptionFilter {
 	private getDomainStatus(exception: DomainBaseException): HttpStatus {
-		//! TODO: Add Domain Exceptions here for Recruitment
 		switch (exception.constructor) {
 			case JobNotUpdatableException:
 			case JobAlreadyClosedException:

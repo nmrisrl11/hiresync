@@ -81,7 +81,7 @@
     - [/] Updated company profile
     - [x] Created job listing
     - [/] Updated job listing
-    - [ ] Closed job listing
+    - [x] Closed job listing
     - [ ] Expired job listing - with Task job using CRON?
 
 ### Applicants
@@ -103,7 +103,6 @@
 ### File Uploading
 - [ ] Resume in PDF
 - [ ] Cover letter in PDF
-- [ ] Company logo?
 
 ### Email Notifications
 - [x] Welcome Email
@@ -112,7 +111,6 @@
 - [x] Forgot and Change Password
 - [x] Request and Confirmation of Changing Email
 - [ ] Job Application Confirmation
-- [ ] Employer Notification
 - [ ] Job Expiration Reminder
 
 ### Schedule Tasks

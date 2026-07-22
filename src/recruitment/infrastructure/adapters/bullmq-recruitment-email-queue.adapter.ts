@@ -25,4 +25,18 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
 		);
 	}
+
+	public async enqueueJobClosedEmail(
+		email: string,
+		companyName: string,
+		jobTitle: string,
+		reason: string,
+	): Promise<void> {
+		await this.emailQueue.add("send-job-closed", {
+			email,
+			companyName,
+			jobTitle,
+			reason,
+		});
+	}
 }
