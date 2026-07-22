@@ -68,7 +68,7 @@
 ### Employers
 - [x] Create company profile
 - [x] Edit company profile
-- [ ] Upload/Remove company profile logo
+- [x] Upload/Remove company profile logo
 - [x] Get/View company profile
 - [x] Create job listing
 - [x] Edit job listing
@@ -76,9 +76,9 @@
 - [x] Get/View job listing
     #### Email Notifications
     - [x] Created company profile
-    - [ ] Updated company profile
+    - [/] Updated company profile
     - [x] Created job listing
-    - [ ] Updated job listing
+    - [/] Updated job listing
     - [ ] Closed job listing
     - [ ] Expired job listing - with Task job using CRON?
 
