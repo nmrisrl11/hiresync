@@ -13,20 +13,30 @@ import {
 	GetEmployerJobsUseCasePort,
 	GetEmployerProfileQuery,
 	GetEmployerProfileUseCasePort,
+	RemoveCompanyLogoCommand,
+	RemoveCompanyLogoUseCasePort,
+	UploadCompanyLogoCommand,
+	UploadCompanyLogoUseCasePort,
 } from "@/recruitment/application/ports/inbound/employers";
 import { type JwtPayload } from "@/shared/application/types";
 import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
 import {
 	Body,
 	Controller,
+	Delete,
+	FileTypeValidator,
 	Get,
 	HttpCode,
 	HttpStatus,
+	MaxFileSizeValidator,
 	Param,
+	ParseFilePipe,
 	Patch,
 	Post,
 	Put,
 	Query,
+	UploadedFile,
+	UseInterceptors,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import {
@@ -38,6 +48,7 @@ import {
 	GetEmployerJobsDto,
 } from "../dtos";
 import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mapper";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @ApiTags("Employers")
 @ApiBearerAuth()
@@ -47,6 +58,8 @@ export class EmployerController {
 		private readonly createEmployerProfileUseCase: CreateEmployerProfileUseCasePort,
 		private readonly getEmployerProfileUseCase: GetEmployerProfileUseCasePort,
 		private readonly editEmployerProfileUseCase: EditEmployerProfileUseCasePort,
+		private readonly uploadCompanyLogoUseCase: UploadCompanyLogoUseCasePort,
+		private readonly removeCompanyLogoUseCase: RemoveCompanyLogoUseCasePort,
 		private readonly createJobListingUseCase: CreateJobListingUseCasePort,
 		private readonly editJobListingUseCase: EditJobListingUseCasePort,
 		private readonly closeJobListingUseCase: CloseJobListingUseCasePort,
@@ -99,6 +112,40 @@ export class EmployerController {
 		await this.editEmployerProfileUseCase.execute(command);
 
 		return { message: "Employer profile updated successfully." };
+	}
+
+	@Post("profile/logo")
+	@HttpCode(HttpStatus.OK)
+	@UseInterceptors(FileInterceptor("file"))
+	@ApiOperation({ summary: "Upload or update the company profile logo." })
+	public async uploadLogo(
+		@CurrentUser() user: JwtPayload,
+		@UploadedFile(
+			new ParseFilePipe({
+				validators: [
+					new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB limit
+					new FileTypeValidator({ fileType: ".(png|jpeg|jpg|webp)" }),
+				],
+			}),
+		)
+		file: Express.Multer.File,
+	) {
+		const command = new UploadCompanyLogoCommand(user.sub, file.buffer, file.mimetype);
+
+		await this.uploadCompanyLogoUseCase.execute(command);
+
+		return { message: "Company logo uploaded successfully." };
+	}
+
+	@Delete("profile/logo")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Remove the company profile logo." })
+	public async removeLogo(@CurrentUser() user: JwtPayload) {
+		const command = new RemoveCompanyLogoCommand(user.sub);
+
+		await this.removeCompanyLogoUseCase.execute(command);
+
+		return { message: "Company logo removed successfully." };
 	}
 
 	@Post("jobs")
