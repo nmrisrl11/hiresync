@@ -93,9 +93,9 @@
     - [x] Expired job listing - with Task job using CRON?
 
 ### Applicants
-- [ ] Create applicant profile
-- [ ] Edit applicant profile
-- [ ] View applicant profile
+- [x] Create applicant profile
+- [x] Edit applicant profile
+- [x] Get/View applicant profile
     #### Email Notifications
     - [ ] Created applicant profile
 
