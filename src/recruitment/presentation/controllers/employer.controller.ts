@@ -21,7 +21,9 @@ import {
 	GetEmployerJobsUseCasePort,
 } from "@/recruitment/application/ports/inbound/jobs";
 import { type JwtPayload } from "@/shared/application/types";
+import { ROLES } from "@/shared/domain/types/role.type";
 import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
+import { Roles } from "@/shared/presentation/decorators/roles.decorator";
 import {
 	Body,
 	Controller,
@@ -58,6 +60,7 @@ import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mappe
 @UseFilters(RecruitmentExceptionFilter)
 @ApiTags("Employers")
 @ApiBearerAuth()
+@Roles(ROLES.EMPLOYER)
 @Controller("employers")
 export class EmployerController {
 	constructor(

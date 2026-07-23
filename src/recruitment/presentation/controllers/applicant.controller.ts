@@ -7,7 +7,9 @@ import {
 	GetApplicantProfileUseCasePort,
 } from "@/recruitment/application/ports/inbound/applicants";
 import { type JwtPayload } from "@/shared/application/types";
+import { ROLES } from "@/shared/domain/types/role.type";
 import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
+import { Roles } from "@/shared/presentation/decorators/roles.decorator";
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, UseFilters } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
@@ -17,6 +19,7 @@ import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.fil
 @UseFilters(RecruitmentExceptionFilter)
 @ApiTags("Applicants")
 @ApiBearerAuth()
+@Roles(ROLES.APPLICANT)
 @Controller("applicants")
 export class ApplicantController {
 	constructor(
