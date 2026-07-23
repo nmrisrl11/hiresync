@@ -50,3 +50,22 @@ model JobListing {
 	createdAt       DateTime @default(now())
 	updatedAt       DateTime @updatedAt
 }
+
+// ------------------------------------------------------
+// APPLICANT PROFILE TABLE: Candidate Details
+// ------------------------------------------------------
+model ApplicantProfile {
+	id        String   @id @default(uuid())
+
+	// Foreign Key to User
+	userId    String   @unique
+	user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+	firstName String
+	lastName  String
+	headline  String?
+	bio       String?  @db.Text
+
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+}

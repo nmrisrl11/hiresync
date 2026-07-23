@@ -3,6 +3,11 @@ import { DatabaseModule } from "@/shared/database/database.module";
 import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
 import { Module } from "@nestjs/common";
 import {
+	CreateApplicantProfileUseCasePort,
+	EditApplicantProfileUseCasePort,
+	GetApplicantProfileUseCasePort,
+} from "./application/ports/inbound/applicants";
+import {
 	CreateEmployerProfileUseCasePort,
 	EditEmployerProfileUseCasePort,
 	GetEmployerProfileByIdUseCasePort,
@@ -30,6 +35,11 @@ import {
 	UserIntegrationPort,
 } from "./application/ports/outbound";
 import {
+	CreateApplicantProfileUseCase,
+	EditApplicantProfileUseCase,
+	GetApplicantProfileUseCase,
+} from "./application/use-cases/applicants";
+import {
 	CreateEmployerProfileUseCase,
 	EditEmployerProfileUseCase,
 	GetEmployerProfileByIdUseCase,
@@ -51,18 +61,24 @@ import {
 	EnqueueJobClosedEmailUseCase,
 	EnqueueJobCreatedEmailUseCase,
 } from "./application/use-cases/notifications";
-import { EmployerProfileRepository, JobListingRepository } from "./domain/repositories";
+import {
+	ApplicantProfileRepository,
+	EmployerProfileRepository,
+	JobListingRepository,
+} from "./domain/repositories";
 import {
 	BullMqRecruitmentEmailQueueAdapter,
 	CloudinaryImageStorageAdapter,
 	PrismaUserIntegrationAdapter,
 } from "./infrastructure/adapters";
 import {
+	PrismaApplicantProfileRepository,
 	PrismaEmployerProfileRepository,
 	PrismaJobListingRepository,
 } from "./infrastructure/adapters/persistence";
 import { ExpireJobListingsCron } from "./infrastructure/cron/expire-job-listings.cron";
 import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
+import { ApplicantController } from "./presentation/controllers/applicant.controller";
 import { EmployerController } from "./presentation/controllers/employer.controller";
 import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
 import {
@@ -73,11 +89,12 @@ import {
 
 @Module({
 	imports: [DatabaseModule, RecruitmentNotificationsModule],
-	controllers: [EmployerController, RecruitmentController],
+	controllers: [EmployerController, RecruitmentController, ApplicantController],
 	providers: [
 		//! Repositories and Persistence
 		{ provide: EmployerProfileRepository, useClass: PrismaEmployerProfileRepository },
 		{ provide: JobListingRepository, useClass: PrismaJobListingRepository },
+		{ provide: ApplicantProfileRepository, useClass: PrismaApplicantProfileRepository },
 
 		//! Use Cases
 		{ provide: CreateEmployerProfileUseCasePort, useClass: CreateEmployerProfileUseCase },
@@ -94,6 +111,10 @@ import {
 		{ provide: GetJobListingByIdUseCasePort, useClass: GetJobListingByIdUseCase },
 		{ provide: ExpireJobListingsUseCasePort, useClass: ExpireJobListingsUseCase },
 		{ provide: SearchJobListingUseCasePort, useClass: SearchJobListingUseCase },
+
+		{ provide: CreateApplicantProfileUseCasePort, useClass: CreateApplicantProfileUseCase },
+		{ provide: EditApplicantProfileUseCasePort, useClass: EditApplicantProfileUseCase },
+		{ provide: GetApplicantProfileUseCasePort, useClass: GetApplicantProfileUseCase },
 
 		//! Outbound - Adapters
 		{ provide: UserIntegrationPort, useClass: PrismaUserIntegrationAdapter },
@@ -119,6 +140,7 @@ import {
 
 		//! CRON Jobs
 		ExpireJobListingsCron,
+
 		//! Shared
 		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },
 	],

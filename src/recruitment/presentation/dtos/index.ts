@@ -6,3 +6,6 @@ export * from "./edit-job-listing.dto";
 export * from "./close-job-listing.dto";
 export * from "./get-employer-jobs.dto";
 export * from "./search-job-listing.dto";
+
+export * from "./create-applicant-profile.dto";
+export * from "./edit-applicant-profile.dto";

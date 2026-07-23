@@ -1,9 +1,11 @@
 import {
+	ApplicantProfile as PrismaApplicantProfile,
 	EmployerProfile as PrismaEmployerProfile,
 	JobListing as PrismaJobListing,
 } from "@/generated/prisma/client";
-import { EmployerProfile, JobListing } from "@/recruitment/domain/entities";
+import { ApplicantProfile, EmployerProfile, JobListing } from "@/recruitment/domain/entities";
 import {
+	ApplicantId,
 	CompanyWebsite,
 	EmployerId,
 	JobListingId,
@@ -47,6 +49,19 @@ export class RecruitmentMapper {
 			salaryVo,
 			raw.status,
 			raw.expiresAt,
+			raw.createdAt,
+			raw.updatedAt,
+		);
+	}
+
+	public static toApplicantProfileDomain(raw: PrismaApplicantProfile): ApplicantProfile {
+		return new ApplicantProfile(
+			new ApplicantId(raw.id),
+			raw.userId,
+			raw.firstName,
+			raw.lastName,
+			raw.headline,
+			raw.bio,
 			raw.createdAt,
 			raw.updatedAt,
 		);
