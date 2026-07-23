@@ -31,3 +31,11 @@ enum JobStatus {
 	CLOSED
 	EXPIRED
 }
+
+enum ApplicationStatus {
+	PENDING
+	REVIEWING
+	SHORTLISTED
+	REJECTED
+	HIRED
+}

@@ -2,70 +2,108 @@
 // EMPLOYER PROFILE TABLE: Company Details
 // ------------------------------------------------------
 model EmployerProfile {
-	id          String  @id @default(uuid())
+    id String @id @default(uuid())
 
-	// Foreign Key to User
-	userId      String  @unique
-	user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    // Foreign Key to User
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-	companyName String
-	description String
-	website     String?
-	logoUrl     String?
-	industry    String?
+    companyName String
+    description String
+    website     String?
+    logoUrl     String?
+    industry    String?
 
-	jobListings JobListing[]
+    jobListings  JobListing[]
+    applications JobApplication[]
 
-	createdAt   DateTime @default(now())
-	updatedAt   DateTime @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 // ------------------------------------------------------
 // JOB LISTING TABLE: Recruitment Posts
 // ------------------------------------------------------
 model JobListing {
-	id              String   @id @default(uuid())
+    id String @id @default(uuid())
 
-	// Foreign Key to EmployerProfile
-	employerId      String
-	employer        EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+    // Foreign Key to EmployerProfile
+    employerId String
+    employer   EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
 
-	title           String
-	description     String
-	requirements    String[]
-	employmentType  EmploymentType
+    title          String
+    description    String
+    requirements   String[]
+    employmentType EmploymentType
 
-	// Flattened JobLocation Value Object
-	locationType    LocationType
-	locationAddress String?
+    // Flattened JobLocation Value Object
+    locationType    LocationType
+    locationAddress String?
 
-	// Flattened SalaryRange Value Object
-	salaryMin       Float?
-	salaryMax       Float?
-	salaryCurrency  String   @default("USD")
+    // Flattened SalaryRange Value Object
+    salaryMin      Float?
+    salaryMax      Float?
+    salaryCurrency String @default("USD")
 
-	status          JobStatus
-	expiresAt       DateTime
+    status    JobStatus
+    expiresAt DateTime
 
-	createdAt       DateTime @default(now())
-	updatedAt       DateTime @updatedAt
+    applications JobApplication[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 // ------------------------------------------------------
 // APPLICANT PROFILE TABLE: Candidate Details
 // ------------------------------------------------------
 model ApplicantProfile {
-	id        String   @id @default(uuid())
+    id String @id @default(uuid())
 
-	// Foreign Key to User
-	userId    String   @unique
-	user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    // Foreign Key to User
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-	firstName String
-	lastName  String
-	headline  String?
-	bio       String?  @db.Text
+    firstName String
+    lastName  String
+    headline  String?
+    bio       String? @db.Text
 
-	createdAt DateTime @default(now())
-	updatedAt DateTime @updatedAt
+    applications JobApplication[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// ------------------------------------------------------
+// JOB APPLICATION TABLE: The Transactional Record
+// ------------------------------------------------------
+model JobApplication {
+    id String @id @default(uuid())
+
+    // Foreign Key to ApplicantProfile
+    applicantId String
+    applicant   ApplicantProfile @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+
+    // Foreign Key to JobListing
+    jobListingId String
+    jobListing   JobListing @relation(fields: [jobListingId], references: [id], onDelete: Cascade)
+
+    // Foreign Key to EmployerProfile (for optimized employer dashboard queries)
+    employerId String
+    employer   EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+
+    resumeUrl      String
+    coverLetterUrl String?
+    status         ApplicationStatus @default(PENDING)
+
+    appliedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Prevent duplicate applications to the same job
+    @@unique([applicantId, jobListingId])
+    // Indexes for fast dashboard loading
+    @@index([employerId])
+    @@index([jobListingId])
+    @@index([applicantId])
 }

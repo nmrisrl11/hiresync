@@ -106,13 +106,18 @@
     - [ ] Upload cover letters
     - [ ] View submitted applications
     - [ ] Track application status
-        ### File Uploading
+        #### File Uploading
         - [ ] Resume in PDF
         - [ ] Cover letter in PDF
+        #### Email Notifications
+        - [ ] Application submitted
+        - [ ] Application status updated
 - Employers can:
     - [ ] View applicants
     - [ ] Review uploaded resumes and cover letters
     - [ ] Update application status
+        #### Email Notifications
+        - [ ] New application received
 
 ### Email Notifications
 - [x] Welcome Email
