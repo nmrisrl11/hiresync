@@ -15,6 +15,9 @@ export class PrismaJobListingRepository implements JobListingRepository {
 
 		if (filter.status) where.status = filter.status;
 		if (filter.employerId) where.employerId = filter.employerId.getValue();
+		if (filter.employmentType) where.employmentType = filter.employmentType;
+		if (filter.locationType) where.locationType = filter.locationType;
+
 		if (filter.searchQuery)
 			where.OR = [
 				{ title: { contains: filter.searchQuery, mode: "insensitive" } },

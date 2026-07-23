@@ -1,13 +1,15 @@
 import { JobListing } from "../entities";
-import { JobStatus } from "../types";
+import { EmploymentType, JobStatus, LocationType } from "../types";
 import { EmployerId, JobListingId } from "../value-objects";
 
 export interface FindJobsFilter {
+	limit: number;
+	offset: number;
 	status?: JobStatus;
 	employerId?: EmployerId;
 	searchQuery?: string;
-	limit: number;
-	offset: number;
+	employmentType?: EmploymentType;
+	locationType?: LocationType;
 }
 
 export abstract class JobListingRepository {

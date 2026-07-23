@@ -17,6 +17,7 @@ import {
 	ExpireJobListingsUseCasePort,
 	GetEmployerJobsUseCasePort,
 	GetJobListingByIdUseCasePort,
+	SearchJobListingUseCasePort,
 } from "./application/ports/inbound/jobs";
 import {
 	EnqueueEmployerWelcomeEmailUseCasePort,
@@ -43,6 +44,7 @@ import {
 	ExpireJobListingsUseCase,
 	GetEmployerJobsUseCase,
 	GetJobListingByIdUseCase,
+	SearchJobListingUseCase,
 } from "./application/use-cases/jobs";
 import {
 	EnqueueEmployerWelcomeEmailUseCase,
@@ -59,6 +61,7 @@ import {
 	PrismaEmployerProfileRepository,
 	PrismaJobListingRepository,
 } from "./infrastructure/adapters/persistence";
+import { ExpireJobListingsCron } from "./infrastructure/cron/expire-job-listings.cron";
 import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
 import { EmployerController } from "./presentation/controllers/employer.controller";
 import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
@@ -67,7 +70,6 @@ import {
 	JobListingClosedListener,
 	JobListingCreatedListener,
 } from "./presentation/event-listeners";
-import { ExpireJobListingsCron } from "./infrastructure/cron/expire-job-listings.cron";
 
 @Module({
 	imports: [DatabaseModule, RecruitmentNotificationsModule],
@@ -91,6 +93,7 @@ import { ExpireJobListingsCron } from "./infrastructure/cron/expire-job-listings
 		{ provide: GetEmployerJobsUseCasePort, useClass: GetEmployerJobsUseCase },
 		{ provide: GetJobListingByIdUseCasePort, useClass: GetJobListingByIdUseCase },
 		{ provide: ExpireJobListingsUseCasePort, useClass: ExpireJobListingsUseCase },
+		{ provide: SearchJobListingUseCasePort, useClass: SearchJobListingUseCase },
 
 		//! Outbound - Adapters
 		{ provide: UserIntegrationPort, useClass: PrismaUserIntegrationAdapter },
