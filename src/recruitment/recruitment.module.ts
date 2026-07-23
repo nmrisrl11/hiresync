@@ -66,6 +66,7 @@ import {
 import {
 	ApplicantProfileRepository,
 	EmployerProfileRepository,
+	JobApplicationRepository,
 	JobListingRepository,
 } from "./domain/repositories";
 import {
@@ -76,6 +77,7 @@ import {
 import {
 	PrismaApplicantProfileRepository,
 	PrismaEmployerProfileRepository,
+	PrismaJobApplicationRepository,
 	PrismaJobListingRepository,
 } from "./infrastructure/adapters/persistence";
 import { ExpireJobListingsCron } from "./infrastructure/cron/expire-job-listings.cron";
@@ -98,6 +100,7 @@ import {
 		{ provide: EmployerProfileRepository, useClass: PrismaEmployerProfileRepository },
 		{ provide: JobListingRepository, useClass: PrismaJobListingRepository },
 		{ provide: ApplicantProfileRepository, useClass: PrismaApplicantProfileRepository },
+		{ provide: JobApplicationRepository, useClass: PrismaJobApplicationRepository },
 
 		//! Use Cases
 		{ provide: CreateEmployerProfileUseCasePort, useClass: CreateEmployerProfileUseCase },
