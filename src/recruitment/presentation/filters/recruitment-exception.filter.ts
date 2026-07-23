@@ -1,9 +1,13 @@
 import {
 	ApplicantProfileAlreadyExistsException,
 	ApplicantProfileNotFoundException,
+	DuplicateJobApplicationException,
 	EmployerProfileAlreadyExistsException,
 	EmployerProfileNotFoundException,
+	JobApplicationNotFoundException,
 	JobListingNotFoundException,
+	JobNotAcceptingApplicationsException,
+	UnauthorizedApplicationAccessException,
 	UnauthorizedJobListingException,
 } from "@/recruitment/application/exceptions";
 import {
@@ -29,13 +33,17 @@ export class RecruitmentExceptionFilter extends BaseExceptionFilter {
 	private getApplicationStatus(exception: ApplicationBaseException): HttpStatus {
 		switch (exception.constructor) {
 			case UnauthorizedJobListingException:
+			case UnauthorizedApplicationAccessException:
 				return HttpStatus.FORBIDDEN;
 			case EmployerProfileAlreadyExistsException:
 			case ApplicantProfileAlreadyExistsException:
+			case DuplicateJobApplicationException:
+			case JobNotAcceptingApplicationsException:
 				return HttpStatus.CONFLICT;
 			case EmployerProfileNotFoundException:
 			case JobListingNotFoundException:
 			case ApplicantProfileNotFoundException:
+			case JobApplicationNotFoundException:
 				return HttpStatus.NOT_FOUND;
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;

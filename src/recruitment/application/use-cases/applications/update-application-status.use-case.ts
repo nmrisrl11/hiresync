@@ -1,0 +1,39 @@
+import { JobApplicationRepository } from "@/recruitment/domain/repositories";
+import { EmployerId, JobApplicationId } from "@/recruitment/domain/value-objects";
+import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { Injectable } from "@nestjs/common";
+import {
+	JobApplicationNotFoundException,
+	UnauthorizedApplicationAccessException,
+} from "../../exceptions";
+import {
+	UpdateApplicationStatusCommand,
+	UpdateApplicationStatusUseCasePort,
+} from "../../ports/inbound/applications";
+
+@Injectable()
+export class UpdateApplicationStatusUseCase implements UpdateApplicationStatusUseCasePort {
+	constructor(
+		private readonly jobApplicationRepository: JobApplicationRepository,
+		private readonly eventDispatcher: DomainEventDispatcherPort,
+	) {}
+
+	public async execute(command: UpdateApplicationStatusCommand): Promise<void> {
+		const application = await this.jobApplicationRepository.findById(
+			new JobApplicationId(command.applicationId),
+		);
+		if (!application) throw new JobApplicationNotFoundException();
+
+		//! Check if the employer has access to update this application
+		const employerIdVo = new EmployerId(command.employerId);
+		if (!application.employerId.equals(employerIdVo))
+			throw new UnauthorizedApplicationAccessException();
+
+		application.updateStatus(command.newStatus);
+
+		await this.jobApplicationRepository.save(application);
+
+		await this.eventDispatcher.dispatchMultiple(application.domainEvents);
+		application.clearEvents();
+	}
+}
