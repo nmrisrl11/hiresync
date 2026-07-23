@@ -16,7 +16,7 @@ export class CloudinaryImageStorageAdapter implements ImageStoragePort {
 	public async uploadAvatar(fileBuffer: Buffer, fileName: string): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const options: UploadApiOptions = {
-				folder: "avatars",
+				folder: `${env.APP_NAME}/avatars`,
 				public_id: fileName,
 				overwrite: true,
 				gravity: "face", //! handles the automatic resizing and face detection

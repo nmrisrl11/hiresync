@@ -1,20 +1,30 @@
-import { JobApplicationRepository } from "@/recruitment/domain/repositories";
+import {
+	ApplicantProfileRepository,
+	JobApplicationRepository,
+} from "@/recruitment/domain/repositories";
 import { Injectable } from "@nestjs/common";
 import {
 	GetApplicantApplicationsQuery,
 	GetApplicantApplicationsUseCasePort,
 	JobApplicationResult,
 } from "../../ports/inbound/applications";
+import { ApplicantProfileNotFoundException } from "../../exceptions";
 
 @Injectable()
 export class GetApplicantApplicationsUseCase implements GetApplicantApplicationsUseCasePort {
-	constructor(private readonly jobApplicationRepository: JobApplicationRepository) {}
+	constructor(
+		private readonly jobApplicationRepository: JobApplicationRepository,
+		private readonly applicantProfileRepository: ApplicantProfileRepository,
+	) {}
 
 	public async execute(
 		query: GetApplicantApplicationsQuery,
 	): Promise<{ items: JobApplicationResult[]; total: number }> {
+		const applicant = await this.applicantProfileRepository.findByUserId(query.applicantId);
+		if (!applicant) throw new ApplicantProfileNotFoundException();
+
 		const filter = {
-			applicantId: query.applicantId,
+			applicantId: applicant.id.getValue(),
 			limit: query.limit,
 			offset: query.offset,
 			status: query.status,

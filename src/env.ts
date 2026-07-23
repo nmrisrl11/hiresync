@@ -9,6 +9,7 @@ const emailProvider = z.enum(["nodemailer", "resend"]);
 export const env = createEnv({
 	server: {
 		NODE_ENV: nodeEnvSchema,
+		APP_NAME: z.string(),
 		APP_URL: z.url(),
 		PORT: z.coerce.number().default(3000),
 

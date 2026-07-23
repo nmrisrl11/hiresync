@@ -9,3 +9,7 @@ export * from "./search-job-listing.dto";
 
 export * from "./create-applicant-profile.dto";
 export * from "./edit-applicant-profile.dto";
+
+export * from "./apply-for-job.dto";
+export * from "./get-applications.dto";
+export * from "./update-application-status.dto";
