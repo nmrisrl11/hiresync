@@ -5,12 +5,15 @@ import {
 import {
 	GetJobListingByIdQuery,
 	GetJobListingByIdUseCasePort,
+	SearchJobListingQuery,
+	SearchJobListingUseCasePort,
 } from "@/recruitment/application/ports/inbound/jobs";
 import { EMPLOYMENT_TYPE, JOB_STATUS, LOCATION_TYPE } from "@/recruitment/domain/types";
 import { Public } from "@/shared/presentation/decorators/public.decorator";
-import { Controller, Get, HttpCode, HttpStatus, Param } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus, Param, Query } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
+import { SearchJobListingDto } from "../dtos";
 
 @ApiTags("Recruitment")
 @Controller("recruitments")
@@ -18,6 +21,7 @@ export class RecruitmentController {
 	constructor(
 		private readonly getEmployerProfileByIdUseCase: GetEmployerProfileByIdUseCasePort,
 		private readonly getJobListingByIdUseCase: GetJobListingByIdUseCasePort,
+		private readonly searchJobListingUseCase: SearchJobListingUseCasePort,
 	) {}
 
 	@Public()
@@ -30,6 +34,32 @@ export class RecruitmentController {
 		const profile = await this.getEmployerProfileByIdUseCase.execute(query);
 
 		return { data: profile };
+	}
+
+	@Public()
+	@Get("jobs")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
+	@ApiOperation({ summary: "Search, filter, and paginate published job listings." })
+	public async searchJobs(@Query() dto: SearchJobListingDto) {
+		const query = new SearchJobListingQuery(
+			dto.limit,
+			dto.offset,
+			dto.searchQuery,
+			dto.employmentType,
+			dto.locationType,
+		);
+
+		const { items, total } = await this.searchJobListingUseCase.execute(query);
+
+		return {
+			data: items,
+			meta: {
+				total,
+				limit: dto.limit,
+				offset: dto.offset,
+			},
+		};
 	}
 
 	@Public()

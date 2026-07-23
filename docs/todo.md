@@ -65,44 +65,54 @@
 
 - [x] Move email background queueing with event-driven
 
+## Recruitment Module
+
 ### Employers
 - [x] Create company profile
 - [x] Edit company profile
 - [x] Upload/Remove company profile logo
 - [x] Get/View company profile
 - [x] Get company profile by ID
+    #### Email Notifications
+    - [x] Created company profile
+    - [/] Updated company profile
+
+### Job Listings
 - [x] Create job listing
 - [x] Edit job listing
 - [x] Delete/Close job listing
 - [x] Get/View job listing
 - [x] Get job listing by ID
+- [x] Filter job listings
+- [x] Search job listings
+- [x] Paginated job listing
     #### Email Notifications
-    - [x] Created company profile
-    - [/] Updated company profile
     - [x] Created job listing
     - [/] Updated job listing
     - [x] Closed job listing
     - [x] Expired job listing - with Task job using CRON?
 
 ### Applicants
-- [ ] Browse available jobs
-- [ ] View job details
-- [ ] Search jobs
-- [ ] Filter jobs
+- [ ] Create applicant profile
+- [ ] Edit applicant profile
+- [ ] View applicant profile
+    #### Email Notifications
+    - [ ] Created applicant profile
 
-### Applications
+### Job Applications
 - Applicants can:
     - [ ] Apply for jobs
     - [ ] Upload resumes
     - [ ] Upload cover letters
     - [ ] View submitted applications
+    - [ ] Track application status
+        ### File Uploading
+        - [ ] Resume in PDF
+        - [ ] Cover letter in PDF
 - Employers can:
     - [ ] View applicants
-    - [ ] Review uploaded resumes
-
-### File Uploading
-- [ ] Resume in PDF
-- [ ] Cover letter in PDF
+    - [ ] Review uploaded resumes and cover letters
+    - [ ] Update application status
 
 ### Email Notifications
 - [x] Welcome Email
