@@ -13,4 +13,10 @@ export abstract class RecruitmentEmailQueuePort {
 		jobTitle: string,
 		reason: string,
 	): Promise<void>;
+
+	abstract enqueueApplicantWelcomeEmail(
+		email: string,
+		firstName: string,
+		lastName: string,
+	): Promise<void>;
 }

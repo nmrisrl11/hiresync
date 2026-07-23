@@ -39,4 +39,16 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
 		);
 	}
+
+	public async enqueueApplicantWelcomeEmail(
+		email: string,
+		firstName: string,
+		lastName: string,
+	): Promise<void> {
+		await this.emailQueue.add(
+			"send-applicant-welcome",
+			{ email, firstName, lastName },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
 }

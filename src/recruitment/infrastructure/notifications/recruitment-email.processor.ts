@@ -3,6 +3,7 @@ import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import { RecruitmentEmailService } from "./recruitment-email.service";
 import {
+	ApplicantWelcomeEmailSchema,
 	EmployerWelcomeEmailSchema,
 	JobClosedEmailSchema,
 	JobCreatedEmailSchema,
@@ -43,6 +44,15 @@ export class RecruitmentEmailProcessor extends WorkerHost {
 						payload.companyName,
 						payload.jobTitle,
 						payload.reason,
+					);
+					break;
+				}
+				case "send-applicant-welcome": {
+					const payload = ApplicantWelcomeEmailSchema.parse(job.data);
+					await this.emailService.sendApplicantWelcomeEmail(
+						payload.email,
+						payload.firstName,
+						payload.lastName,
 					);
 					break;
 				}
