@@ -16,7 +16,7 @@ export class CloudinaryImageStorageAdapter implements ImageStoragePort {
 	public async uploadLogo(fileBuffer: Buffer, fileName: string): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const options: UploadApiOptions = {
-				folder: "employers/logos",
+				folder: `${env.APP_NAME}/employers/logos`,
 				public_id: fileName,
 				overwrite: true,
 				crop: "limit", //! Resizes only if the image exceeds the width/height, keeping aspect ratio

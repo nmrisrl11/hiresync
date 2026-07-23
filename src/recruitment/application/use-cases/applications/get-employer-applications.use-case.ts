@@ -1,5 +1,9 @@
-import { JobApplicationRepository } from "@/recruitment/domain/repositories";
+import {
+	EmployerProfileRepository,
+	JobApplicationRepository,
+} from "@/recruitment/domain/repositories";
 import { Injectable } from "@nestjs/common";
+import { EmployerProfileNotFoundException } from "../../exceptions";
 import {
 	GetEmployerApplicationsQuery,
 	GetEmployerApplicationsUseCasePort,
@@ -8,13 +12,19 @@ import {
 
 @Injectable()
 export class GetEmployerApplicationsUseCase implements GetEmployerApplicationsUseCasePort {
-	constructor(private readonly jobApplicationRepository: JobApplicationRepository) {}
+	constructor(
+		private readonly jobApplicationRepository: JobApplicationRepository,
+		private readonly employerProfileRepository: EmployerProfileRepository,
+	) {}
 
 	public async execute(
 		query: GetEmployerApplicationsQuery,
 	): Promise<{ items: JobApplicationResult[]; total: number }> {
+		const employerProfile = await this.employerProfileRepository.findByUserId(query.employerId);
+		if (!employerProfile) throw new EmployerProfileNotFoundException();
+
 		const filter = {
-			employerId: query.employerId,
+			employerId: employerProfile.id.getValue(),
 			jobListingId: query.jobListingId,
 			limit: query.limit,
 			offset: query.offset,

@@ -5,7 +5,7 @@ import {
 	JobListingRepository,
 } from "@/recruitment/domain/repositories";
 import { JOB_STATUS } from "@/recruitment/domain/types";
-import { ApplicantId, JobApplicationId, JobListingId } from "@/recruitment/domain/value-objects";
+import { JobApplicationId, JobListingId } from "@/recruitment/domain/value-objects";
 import { DomainEventDispatcherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
@@ -15,6 +15,7 @@ import {
 	JobNotAcceptingApplicationsException,
 } from "../../exceptions";
 import { ApplyForJobCommand, ApplyForJobUseCasePort } from "../../ports/inbound/applications";
+import { DocumentStoragePort } from "../../ports/outbound";
 
 @Injectable()
 export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
@@ -23,16 +24,17 @@ export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
 		private readonly jobListingRepository: JobListingRepository,
 		private readonly applicantProfileRepository: ApplicantProfileRepository,
 		private readonly idGenerator: IdGeneratorPort,
+		private readonly documentStorage: DocumentStoragePort,
 		private readonly eventDispatcher: DomainEventDispatcherPort,
 	) {}
 
 	public async execute(command: ApplyForJobCommand): Promise<string> {
-		const applicantIdVo = new ApplicantId(command.applicantId);
 		const jobListingIdVo = new JobListingId(command.jobListingId);
 
 		//! Check if the applicant exists
-		const applicant = await this.applicantProfileRepository.findById(applicantIdVo);
+		const applicant = await this.applicantProfileRepository.findByUserId(command.applicantId);
 		if (!applicant) throw new ApplicantProfileNotFoundException();
+		const applicantId = applicant.id;
 
 		//! Check if the job listing exists and is published
 		const jobListing = await this.jobListingRepository.findById(jobListingIdVo);
@@ -42,24 +44,40 @@ export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
 
 		//! Check if the applicant has already applied for this job
 		const existingApplication = await this.jobApplicationRepository.findByApplicantAndJob(
-			applicantIdVo,
+			applicantId,
 			jobListingIdVo,
 		);
 		if (existingApplication) throw new DuplicateJobApplicationException();
 
 		const applicationId = new JobApplicationId(this.idGenerator.generateId());
+
+		//! Upload resume (PDF)
+		const resumeUrl = await this.documentStorage.uploadResume(
+			command.resumeBuffer,
+			`resume_${applicantId.getValue()}_${jobListingIdVo.getValue()}`,
+		);
+
+		//! Upload Cover Letter (TXT) if provided
+		let coverLetterUrl: string | null = null;
+		if (command.coverLetterBuffer) {
+			coverLetterUrl = await this.documentStorage.uploadCoverLetter(
+				command.coverLetterBuffer,
+				`cover_letter_${applicantId.getValue()}_${jobListingIdVo.getValue()}.txt`,
+			);
+		}
+
 		const application = JobApplication.submit(
 			applicationId,
-			applicantIdVo,
+			applicantId,
 			jobListingIdVo,
 			jobListing.employerId,
-			command.resumeUrl,
-			command.coverLetterUrl,
+			resumeUrl,
+			coverLetterUrl,
 		);
 
 		await this.jobApplicationRepository.save(application);
 
-		await this.eventDispatcher.dispatchMultiple(applicant.domainEvents);
+		await this.eventDispatcher.dispatchMultiple(application.domainEvents);
 		application.clearEvents();
 
 		return applicationId.getValue();

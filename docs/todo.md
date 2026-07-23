@@ -101,21 +101,22 @@
 
 ### Job Applications
 - Applicants can:
-    - [ ] Apply for jobs
-    - [ ] Upload resumes
-    - [ ] Upload cover letters
-    - [ ] View submitted applications
+    - [x] Apply for jobs
+    - [x] Upload resumes
+    - [x] Upload cover letters
+    - [x] Get/View submitted applications
     - [ ] Track application status
         #### File Uploading
-        - [ ] Resume in PDF
-        - [ ] Cover letter in PDF
+        - [x] Resume in PDF
+        - [x] Cover letter in TXT
         #### Email Notifications
         - [ ] Application submitted
         - [ ] Application status updated
 - Employers can:
-    - [ ] View applicants
+    - [x] Get/View applications
+    - [x] Update application status
+    - [ ] Get/View applicants
     - [ ] Review uploaded resumes and cover letters
-    - [ ] Update application status
         #### Email Notifications
         - [ ] New application received
 

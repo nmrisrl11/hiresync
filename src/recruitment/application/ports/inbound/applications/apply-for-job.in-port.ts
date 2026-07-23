@@ -2,8 +2,8 @@ export class ApplyForJobCommand {
 	constructor(
 		public readonly applicantId: string,
 		public readonly jobListingId: string,
-		public readonly resumeUrl: string,
-		public readonly coverLetterUrl: string | null,
+		public readonly resumeBuffer: Buffer,
+		public readonly coverLetterBuffer?: Buffer,
 	) {}
 }
 

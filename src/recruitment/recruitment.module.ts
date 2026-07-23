@@ -37,6 +37,7 @@ import {
 	EnqueueJobCreatedEmailUseCasePort,
 } from "./application/ports/inbound/notifications";
 import {
+	DocumentStoragePort,
 	ImageStoragePort,
 	RecruitmentEmailQueuePort,
 	UserIntegrationPort,
@@ -83,6 +84,7 @@ import {
 } from "./domain/repositories";
 import {
 	BullMqRecruitmentEmailQueueAdapter,
+	CloudinaryDocumentStorageAdapter,
 	CloudinaryImageStorageAdapter,
 	PrismaUserIntegrationAdapter,
 } from "./infrastructure/adapters";
@@ -143,6 +145,7 @@ import {
 		{ provide: UserIntegrationPort, useClass: PrismaUserIntegrationAdapter },
 		{ provide: RecruitmentEmailQueuePort, useClass: BullMqRecruitmentEmailQueueAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
+		{ provide: DocumentStoragePort, useClass: CloudinaryDocumentStorageAdapter },
 
 		//! Domain Event and Event Listeners
 		{

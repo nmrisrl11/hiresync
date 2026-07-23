@@ -1,4 +1,10 @@
 import {
+	GetEmployerApplicationsQuery,
+	GetEmployerApplicationsUseCasePort,
+	UpdateApplicationStatusCommand,
+	UpdateApplicationStatusUseCasePort,
+} from "@/recruitment/application/ports/inbound/applications";
+import {
 	CreateEmployerProfileCommand,
 	CreateEmployerProfileUseCasePort,
 	EditEmployerProfileCommand,
@@ -52,7 +58,9 @@ import {
 	CreateJobListingDto,
 	EditEmployerProfileDto,
 	EditJobListingDto,
+	GetApplicationsDto,
 	GetEmployerJobsDto,
+	UpdateApplicationStatusDto,
 } from "../dtos";
 import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.filter";
 import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mapper";
@@ -73,6 +81,8 @@ export class EmployerController {
 		private readonly editJobListingUseCase: EditJobListingUseCasePort,
 		private readonly closeJobListingUseCase: CloseJobListingUseCasePort,
 		private readonly getEmployerJobsUseCase: GetEmployerJobsUseCasePort,
+		private readonly getEmployerApplicationsUseCase: GetEmployerApplicationsUseCasePort,
+		private readonly updateApplicationStatusUseCase: UpdateApplicationStatusUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -264,5 +274,45 @@ export class EmployerController {
 				offset: queryDto.offset,
 			},
 		};
+	}
+
+	@Get("applications")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
+	@ApiOperation({ summary: "Get a paginated list of applications received for your jobs." })
+	public async getApplications(
+		@CurrentUser() user: JwtPayload,
+		@Query() queryDto: GetApplicationsDto,
+	) {
+		const query = new GetEmployerApplicationsQuery(
+			user.sub,
+			queryDto.limit,
+			queryDto.offset,
+			queryDto.jobListingId,
+			queryDto.status,
+		);
+
+		const { items, total } = await this.getEmployerApplicationsUseCase.execute(query);
+
+		return {
+			data: items,
+			meta: { total, limit: queryDto.limit, offset: queryDto.offset },
+		};
+	}
+
+	@Patch("applications/:id/status")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 15 } })
+	@ApiOperation({ summary: "Update the status of a specific job application." })
+	public async updateApplicationStatus(
+		@CurrentUser() user: JwtPayload,
+		@Param("id") applicationId: string,
+		@Body() dto: UpdateApplicationStatusDto,
+	) {
+		const command = new UpdateApplicationStatusCommand(user.sub, applicationId, dto.newStatus);
+
+		await this.updateApplicationStatusUseCase.execute(command);
+
+		return { message: "Application status updated successfully." };
 	}
 }
