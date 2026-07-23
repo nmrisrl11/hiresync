@@ -49,4 +49,19 @@ export class RecruitmentEmailService {
 			context: { jobsUrl, companyName, jobTitle, reason },
 		});
 	}
+
+	public async sendApplicantWelcomeEmail(
+		email: string,
+		firstName: string,
+		lastName: string,
+	): Promise<void> {
+		const jobsUrl = `${this.appUrl}/jobs`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: "Welcome to your Applicant Profile!",
+			template: "recruitment/applicant-welcome",
+			context: { jobsUrl, firstName, lastName },
+		});
+	}
 }

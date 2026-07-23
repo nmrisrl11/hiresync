@@ -97,7 +97,7 @@
 - [x] Edit applicant profile
 - [x] Get/View applicant profile
     #### Email Notifications
-    - [ ] Created applicant profile
+    - [x] Created applicant profile
 
 ### Job Applications
 - Applicants can:

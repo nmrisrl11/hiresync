@@ -25,6 +25,7 @@ import {
 	SearchJobListingUseCasePort,
 } from "./application/ports/inbound/jobs";
 import {
+	EnqueueApplicantWelcomeEmailUseCasePort,
 	EnqueueEmployerWelcomeEmailUseCasePort,
 	EnqueueJobClosedEmailUseCasePort,
 	EnqueueJobCreatedEmailUseCasePort,
@@ -57,6 +58,7 @@ import {
 	SearchJobListingUseCase,
 } from "./application/use-cases/jobs";
 import {
+	EnqueueApplicantWelcomeEmailUseCase,
 	EnqueueEmployerWelcomeEmailUseCase,
 	EnqueueJobClosedEmailUseCase,
 	EnqueueJobCreatedEmailUseCase,
@@ -82,6 +84,7 @@ import { ApplicantController } from "./presentation/controllers/applicant.contro
 import { EmployerController } from "./presentation/controllers/employer.controller";
 import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
 import {
+	ApplicantProfileCreatedListener,
 	EmployerProfileCreatedListener,
 	JobListingClosedListener,
 	JobListingCreatedListener,
@@ -134,9 +137,14 @@ import {
 			provide: EnqueueJobClosedEmailUseCasePort,
 			useClass: EnqueueJobClosedEmailUseCase,
 		},
+		{
+			provide: EnqueueApplicantWelcomeEmailUseCasePort,
+			useClass: EnqueueApplicantWelcomeEmailUseCase,
+		},
 		EmployerProfileCreatedListener,
 		JobListingCreatedListener,
 		JobListingClosedListener,
+		ApplicantProfileCreatedListener,
 
 		//! CRON Jobs
 		ExpireJobListingsCron,
