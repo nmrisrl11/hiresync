@@ -8,6 +8,12 @@ import {
 	GetApplicantProfileUseCasePort,
 } from "./application/ports/inbound/applicants";
 import {
+	ApplyForJobUseCasePort,
+	GetApplicantApplicationsUseCasePort,
+	GetEmployerApplicationsUseCasePort,
+	UpdateApplicationStatusUseCasePort,
+} from "./application/ports/inbound/applications";
+import {
 	CreateEmployerProfileUseCasePort,
 	EditEmployerProfileUseCasePort,
 	GetEmployerProfileByIdUseCasePort,
@@ -40,6 +46,12 @@ import {
 	EditApplicantProfileUseCase,
 	GetApplicantProfileUseCase,
 } from "./application/use-cases/applicants";
+import {
+	ApplyForJobUseCase,
+	GetApplicantApplicationsUseCase,
+	GetEmployerApplicationsUseCase,
+	UpdateApplicationStatusUseCase,
+} from "./application/use-cases/applications";
 import {
 	CreateEmployerProfileUseCase,
 	EditEmployerProfileUseCase,
@@ -121,6 +133,11 @@ import {
 		{ provide: CreateApplicantProfileUseCasePort, useClass: CreateApplicantProfileUseCase },
 		{ provide: EditApplicantProfileUseCasePort, useClass: EditApplicantProfileUseCase },
 		{ provide: GetApplicantProfileUseCasePort, useClass: GetApplicantProfileUseCase },
+
+		{ provide: ApplyForJobUseCasePort, useClass: ApplyForJobUseCase },
+		{ provide: GetApplicantApplicationsUseCasePort, useClass: GetApplicantApplicationsUseCase },
+		{ provide: GetEmployerApplicationsUseCasePort, useClass: GetEmployerApplicationsUseCase },
+		{ provide: UpdateApplicationStatusUseCasePort, useClass: UpdateApplicationStatusUseCase },
 
 		//! Outbound - Adapters
 		{ provide: UserIntegrationPort, useClass: PrismaUserIntegrationAdapter },
