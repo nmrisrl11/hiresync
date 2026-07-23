@@ -1,0 +1,41 @@
+import { ApplicantProfile } from "@/recruitment/domain/entities";
+import { ApplicantProfileRepository } from "@/recruitment/domain/repositories";
+import { ApplicantId } from "@/recruitment/domain/value-objects";
+import { DomainEventDispatcherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
+import { Injectable } from "@nestjs/common";
+import { ApplicantProfileAlreadyExistsException } from "../../exceptions";
+import {
+	CreateApplicantProfileCommand,
+	CreateApplicantProfileUseCasePort,
+} from "../../ports/inbound/applicants";
+
+@Injectable()
+export class CreateApplicantProfileUseCase implements CreateApplicantProfileUseCasePort {
+	constructor(
+		private readonly applicantProfileRepository: ApplicantProfileRepository,
+		private readonly idGenerator: IdGeneratorPort,
+		private readonly eventDispatcher: DomainEventDispatcherPort,
+	) {}
+
+	public async execute(command: CreateApplicantProfileCommand): Promise<void> {
+		const existingProfile = await this.applicantProfileRepository.findByUserId(command.userId);
+
+		if (existingProfile) throw new ApplicantProfileAlreadyExistsException();
+
+		const applicantId = new ApplicantId(this.idGenerator.generateId());
+
+		const applicantProfile = ApplicantProfile.create(
+			applicantId,
+			command.userId,
+			command.firstName,
+			command.lastName,
+			command.headline || null,
+			command.bio || null,
+		);
+
+		await this.applicantProfileRepository.save(applicantProfile);
+
+		await this.eventDispatcher.dispatchMultiple(applicantProfile.domainEvents);
+		applicantProfile.clearEvents();
+	}
+}

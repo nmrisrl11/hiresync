@@ -15,6 +15,7 @@ model User {
 
     account Account? // 1:1 relationship with Account
     employerProfile EmployerProfile? // 1:1 relationship with EmployerProfile
+    applicantProfile ApplicantProfile? // 1:1 relationship with ApplicantProfile
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

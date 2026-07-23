@@ -1,4 +1,6 @@
 import {
+	ApplicantProfileAlreadyExistsException,
+	ApplicantProfileNotFoundException,
 	EmployerProfileAlreadyExistsException,
 	EmployerProfileNotFoundException,
 	JobListingNotFoundException,
@@ -29,9 +31,11 @@ export class RecruitmentExceptionFilter extends BaseExceptionFilter {
 			case UnauthorizedJobListingException:
 				return HttpStatus.FORBIDDEN;
 			case EmployerProfileAlreadyExistsException:
+			case ApplicantProfileAlreadyExistsException:
 				return HttpStatus.CONFLICT;
 			case EmployerProfileNotFoundException:
 			case JobListingNotFoundException:
+			case ApplicantProfileNotFoundException:
 				return HttpStatus.NOT_FOUND;
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;
