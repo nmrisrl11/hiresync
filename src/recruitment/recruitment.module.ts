@@ -6,6 +6,8 @@ import {
 	CreateApplicantProfileUseCasePort,
 	EditApplicantProfileUseCasePort,
 	GetApplicantProfileUseCasePort,
+	GetSavedJobsUseCasePort,
+	ToggleSavedJobUseCasePort,
 } from "./application/ports/inbound/applicants";
 import {
 	ApplyForJobUseCasePort,
@@ -51,6 +53,8 @@ import {
 	CreateApplicantProfileUseCase,
 	EditApplicantProfileUseCase,
 	GetApplicantProfileUseCase,
+	GetSavedJobsUseCase,
+	ToggleSavedJobUseCase,
 } from "./application/use-cases/applicants";
 import {
 	ApplyForJobUseCase,
@@ -91,6 +95,7 @@ import {
 	EmployerProfileRepository,
 	JobApplicationRepository,
 	JobListingRepository,
+	SavedJobRepository,
 } from "./domain/repositories";
 import {
 	BullMqRecruitmentEmailQueueAdapter,
@@ -103,6 +108,7 @@ import {
 	PrismaEmployerProfileRepository,
 	PrismaJobApplicationRepository,
 	PrismaJobListingRepository,
+	PrismaSavedJobRepository,
 } from "./infrastructure/adapters/persistence";
 import { ExpireJobListingsCron } from "./infrastructure/cron/expire-job-listings.cron";
 import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
@@ -128,6 +134,7 @@ import {
 		{ provide: JobListingRepository, useClass: PrismaJobListingRepository },
 		{ provide: ApplicantProfileRepository, useClass: PrismaApplicantProfileRepository },
 		{ provide: JobApplicationRepository, useClass: PrismaJobApplicationRepository },
+		{ provide: SavedJobRepository, useClass: PrismaSavedJobRepository },
 
 		//! Use Cases
 		{ provide: CreateEmployerProfileUseCasePort, useClass: CreateEmployerProfileUseCase },
@@ -152,6 +159,8 @@ import {
 		{ provide: CreateApplicantProfileUseCasePort, useClass: CreateApplicantProfileUseCase },
 		{ provide: EditApplicantProfileUseCasePort, useClass: EditApplicantProfileUseCase },
 		{ provide: GetApplicantProfileUseCasePort, useClass: GetApplicantProfileUseCase },
+		{ provide: ToggleSavedJobUseCasePort, useClass: ToggleSavedJobUseCase },
+		{ provide: GetSavedJobsUseCasePort, useClass: GetSavedJobsUseCase },
 
 		{ provide: ApplyForJobUseCasePort, useClass: ApplyForJobUseCase },
 		{ provide: GetApplicantApplicationsUseCasePort, useClass: GetApplicantApplicationsUseCase },

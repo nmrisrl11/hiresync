@@ -50,8 +50,9 @@ model JobListing {
 
     applications JobApplication[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    savedJobs SavedJob[]
 }
 
 // ------------------------------------------------------
@@ -71,8 +72,9 @@ model ApplicantProfile {
 
     applications JobApplication[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    savedJobs SavedJob[]
 }
 
 // ------------------------------------------------------
@@ -106,4 +108,18 @@ model JobApplication {
     @@index([employerId])
     @@index([jobListingId])
     @@index([applicantId])
+}
+
+// -----------------------------------------------------------------------
+// SAVED JOB APPLICATION TABLE: The Saved Job Application for Applicants
+// -----------------------------------------------------------------------
+model SavedJob {
+    applicantId  String
+    jobListingId String
+    createdAt    DateTime @default(now())
+
+    applicant  ApplicantProfile @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+    jobListing JobListing       @relation(fields: [jobListingId], references: [id], onDelete: Cascade)
+
+    @@id([applicantId, jobListingId])
 }

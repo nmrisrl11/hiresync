@@ -2,3 +2,4 @@ export * from "./prisma-employer-profile.repository";
 export * from "./prisma-job-listing.repository";
 export * from "./prisma-applicant-profile.repository";
 export * from "./prisma-job-application.repository";
+export * from "./prisma-saved-job.repository";
