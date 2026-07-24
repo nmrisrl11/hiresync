@@ -11,6 +11,8 @@ import {
 	ApplyForJobUseCasePort,
 	GetApplicantApplicationsQuery,
 	GetApplicantApplicationsUseCasePort,
+	WithdrawApplicationCommand,
+	WithdrawApplicationUseCasePort,
 } from "@/recruitment/application/ports/inbound/applications";
 import { type JwtPayload } from "@/shared/application/types";
 import { ROLES } from "@/shared/domain/types/role.type";
@@ -22,6 +24,8 @@ import {
 	Get,
 	HttpCode,
 	HttpStatus,
+	Param,
+	Patch,
 	Post,
 	Put,
 	Query,
@@ -53,6 +57,7 @@ export class ApplicantController {
 		private readonly getApplicantProfileUseCase: GetApplicantProfileUseCasePort,
 		private readonly applyForJobUseCase: ApplyForJobUseCasePort,
 		private readonly getApplicantApplicationsUseCase: GetApplicantApplicationsUseCasePort,
+		private readonly withdrawApplicationUseCase: WithdrawApplicationUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -183,5 +188,20 @@ export class ApplicantController {
 			data: items,
 			meta: { total, limit: queryDto.limit, offset: queryDto.offset },
 		};
+	}
+
+	@Patch("applications/:id/withdraw")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 15 } })
+	@ApiOperation({ summary: "Withdraw a pending job application." })
+	public async withdrawApplication(
+		@CurrentUser() user: JwtPayload,
+		@Param("id") applicationId: string,
+	) {
+		const command = new WithdrawApplicationCommand(user.sub, applicationId);
+
+		await this.withdrawApplicationUseCase.execute(command);
+
+		return { message: "Application withdrawn successfully." };
 	}
 }

@@ -76,6 +76,8 @@
     - [x] Upload resumes
     - [x] Upload cover letters
     - [x] Get/View submitted applications
+    - [x] Withdraw application
+    - [ ] Save/Bookmark job listing
     - [ ] Track application status
         #### File Uploading
         - [x] Resume in PDF
@@ -86,10 +88,13 @@
 - Employers can:
     - [x] Get/View applications
     - [x] Update application status
+    - [ ] Bulk update application status
+    - [ ] Internal application review/note
     - [x] Get/View applicants who applied for jobs
     - [ ] Review uploaded resumes and cover letters
         #### Email Notifications
         - [x] New application received
+        - [ ] Application withdrawn
 
 ## **Third-Party Service Integrations**
 
