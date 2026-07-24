@@ -24,8 +24,33 @@ export const ApplicantWelcomeEmailSchema = z.object({
 	lastName: z.string().trim(),
 });
 
+export const ApplicationSubmittedEmailSchema = z.object({
+	email: z.email().trim(),
+	applicantName: z.string().trim(),
+	jobTitle: z.string().trim(),
+	companyName: z.string().trim(),
+});
+
+export const ApplicationReceivedEmailSchema = z.object({
+	email: z.email().trim(),
+	companyName: z.string().trim(),
+	applicantName: z.string().trim(),
+	jobTitle: z.string().trim(),
+});
+
+export const ApplicationStatusUpdatedEmailSchema = z.object({
+	email: z.email().trim(),
+	applicantName: z.string().trim(),
+	jobTitle: z.string().trim(),
+	companyName: z.string().trim(),
+	newStatus: z.string().trim(),
+});
+
 export type RecruitmentEmailJobPayload =
 	| z.infer<typeof EmployerWelcomeEmailSchema>
 	| z.infer<typeof JobCreatedEmailSchema>
 	| z.infer<typeof JobClosedEmailSchema>
-	| z.infer<typeof ApplicantWelcomeEmailSchema>;
+	| z.infer<typeof ApplicantWelcomeEmailSchema>
+	| z.infer<typeof ApplicationSubmittedEmailSchema>
+	| z.infer<typeof ApplicationReceivedEmailSchema>
+	| z.infer<typeof ApplicationStatusUpdatedEmailSchema>;

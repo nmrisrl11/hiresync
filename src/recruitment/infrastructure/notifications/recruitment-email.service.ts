@@ -64,4 +64,53 @@ export class RecruitmentEmailService {
 			context: { jobsUrl, firstName, lastName },
 		});
 	}
+
+	public async sendApplicationSubmittedEmail(
+		email: string,
+		applicantName: string,
+		jobTitle: string,
+		companyName: string,
+	): Promise<void> {
+		const applicationsUrl = `${this.appUrl}/applicant/applications`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: `Application Submitted: ${jobTitle} at ${companyName}`,
+			template: "recruitment/application-submitted",
+			context: { applicationsUrl, applicantName, jobTitle, companyName },
+		});
+	}
+
+	public async sendApplicationReceivedEmail(
+		email: string,
+		companyName: string,
+		applicantName: string,
+		jobTitle: string,
+	): Promise<void> {
+		const employerApplicationsUrl = `${this.appUrl}/employer/applications`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: `New Application Received for ${jobTitle}`,
+			template: "recruitment/application-received",
+			context: { employerApplicationsUrl, companyName, applicantName, jobTitle },
+		});
+	}
+
+	public async sendApplicationStatusUpdatedEmail(
+		email: string,
+		applicantName: string,
+		jobTitle: string,
+		companyName: string,
+		newStatus: string,
+	): Promise<void> {
+		const applicationsUrl = `${this.appUrl}/applicant/applications`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: `Application Update: ${jobTitle} at ${companyName}`,
+			template: "recruitment/application-status-updated",
+			context: { applicationsUrl, applicantName, jobTitle, companyName, newStatus },
+		});
+	}
 }

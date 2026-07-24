@@ -4,6 +4,9 @@ import { Job } from "bullmq";
 import { RecruitmentEmailService } from "./recruitment-email.service";
 import {
 	ApplicantWelcomeEmailSchema,
+	ApplicationReceivedEmailSchema,
+	ApplicationStatusUpdatedEmailSchema,
+	ApplicationSubmittedEmailSchema,
 	EmployerWelcomeEmailSchema,
 	JobClosedEmailSchema,
 	JobCreatedEmailSchema,
@@ -53,6 +56,37 @@ export class RecruitmentEmailProcessor extends WorkerHost {
 						payload.email,
 						payload.firstName,
 						payload.lastName,
+					);
+					break;
+				}
+				case "send-application-submitted": {
+					const payload = ApplicationSubmittedEmailSchema.parse(job.data);
+					await this.emailService.sendApplicationSubmittedEmail(
+						payload.email,
+						payload.applicantName,
+						payload.jobTitle,
+						payload.companyName,
+					);
+					break;
+				}
+				case "send-application-received": {
+					const payload = ApplicationReceivedEmailSchema.parse(job.data);
+					await this.emailService.sendApplicationReceivedEmail(
+						payload.email,
+						payload.companyName,
+						payload.applicantName,
+						payload.jobTitle,
+					);
+					break;
+				}
+				case "send-application-status-updated": {
+					const payload = ApplicationStatusUpdatedEmailSchema.parse(job.data);
+					await this.emailService.sendApplicationStatusUpdatedEmail(
+						payload.email,
+						payload.applicantName,
+						payload.jobTitle,
+						payload.companyName,
+						payload.newStatus,
 					);
 					break;
 				}
