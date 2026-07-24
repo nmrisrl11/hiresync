@@ -113,4 +113,20 @@ export class RecruitmentEmailService {
 			context: { applicationsUrl, applicantName, jobTitle, companyName, newStatus },
 		});
 	}
+
+	public async sendApplicationWithdrawnEmail(
+		email: string,
+		companyName: string,
+		applicantName: string,
+		jobTitle: string,
+	): Promise<void> {
+		const employerApplicationsUrl = `${this.appUrl}/employer/applications`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: `Application Withdrawn: ${applicantName} for ${jobTitle}`,
+			template: "recruitment/application-withdrawn",
+			context: { employerApplicationsUrl, companyName, applicantName, jobTitle },
+		});
+	}
 }

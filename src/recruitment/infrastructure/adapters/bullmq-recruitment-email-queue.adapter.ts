@@ -91,4 +91,17 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
 		);
 	}
+
+	public async enqueueApplicationWithdrawnEmail(
+		email: string,
+		companyName: string,
+		applicantName: string,
+		jobTitle: string,
+	): Promise<void> {
+		await this.emailQueue.add(
+			"send-application-withdrawn",
+			{ email, companyName, applicantName, jobTitle },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
 }

@@ -7,6 +7,7 @@ import {
 	ApplicationReceivedEmailSchema,
 	ApplicationStatusUpdatedEmailSchema,
 	ApplicationSubmittedEmailSchema,
+	ApplicationWithdrawnEmailSchema,
 	EmployerWelcomeEmailSchema,
 	JobClosedEmailSchema,
 	JobCreatedEmailSchema,
@@ -87,6 +88,16 @@ export class RecruitmentEmailProcessor extends WorkerHost {
 						payload.jobTitle,
 						payload.companyName,
 						payload.newStatus,
+					);
+					break;
+				}
+				case "send-application-withdrawn": {
+					const payload = ApplicationWithdrawnEmailSchema.parse(job.data);
+					await this.emailService.sendApplicationWithdrawnEmail(
+						payload.email,
+						payload.companyName,
+						payload.applicantName,
+						payload.jobTitle,
 					);
 					break;
 				}

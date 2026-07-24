@@ -94,7 +94,7 @@
     - [ ] Review uploaded resumes and cover letters
         #### Email Notifications
         - [x] New application received
-        - [ ] Application withdrawn
+        - [x] Application withdrawn
 
 ## **Third-Party Service Integrations**
 

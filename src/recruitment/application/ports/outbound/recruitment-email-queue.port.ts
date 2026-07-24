@@ -41,4 +41,11 @@ export abstract class RecruitmentEmailQueuePort {
 		companyName: string,
 		newStatus: string,
 	): Promise<void>;
+
+	abstract enqueueApplicationWithdrawnEmail(
+		email: string,
+		companyName: string,
+		applicantName: string,
+		jobTitle: string,
+	): Promise<void>;
 }

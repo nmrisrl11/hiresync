@@ -46,6 +46,13 @@ export const ApplicationStatusUpdatedEmailSchema = z.object({
 	newStatus: z.string().trim(),
 });
 
+export const ApplicationWithdrawnEmailSchema = z.object({
+	email: z.email().trim(),
+	companyName: z.string().trim(),
+	applicantName: z.string().trim(),
+	jobTitle: z.string().trim(),
+});
+
 export type RecruitmentEmailJobPayload =
 	| z.infer<typeof EmployerWelcomeEmailSchema>
 	| z.infer<typeof JobCreatedEmailSchema>
@@ -53,4 +60,5 @@ export type RecruitmentEmailJobPayload =
 	| z.infer<typeof ApplicantWelcomeEmailSchema>
 	| z.infer<typeof ApplicationSubmittedEmailSchema>
 	| z.infer<typeof ApplicationReceivedEmailSchema>
-	| z.infer<typeof ApplicationStatusUpdatedEmailSchema>;
+	| z.infer<typeof ApplicationStatusUpdatedEmailSchema>
+	| z.infer<typeof ApplicationWithdrawnEmailSchema>;

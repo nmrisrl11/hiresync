@@ -7,3 +7,4 @@ export * from "./enqueue-applicant-welcome-email.use-case";
 
 export * from "./enqueue-application-submitted.use-case";
 export * from "./enqueue-application-status-updated.use-case";
+export * from "./enqueue-application-withdrawn.use-case";
