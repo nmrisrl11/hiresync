@@ -11,3 +11,9 @@ export class JobAlreadyClosedException extends DomainBaseException {
 		super(message);
 	}
 }
+
+export class ApplicationNotUpdatableException extends DomainBaseException {
+	constructor(message: string = "Application is already finalized and cannot be withdrawn.") {
+		super(message);
+	}
+}

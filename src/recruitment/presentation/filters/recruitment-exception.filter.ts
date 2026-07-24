@@ -12,6 +12,7 @@ import {
 	UnauthorizedJobListingException,
 } from "@/recruitment/application/exceptions";
 import {
+	ApplicationNotUpdatableException,
 	JobAlreadyClosedException,
 	JobNotUpdatableException,
 } from "@/recruitment/domain/exceptions";
@@ -25,6 +26,7 @@ export class RecruitmentExceptionFilter extends BaseExceptionFilter {
 		switch (exception.constructor) {
 			case JobNotUpdatableException:
 			case JobAlreadyClosedException:
+			case ApplicationNotUpdatableException:
 				return HttpStatus.CONFLICT;
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;

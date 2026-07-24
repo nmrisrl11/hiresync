@@ -2,7 +2,9 @@ import { AggregateRoot } from "@/shared/domain/entities";
 import {
 	JobApplicationStatusUpdatedDomainEvent,
 	JobApplicationSubmittedDomainEvent,
+	JobApplicationWithdrawnDomainEvent,
 } from "../events";
+import { ApplicationNotUpdatableException } from "../exceptions";
 import { APPLICATION_STATUS, ApplicationStatus } from "../types";
 import { ApplicantId, EmployerId, JobApplicationId, JobListingId } from "../value-objects";
 
@@ -66,6 +68,27 @@ export class JobApplication extends AggregateRoot {
 				this.id.getValue(),
 				this.applicantId.getValue(),
 				this.status,
+			),
+		);
+	}
+
+	public withdraw(): void {
+		if (
+			this.status === APPLICATION_STATUS.HIRED ||
+			this.status === APPLICATION_STATUS.REJECTED ||
+			this.status === APPLICATION_STATUS.WITHDRAWN
+		)
+			throw new ApplicationNotUpdatableException();
+
+		this.status = APPLICATION_STATUS.WITHDRAWN;
+		this.updatedAt = new Date();
+
+		this.addDomainEvent(
+			new JobApplicationWithdrawnDomainEvent(
+				this.id.getValue(),
+				this.applicantId.getValue(),
+				this.jobListingId.getValue(),
+				this.employerId.getValue(),
 			),
 		);
 	}
