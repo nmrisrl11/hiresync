@@ -7,3 +7,6 @@ export * from "./job-listing-updated.domain-event";
 
 export * from "./applicant-profile-created.domain-event";
 export * from "./applicant-profile-updated.domain-event";
+
+export * from "./job-application-submitted.domain-event";
+export * from "./job-application-status-updated.domain-event";

@@ -1,8 +1,10 @@
 import { AggregateRoot } from "@/shared/domain/entities";
-import { ApplicantId, EmployerId, JobApplicationId, JobListingId } from "../value-objects";
+import {
+	JobApplicationStatusUpdatedDomainEvent,
+	JobApplicationSubmittedDomainEvent,
+} from "../events";
 import { APPLICATION_STATUS, ApplicationStatus } from "../types";
-import { JobApplicationSubmittedDomainEvent } from "../events/job-application-submitted.domain-event";
-import { JobApplicationStatusUpdatedDomainEvent } from "../events/job-application-status-updated.domain-event";
+import { ApplicantId, EmployerId, JobApplicationId, JobListingId } from "../value-objects";
 
 export class JobApplication extends AggregateRoot {
 	constructor(

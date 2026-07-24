@@ -32,6 +32,8 @@ import {
 } from "./application/ports/inbound/jobs";
 import {
 	EnqueueApplicantWelcomeEmailUseCasePort,
+	EnqueueApplicationStatusUpdatedUseCasePort,
+	EnqueueApplicationSubmittedUseCasePort,
 	EnqueueEmployerWelcomeEmailUseCasePort,
 	EnqueueJobClosedEmailUseCasePort,
 	EnqueueJobCreatedEmailUseCasePort,
@@ -72,6 +74,8 @@ import {
 } from "./application/use-cases/jobs";
 import {
 	EnqueueApplicantWelcomeEmailUseCase,
+	EnqueueApplicationStatusUpdatedUseCase,
+	EnqueueApplicationSubmittedUseCase,
 	EnqueueEmployerWelcomeEmailUseCase,
 	EnqueueJobClosedEmailUseCase,
 	EnqueueJobCreatedEmailUseCase,
@@ -102,6 +106,8 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 import {
 	ApplicantProfileCreatedListener,
 	EmployerProfileCreatedListener,
+	JobApplicationStatusUpdatedListener,
+	JobApplicationSubmittedListener,
 	JobListingClosedListener,
 	JobListingCreatedListener,
 } from "./presentation/event-listeners";
@@ -164,10 +170,20 @@ import {
 			provide: EnqueueApplicantWelcomeEmailUseCasePort,
 			useClass: EnqueueApplicantWelcomeEmailUseCase,
 		},
+		{
+			provide: EnqueueApplicationSubmittedUseCasePort,
+			useClass: EnqueueApplicationSubmittedUseCase,
+		},
+		{
+			provide: EnqueueApplicationStatusUpdatedUseCasePort,
+			useClass: EnqueueApplicationStatusUpdatedUseCase,
+		},
 		EmployerProfileCreatedListener,
 		JobListingCreatedListener,
 		JobListingClosedListener,
 		ApplicantProfileCreatedListener,
+		JobApplicationSubmittedListener,
+		JobApplicationStatusUpdatedListener,
 
 		//! CRON Jobs
 		ExpireJobListingsCron,

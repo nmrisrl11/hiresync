@@ -110,15 +110,15 @@
         - [x] Resume in PDF
         - [x] Cover letter in TXT
         #### Email Notifications
-        - [ ] Application submitted
-        - [ ] Application status updated
+        - [x] Application submitted
+        - [x] Application status updated
 - Employers can:
     - [x] Get/View applications
     - [x] Update application status
     - [ ] Get/View applicants
     - [ ] Review uploaded resumes and cover letters
         #### Email Notifications
-        - [ ] New application received
+        - [x] New application received
 
 ### Email Notifications
 - [x] Welcome Email

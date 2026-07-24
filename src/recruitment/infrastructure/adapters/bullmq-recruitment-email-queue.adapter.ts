@@ -51,4 +51,44 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
 		);
 	}
+
+	public async enqueueApplicationSubmittedEmail(
+		email: string,
+		applicantName: string,
+		jobTitle: string,
+		companyName: string,
+	): Promise<void> {
+		await this.emailQueue.add(
+			"send-application-submitted",
+			{ email, applicantName, jobTitle, companyName },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
+
+	public async enqueueApplicationReceivedEmail(
+		email: string,
+		companyName: string,
+		applicantName: string,
+		jobTitle: string,
+	): Promise<void> {
+		await this.emailQueue.add(
+			"send-application-received",
+			{ email, companyName, applicantName, jobTitle },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
+
+	public async enqueueApplicationStatusUpdatedEmail(
+		email: string,
+		applicantName: string,
+		jobTitle: string,
+		companyName: string,
+		newStatus: string,
+	): Promise<void> {
+		await this.emailQueue.add(
+			"send-application-status-updated",
+			{ email, applicantName, jobTitle, companyName, newStatus },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
 }
