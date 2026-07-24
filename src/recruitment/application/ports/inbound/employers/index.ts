@@ -4,3 +4,4 @@ export * from "./upload-company-logo.in-port";
 export * from "./remove-company-logo.in-port";
 export * from "./get-employer-profile.in-port";
 export * from "./get-employer-profile-by-id.in-port";
+export * from "./get-applicant-profile-for-employer.in-port";

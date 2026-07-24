@@ -11,3 +11,11 @@ export class ApplicantProfileNotFoundException extends ApplicationBaseException 
 		super(message);
 	}
 }
+
+export class UnauthorizedApplicantAccessException extends ApplicationBaseException {
+	constructor(
+		message: string = "You cannot view this applicant's profile because they have not applied to any of your job listings.",
+	) {
+		super(message);
+	}
+}

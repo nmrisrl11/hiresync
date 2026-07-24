@@ -1,5 +1,4 @@
 import { ApplicationStatus } from "@/recruitment/domain/types";
-import { JobApplicationResult } from "./get-applicant-applications.in-port";
 
 export class GetEmployerApplicationsQuery {
 	constructor(
@@ -11,8 +10,19 @@ export class GetEmployerApplicationsQuery {
 	) {}
 }
 
+export type EmployerJobApplicationResult = {
+	id: string;
+	jobListingId: string;
+	applicantId: string;
+	status: ApplicationStatus;
+	resumeUrl: string;
+	coverLetterUrl: string | null;
+	appliedAt: Date;
+	updatedAt: Date;
+};
+
 export abstract class GetEmployerApplicationsUseCasePort {
 	abstract execute(
 		query: GetEmployerApplicationsQuery,
-	): Promise<{ items: JobApplicationResult[]; total: number }>;
+	): Promise<{ items: EmployerJobApplicationResult[]; total: number }>;
 }

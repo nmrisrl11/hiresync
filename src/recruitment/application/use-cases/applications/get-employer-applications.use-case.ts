@@ -5,9 +5,9 @@ import {
 import { Injectable } from "@nestjs/common";
 import { EmployerProfileNotFoundException } from "../../exceptions";
 import {
+	EmployerJobApplicationResult,
 	GetEmployerApplicationsQuery,
 	GetEmployerApplicationsUseCasePort,
-	JobApplicationResult,
 } from "../../ports/inbound/applications";
 
 @Injectable()
@@ -19,7 +19,7 @@ export class GetEmployerApplicationsUseCase implements GetEmployerApplicationsUs
 
 	public async execute(
 		query: GetEmployerApplicationsQuery,
-	): Promise<{ items: JobApplicationResult[]; total: number }> {
+	): Promise<{ items: EmployerJobApplicationResult[]; total: number }> {
 		const employerProfile = await this.employerProfileRepository.findByUserId(query.employerId);
 		if (!employerProfile) throw new EmployerProfileNotFoundException();
 
@@ -36,10 +36,10 @@ export class GetEmployerApplicationsUseCase implements GetEmployerApplicationsUs
 			this.jobApplicationRepository.count(filter),
 		]);
 
-		const items: JobApplicationResult[] = applications.map((app) => ({
+		const items: EmployerJobApplicationResult[] = applications.map((app) => ({
 			id: app.id.getValue(),
 			jobListingId: app.jobListingId.getValue(),
-			employerId: app.employerId.getValue(),
+			applicantId: app.applicantId.getValue(),
 			status: app.status,
 			resumeUrl: app.resumeUrl,
 			coverLetterUrl: app.coverLetterUrl,

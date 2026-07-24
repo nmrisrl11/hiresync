@@ -16,6 +16,7 @@ import {
 import {
 	CreateEmployerProfileUseCasePort,
 	EditEmployerProfileUseCasePort,
+	GetApplicantProfileForEmployerUseCasePort,
 	GetEmployerProfileByIdUseCasePort,
 	GetEmployerProfileUseCasePort,
 	RemoveCompanyLogoUseCasePort,
@@ -58,6 +59,7 @@ import {
 import {
 	CreateEmployerProfileUseCase,
 	EditEmployerProfileUseCase,
+	GetApplicantProfileForEmployerUseCase,
 	GetEmployerProfileByIdUseCase,
 	GetEmployerProfileUseCase,
 	RemoveCompanyLogoUseCase,
@@ -129,6 +131,10 @@ import {
 		{ provide: RemoveCompanyLogoUseCasePort, useClass: RemoveCompanyLogoUseCase },
 		{ provide: GetEmployerProfileUseCasePort, useClass: GetEmployerProfileUseCase },
 		{ provide: GetEmployerProfileByIdUseCasePort, useClass: GetEmployerProfileByIdUseCase },
+		{
+			provide: GetApplicantProfileForEmployerUseCasePort,
+			useClass: GetApplicantProfileForEmployerUseCase,
+		},
 
 		{ provide: CreateJobListingUseCasePort, useClass: CreateJobListingUseCase },
 		{ provide: EditJobListingUseCasePort, useClass: EditJobListingUseCase },

@@ -7,6 +7,7 @@ import {
 	JobApplicationNotFoundException,
 	JobListingNotFoundException,
 	JobNotAcceptingApplicationsException,
+	UnauthorizedApplicantAccessException,
 	UnauthorizedApplicationAccessException,
 	UnauthorizedJobListingException,
 } from "@/recruitment/application/exceptions";
@@ -34,6 +35,7 @@ export class RecruitmentExceptionFilter extends BaseExceptionFilter {
 		switch (exception.constructor) {
 			case UnauthorizedJobListingException:
 			case UnauthorizedApplicationAccessException:
+			case UnauthorizedApplicantAccessException:
 				return HttpStatus.FORBIDDEN;
 			case EmployerProfileAlreadyExistsException:
 			case ApplicantProfileAlreadyExistsException:

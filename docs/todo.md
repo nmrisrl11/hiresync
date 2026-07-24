@@ -1,9 +1,8 @@
 # HireSync - Todos
 
-## Roadmap
+## **IAM (Identity and Access Management) Module**
 
 ### Authentication
-
 - [x] Registration
 - [x] Login
 - [x] Logout
@@ -14,32 +13,14 @@
 - [x] Reset Password
 - [x] Refresh Access Token with refresh token
 - [x] Resending Email Verification
-
-#### To add on IAM (Identity and Access Management)
-
-- [x] Update Password (Authenticated)
-  - A secure flow for logged-in users to change their password by validating their old password hash before accepting a new password.
-
-- [x] Update Email Address
-  - A dual-step flow that generates a new verification token and sends it to the new email address before updating the actual database record, preventing accidental account lockouts.
-
-- [x] Account Deletion
-  - A compliance-driven feature (GDPR/CCPA) that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.
-
-- [ ] Account Lockout (Brute Force Protection)
-  - Track consecutive failed login attempts and temporarily lock the account (e.g., 15 minutes) after exceeding a threshold.
-
-- [ ] Multi-Factor Authentication (MFA / 2FA)
-  - Implement TOTP authentication using apps like Google Authenticator or Authy.
-
-- [ ] Multi-Device Session Management
-  - Replace the single refreshTokenHash with a Session entity (one-to-many) to allow users to manage active sessions.
-
-- [ ] Manual OAuth Integration
-  - Build custom authorization flows for Google, GitHub, Microsoft, etc., without relying on third-party UI libraries.
+    #### Email Notifications
+    - [x] Welcome Email
+    - [x] Farewell (Deleted Account) Email
+    - [x] Send and Resend Verification Email
+    - [x] Forgot and Change Password
+    - [x] Request and Confirmation of Changing Email
 
 ### User
-
 - [x] Create User
 - [x] Get Current Authenticated User
 - [x] Get Users (Admin)
@@ -49,23 +30,13 @@
 - [x] Delete User
 
 ### Role
-
 - [/] Create Role
 - [x] Get Roles
 - [/] Get Role by ID
 - [/] Update Role
 - [/] Delete Role
 
-### Storage
-
-- [x] Upload and set account avatar with Cloudinary
-- [x] Removing of account avatar
-
-### Event Driven
-
-- [x] Move email background queueing with event-driven
-
-## Recruitment Module
+## **Recruitment Module**
 
 ### Employers
 - [x] Create company profile
@@ -115,19 +86,60 @@
 - Employers can:
     - [x] Get/View applications
     - [x] Update application status
-    - [ ] Get/View applicants
+    - [x] Get/View applicants who applied for jobs
     - [ ] Review uploaded resumes and cover letters
         #### Email Notifications
         - [x] New application received
 
-### Email Notifications
-- [x] Welcome Email
-- [x] Farewell (Deleted Account) Email
-- [x] Send and Resend Verification Email
-- [x] Forgot and Change Password
-- [x] Request and Confirmation of Changing Email
-- [ ] Job Application Confirmation
-- [ ] Job Expiration Reminder
+## **Third-Party Service Integrations**
 
-### Schedule Tasks
-- [ ] Remove expired tokens
+### Email Services
+- [x] Integrate nodemailer
+- [x] Integrate resend
+
+### Image and Documents Storage
+- [x] Cloudinary integration
+- [x] Upload/Remove Account Avatar
+- [x] Upload/Remove Company Profile Logo
+- [x] Uploading of Resumes in PDF format
+- [x] Uploading of Cover Letters in TXT format
+
+### Rate Limiting
+- [x] Integrate rate limiting middleware (NestJS Throttler)
+- [x] Implement rate limiting for API endpoints
+
+### Background Queueing
+- [x] Integrate background queueing (NestJS BullMQ)
+- [x] Implement background queueing for email notifications
+
+### Event Driven
+- [x] Integrate with event-driven architecture (NestJS Event Emitter)
+- [x] Move email background queueing with event-driven
+
+### Tasks Scheduling
+- [x] Integrate tasks scheduling (NestJS Cron/Schedule)
+- [x] Implement task scheduling to expire job listings
+- [ ] Remove expired tokens (verification & reset tokens)
+- [ ] Send reminder to employers about expiring job listings
+
+## **To add on IAM (Identity and Access Management)**
+- [x] Update Password (Authenticated)
+  - A secure flow for logged-in users to change their password by validating their old password hash before accepting a new password.
+
+- [x] Update Email Address
+  - A dual-step flow that generates a new verification token and sends it to the new email address before updating the actual database record, preventing accidental account lockouts.
+
+- [x] Account Deletion
+  - A compliance-driven feature (GDPR/CCPA) that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.
+
+- [ ] Account Lockout (Brute Force Protection)
+  - Track consecutive failed login attempts and temporarily lock the account (e.g., 15 minutes) after exceeding a threshold.
+
+- [ ] Multi-Factor Authentication (MFA / 2FA)
+  - Implement TOTP authentication using apps like Google Authenticator or Authy.
+
+- [ ] Multi-Device Session Management
+  - Replace the single refreshTokenHash with a Session entity (one-to-many) to allow users to manage active sessions.
+
+- [ ] Manual OAuth Integration
+  - Build custom authorization flows for Google, GitHub, Microsoft, etc., without relying on third-party UI libraries.
