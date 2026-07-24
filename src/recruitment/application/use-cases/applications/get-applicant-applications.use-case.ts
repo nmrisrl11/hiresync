@@ -3,12 +3,12 @@ import {
 	JobApplicationRepository,
 } from "@/recruitment/domain/repositories";
 import { Injectable } from "@nestjs/common";
+import { ApplicantProfileNotFoundException } from "../../exceptions";
 import {
+	ApplicantJobApplicationResult,
 	GetApplicantApplicationsQuery,
 	GetApplicantApplicationsUseCasePort,
-	JobApplicationResult,
 } from "../../ports/inbound/applications";
-import { ApplicantProfileNotFoundException } from "../../exceptions";
 
 @Injectable()
 export class GetApplicantApplicationsUseCase implements GetApplicantApplicationsUseCasePort {
@@ -19,7 +19,7 @@ export class GetApplicantApplicationsUseCase implements GetApplicantApplications
 
 	public async execute(
 		query: GetApplicantApplicationsQuery,
-	): Promise<{ items: JobApplicationResult[]; total: number }> {
+	): Promise<{ items: ApplicantJobApplicationResult[]; total: number }> {
 		const applicant = await this.applicantProfileRepository.findByUserId(query.applicantId);
 		if (!applicant) throw new ApplicantProfileNotFoundException();
 
@@ -35,7 +35,7 @@ export class GetApplicantApplicationsUseCase implements GetApplicantApplications
 			this.jobApplicationRepository.count(filter),
 		]);
 
-		const items: JobApplicationResult[] = applications.map((app) => ({
+		const items: ApplicantJobApplicationResult[] = applications.map((app) => ({
 			id: app.id.getValue(),
 			jobListingId: app.jobListingId.getValue(),
 			employerId: app.employerId.getValue(),

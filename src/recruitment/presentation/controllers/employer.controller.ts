@@ -9,6 +9,8 @@ import {
 	CreateEmployerProfileUseCasePort,
 	EditEmployerProfileCommand,
 	EditEmployerProfileUseCasePort,
+	GetApplicantProfileForEmployerQuery,
+	GetApplicantProfileForEmployerUseCasePort,
 	GetEmployerProfileQuery,
 	GetEmployerProfileUseCasePort,
 	RemoveCompanyLogoCommand,
@@ -83,6 +85,7 @@ export class EmployerController {
 		private readonly getEmployerJobsUseCase: GetEmployerJobsUseCasePort,
 		private readonly getEmployerApplicationsUseCase: GetEmployerApplicationsUseCasePort,
 		private readonly updateApplicationStatusUseCase: UpdateApplicationStatusUseCasePort,
+		private readonly getApplicantProfileForEmployerUseCase: GetApplicantProfileForEmployerUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -314,5 +317,21 @@ export class EmployerController {
 		await this.updateApplicationStatusUseCase.execute(command);
 
 		return { message: "Application status updated successfully." };
+	}
+
+	@Get("applicants/:id")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
+	@ApiOperation({
+		summary: "Get an applicant's profile (restricted to applicants who applied to your jobs).",
+	})
+	public async getApplicantProfile(
+		@CurrentUser() user: JwtPayload,
+		@Param("id") applicantId: string,
+	) {
+		const query = new GetApplicantProfileForEmployerQuery(user.sub, applicantId);
+		const profile = await this.getApplicantProfileForEmployerUseCase.execute(query);
+
+		return { data: profile };
 	}
 }

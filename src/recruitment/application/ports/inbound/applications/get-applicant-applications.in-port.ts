@@ -9,7 +9,7 @@ export class GetApplicantApplicationsQuery {
 	) {}
 }
 
-export type JobApplicationResult = {
+export type ApplicantJobApplicationResult = {
 	id: string;
 	jobListingId: string;
 	employerId: string;
@@ -23,5 +23,5 @@ export type JobApplicationResult = {
 export abstract class GetApplicantApplicationsUseCasePort {
 	abstract execute(
 		query: GetApplicantApplicationsQuery,
-	): Promise<{ items: JobApplicationResult[]; total: number }>;
+	): Promise<{ items: ApplicantJobApplicationResult[]; total: number }>;
 }
