@@ -5,10 +5,10 @@ import {
 	type LocationType,
 } from "@/recruitment/domain/types";
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
+import { IsEnum, IsOptional, IsString } from "class-validator";
+import { PaginationDto } from "./pagination.dto";
 
-export class SearchJobListingDto {
+export class SearchJobListingDto extends PaginationDto {
 	@ApiPropertyOptional({ description: "Search by job title or description" })
 	@IsOptional()
 	@IsString()
@@ -23,18 +23,4 @@ export class SearchJobListingDto {
 	@IsOptional()
 	@IsEnum(LOCATION_TYPE)
 	locationType?: LocationType;
-
-	@ApiPropertyOptional({ default: 10 })
-	@IsOptional()
-	@Type(() => Number)
-	@IsInt()
-	@Min(1)
-	limit: number = 10;
-
-	@ApiPropertyOptional({ default: 0 })
-	@IsOptional()
-	@Type(() => Number)
-	@IsInt()
-	@Min(0)
-	offset: number = 0;
 }

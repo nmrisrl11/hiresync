@@ -77,7 +77,9 @@
     - [x] Upload cover letters
     - [x] Get/View submitted applications
     - [x] Withdraw application
-    - [ ] Save/Bookmark job listing
+    - [x] Save/Bookmark job listing
+    - [x] Unsave/Unbookmark job listing
+    - [x] Get saved/bookmarked job listings
     - [ ] Track application status
         #### File Uploading
         - [x] Resume in PDF

@@ -5,6 +5,10 @@ import {
 	EditApplicantProfileUseCasePort,
 	GetApplicantProfileQuery,
 	GetApplicantProfileUseCasePort,
+	GetSavedJobsQuery,
+	GetSavedJobsUseCasePort,
+	ToggleSavedJobCommand,
+	ToggleSavedJobUseCasePort,
 } from "@/recruitment/application/ports/inbound/applicants";
 import {
 	ApplyForJobCommand,
@@ -41,6 +45,7 @@ import {
 	CreateApplicantProfileDto,
 	EditApplicantProfileDto,
 	GetApplicationsDto,
+	PaginationDto,
 } from "../dtos";
 import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.filter";
 import { DocumentValidationPipe } from "../pipes/document-validation.pipe";
@@ -58,6 +63,8 @@ export class ApplicantController {
 		private readonly applyForJobUseCase: ApplyForJobUseCasePort,
 		private readonly getApplicantApplicationsUseCase: GetApplicantApplicationsUseCasePort,
 		private readonly withdrawApplicationUseCase: WithdrawApplicationUseCasePort,
+		private readonly toggleSavedJobUseCase: ToggleSavedJobUseCasePort,
+		private readonly getSavedJobsUseCase: GetSavedJobsUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -203,5 +210,36 @@ export class ApplicantController {
 		await this.withdrawApplicationUseCase.execute(command);
 
 		return { message: "Application withdrawn successfully." };
+	}
+
+	@Post("saved-jobs/:jobListingId/toggle")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
+	@ApiOperation({ summary: "Bookmark or un-bookmark a job listing." })
+	public async toggleSavedJob(
+		@CurrentUser() user: JwtPayload,
+		@Param("jobListingId") jobListingId: string,
+	) {
+		const command = new ToggleSavedJobCommand(user.sub, jobListingId);
+		const result = await this.toggleSavedJobUseCase.execute(command);
+
+		return {
+			message: result.saved ? "Job saved successfully." : "Job removed from saved list.",
+			data: result,
+		};
+	}
+
+	@Get("saved-jobs")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
+	@ApiOperation({ summary: "Get a paginated list of your saved jobs." })
+	public async getSavedJobs(@CurrentUser() user: JwtPayload, @Query() queryDto: PaginationDto) {
+		const query = new GetSavedJobsQuery(user.sub, queryDto.limit, queryDto.offset);
+		const { items, total } = await this.getSavedJobsUseCase.execute(query);
+
+		return {
+			data: items,
+			meta: { total, limit: queryDto.limit, offset: queryDto.offset },
+		};
 	}
 }
