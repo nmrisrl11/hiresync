@@ -36,6 +36,7 @@ import {
 	EnqueueApplicantWelcomeEmailUseCasePort,
 	EnqueueApplicationStatusUpdatedUseCasePort,
 	EnqueueApplicationSubmittedUseCasePort,
+	EnqueueApplicationWithdrawnUseCasePort,
 	EnqueueEmployerWelcomeEmailUseCasePort,
 	EnqueueJobClosedEmailUseCasePort,
 	EnqueueJobCreatedEmailUseCasePort,
@@ -80,6 +81,7 @@ import {
 	EnqueueApplicantWelcomeEmailUseCase,
 	EnqueueApplicationStatusUpdatedUseCase,
 	EnqueueApplicationSubmittedUseCase,
+	EnqueueApplicationWithdrawnUseCase,
 	EnqueueEmployerWelcomeEmailUseCase,
 	EnqueueJobClosedEmailUseCase,
 	EnqueueJobCreatedEmailUseCase,
@@ -112,6 +114,7 @@ import {
 	EmployerProfileCreatedListener,
 	JobApplicationStatusUpdatedListener,
 	JobApplicationSubmittedListener,
+	JobApplicationWithdrawnListener,
 	JobListingClosedListener,
 	JobListingCreatedListener,
 } from "./presentation/event-listeners";
@@ -187,12 +190,17 @@ import {
 			provide: EnqueueApplicationStatusUpdatedUseCasePort,
 			useClass: EnqueueApplicationStatusUpdatedUseCase,
 		},
+		{
+			provide: EnqueueApplicationWithdrawnUseCasePort,
+			useClass: EnqueueApplicationWithdrawnUseCase,
+		},
 		EmployerProfileCreatedListener,
 		JobListingCreatedListener,
 		JobListingClosedListener,
 		ApplicantProfileCreatedListener,
 		JobApplicationSubmittedListener,
 		JobApplicationStatusUpdatedListener,
+		JobApplicationWithdrawnListener,
 
 		//! CRON Jobs
 		ExpireJobListingsCron,
