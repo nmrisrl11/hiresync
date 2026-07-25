@@ -1,6 +1,12 @@
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import {
+	DomainEventDispatcherPort,
+	IntegrationEventPublisherPort,
+} from "@/shared/application/ports/outbound";
 import { DatabaseModule } from "@/shared/database/database.module";
-import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
+import {
+	NestjsEventDispatcherAdapter,
+	NestjsIntegrationEventPublisherAdapter,
+} from "@/shared/infrastructure/adapters";
 import { Module } from "@nestjs/common";
 import {
 	ChangePasswordUseCasePort,
@@ -172,6 +178,9 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: EnqueueEmailChangedAlertUseCasePort, useClass: EnqueueEmailChangedAlertUseCase },
 		{ provide: EnqueueWelcomeEmailUseCasePort, useClass: EnqueueWelcomeEmailUseCase },
 		{ provide: EnqueueFarewellEmailUseCasePort, useClass: EnqueueFarewellEmailUseCase },
+
+		//! Integration Events
+		{ provide: IntegrationEventPublisherPort, useClass: NestjsIntegrationEventPublisherAdapter },
 	],
 })
 export class IamModule {}
