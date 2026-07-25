@@ -5,5 +5,5 @@ import { IsEnum } from "class-validator";
 export class UpdateApplicationStatusDto {
 	@ApiProperty({ enum: APPLICATION_STATUS, description: "The new status of the application" })
 	@IsEnum(APPLICATION_STATUS)
-	newStatus: ApplicationStatus;
+	newStatus!: ApplicationStatus;
 }

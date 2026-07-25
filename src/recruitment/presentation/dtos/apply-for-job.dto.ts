@@ -5,5 +5,5 @@ export class ApplyForJobDto {
 	@ApiProperty({ description: "The ID of the job listing being applied for" })
 	@IsString()
 	@IsUUID()
-	jobListingId: string;
+	jobListingId!: string;
 }

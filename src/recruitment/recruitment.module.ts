@@ -11,6 +11,7 @@ import {
 } from "./application/ports/inbound/applicants";
 import {
 	ApplyForJobUseCasePort,
+	BulkUpdateApplicationStatusUseCasePort,
 	GetApplicantApplicationsUseCasePort,
 	GetEmployerApplicationsUseCasePort,
 	UpdateApplicationStatusUseCasePort,
@@ -58,6 +59,7 @@ import {
 } from "./application/use-cases/applicants";
 import {
 	ApplyForJobUseCase,
+	BulkUpdateApplicationStatusUseCase,
 	GetApplicantApplicationsUseCase,
 	GetEmployerApplicationsUseCase,
 	UpdateApplicationStatusUseCase,
@@ -167,6 +169,10 @@ import {
 		{ provide: GetEmployerApplicationsUseCasePort, useClass: GetEmployerApplicationsUseCase },
 		{ provide: UpdateApplicationStatusUseCasePort, useClass: UpdateApplicationStatusUseCase },
 		{ provide: WithdrawApplicationUseCasePort, useClass: WithdrawApplicationUseCase },
+		{
+			provide: BulkUpdateApplicationStatusUseCasePort,
+			useClass: BulkUpdateApplicationStatusUseCase,
+		},
 
 		//! Outbound - Adapters
 		{ provide: UserIntegrationPort, useClass: PrismaUserIntegrationAdapter },

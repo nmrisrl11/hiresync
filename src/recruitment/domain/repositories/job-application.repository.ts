@@ -13,6 +13,7 @@ export interface FindApplicationsFilter {
 
 export abstract class JobApplicationRepository {
 	abstract findById(id: JobApplicationId): Promise<JobApplication | null>;
+	abstract findByIds(ids: JobApplicationId[]): Promise<JobApplication[]>;
 
 	//! Enforcing the "one application per job" rule
 	abstract findByApplicantAndJob(
@@ -24,4 +25,5 @@ export abstract class JobApplicationRepository {
 	abstract count(filter: FindApplicationsFilter): Promise<number>;
 
 	abstract save(application: JobApplication): Promise<void>;
+	abstract saveMany(applications: JobApplication[]): Promise<void>;
 }
