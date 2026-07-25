@@ -82,7 +82,7 @@
     - [x] Save/Bookmark job listing
     - [x] Unsave/Unbookmark job listing
     - [x] Get saved/bookmarked job listings
-    - [ ] Track application status
+    - [/] Track application status
         #### File Uploading
         - [x] Resume in PDF
         - [x] Cover letter in TXT
@@ -95,7 +95,7 @@
     - [x] Bulk update application status
     - [x] Internal application review/note
     - [x] Get/View applicants who applied for jobs
-    - [ ] Review uploaded resumes and cover letters
+    - [/] Review uploaded resumes and cover letters
         #### Email Notifications
         - [x] New application received
         - [x] Application withdrawn
