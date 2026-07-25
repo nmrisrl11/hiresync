@@ -91,12 +91,6 @@ import {
 	NodeCryptoAdapter,
 } from "./infrastructure/adapters";
 import { PrismaRoleRepository, PrismaUserRepository } from "./infrastructure/adapters/persistence";
-import { IamNotificationsModule } from "./infrastructure/notifications/iam-notifications.module";
-import { AccountController } from "./presentation/controllers/account.controller";
-import { AdminController } from "./presentation/controllers/admin.controller";
-import { AuthController } from "./presentation/controllers/auth.controller";
-import { RoleController } from "./presentation/controllers/role.controller";
-import { UserController } from "./presentation/controllers/user.controller";
 import {
 	EmailChangeRequestedListener,
 	PasswordResetRequestedListener,
@@ -106,7 +100,13 @@ import {
 	UserPasswordChangedListener,
 	UserRegisteredListener,
 	VerificationEmailResentListener,
-} from "./presentation/event-listeners";
+} from "./infrastructure/events/listeners";
+import { IamNotificationsModule } from "./infrastructure/notifications/iam-notifications.module";
+import { AccountController } from "./presentation/controllers/account.controller";
+import { AdminController } from "./presentation/controllers/admin.controller";
+import { AuthController } from "./presentation/controllers/auth.controller";
+import { RoleController } from "./presentation/controllers/role.controller";
+import { UserController } from "./presentation/controllers/user.controller";
 
 @Module({
 	imports: [DatabaseModule, IamNotificationsModule],
