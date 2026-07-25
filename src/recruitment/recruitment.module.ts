@@ -15,6 +15,7 @@ import {
 	GetApplicantApplicationsUseCasePort,
 	GetEmployerApplicationsUseCasePort,
 	UpdateApplicationStatusUseCasePort,
+	UpdateInternalNoteUseCasePort,
 	WithdrawApplicationUseCasePort,
 } from "./application/ports/inbound/applications";
 import {
@@ -63,6 +64,7 @@ import {
 	GetApplicantApplicationsUseCase,
 	GetEmployerApplicationsUseCase,
 	UpdateApplicationStatusUseCase,
+	UpdateInternalNoteUseCase,
 	WithdrawApplicationUseCase,
 } from "./application/use-cases/applications";
 import {
@@ -172,6 +174,10 @@ import {
 		{
 			provide: BulkUpdateApplicationStatusUseCasePort,
 			useClass: BulkUpdateApplicationStatusUseCase,
+		},
+		{
+			provide: UpdateInternalNoteUseCasePort,
+			useClass: UpdateInternalNoteUseCase,
 		},
 
 		//! Outbound - Adapters

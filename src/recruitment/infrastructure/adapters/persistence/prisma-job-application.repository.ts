@@ -82,6 +82,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 			where: { id: application.id.getValue() },
 			update: {
 				status: application.status,
+				internalNote: application.internalNote,
 				updatedAt: application.updatedAt,
 			},
 			create: {
@@ -106,6 +107,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 					where: { id: app.id.getValue() },
 					update: {
 						status: app.status,
+						internalNote: app.internalNote,
 						updatedAt: app.updatedAt,
 					},
 					create: {
@@ -116,6 +118,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 						resumeUrl: app.resumeUrl,
 						coverLetterUrl: app.coverLetterUrl,
 						status: app.status,
+						internalNote: app.internalNote,
 						appliedAt: app.appliedAt,
 						updatedAt: app.updatedAt,
 					},

@@ -5,6 +5,8 @@ import {
 	GetEmployerApplicationsUseCasePort,
 	UpdateApplicationStatusCommand,
 	UpdateApplicationStatusUseCasePort,
+	UpdateInternalNoteCommand,
+	UpdateInternalNoteUseCasePort,
 } from "@/recruitment/application/ports/inbound/applications";
 import {
 	CreateEmployerProfileCommand,
@@ -66,6 +68,7 @@ import {
 	GetApplicationsDto,
 	GetEmployerJobsDto,
 	UpdateApplicationStatusDto,
+	UpdateInternalNoteDto,
 } from "../dtos";
 import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.filter";
 import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mapper";
@@ -90,6 +93,7 @@ export class EmployerController {
 		private readonly updateApplicationStatusUseCase: UpdateApplicationStatusUseCasePort,
 		private readonly getApplicantProfileForEmployerUseCase: GetApplicantProfileForEmployerUseCasePort,
 		private readonly bulkUpdateApplicationStatusUseCase: BulkUpdateApplicationStatusUseCasePort,
+		private readonly updateInternalNoteUseCase: UpdateInternalNoteUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -340,6 +344,22 @@ export class EmployerController {
 		await this.bulkUpdateApplicationStatusUseCase.execute(command);
 
 		return { message: "Applications successfully updated." };
+	}
+
+	@Patch("applications/:id/note")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 15 } })
+	@ApiOperation({ summary: "Update the internal note for an application." })
+	public async updateApplicationNote(
+		@CurrentUser() user: JwtPayload,
+		@Param("id") applicationId: string,
+		@Body() dto: UpdateInternalNoteDto,
+	) {
+		const command = new UpdateInternalNoteCommand(user.sub, applicationId, dto.note ?? null);
+
+		await this.updateInternalNoteUseCase.execute(command);
+
+		return { message: "Internal note successfully updated." };
 	}
 
 	@Get("applicants/:id")

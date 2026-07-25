@@ -4,3 +4,4 @@ export * from "./get-employer-applications.use-case";
 export * from "./update-application-status.use-case";
 export * from "./withdraw-application.use-case";
 export * from "./bulk-update-application-status.use-case";
+export * from "./update-internal-note.use-case";
