@@ -8,3 +8,5 @@ export * from "./applicant-profile-created.listener";
 export * from "./job-application-submitted.listener";
 export * from "./job-application-status-updated.listener";
 export * from "./job-application-withdrawn.listener";
+
+export * from "./user-account-deleting.listener";

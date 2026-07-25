@@ -60,6 +60,14 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 		return RecruitmentMapper.toJobApplicationDomain(application);
 	}
 
+	async findAllByApplicantId(applicantId: ApplicantId): Promise<JobApplication[]> {
+		const applications = await this.prisma.jobApplication.findMany({
+			where: { applicantId: applicantId.getValue() },
+		});
+
+		return applications.map((app) => RecruitmentMapper.toJobApplicationDomain(app));
+	}
+
 	async findMany(filter: FindApplicationsFilter): Promise<JobApplication[]> {
 		const applications = await this.prisma.jobApplication.findMany({
 			where: this.buildWhereClause(filter),

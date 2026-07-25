@@ -21,6 +21,8 @@ export abstract class JobApplicationRepository {
 		jobListingId: JobListingId,
 	): Promise<JobApplication | null>;
 
+	abstract findAllByApplicantId(applicantId: ApplicantId): Promise<JobApplication[]>;
+
 	abstract findMany(filter: FindApplicationsFilter): Promise<JobApplication[]>;
 	abstract count(filter: FindApplicationsFilter): Promise<number>;
 

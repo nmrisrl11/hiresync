@@ -45,6 +45,7 @@ import {
 	EnqueueJobClosedEmailUseCasePort,
 	EnqueueJobCreatedEmailUseCasePort,
 } from "./application/ports/inbound/notifications";
+import { CleanupRecruitmentDataUseCasePort } from "./application/ports/inbound/system";
 import {
 	DocumentStoragePort,
 	ImageStoragePort,
@@ -94,6 +95,7 @@ import {
 	EnqueueJobClosedEmailUseCase,
 	EnqueueJobCreatedEmailUseCase,
 } from "./application/use-cases/notifications";
+import { CleanupRecruitmentDataUseCase } from "./application/use-cases/system";
 import {
 	ApplicantProfileRepository,
 	EmployerProfileRepository,
@@ -123,6 +125,7 @@ import {
 	JobApplicationWithdrawnListener,
 	JobListingClosedListener,
 	JobListingCreatedListener,
+	UserAccountDeletingListener,
 } from "./infrastructure/events/listeners";
 import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
 import { ApplicantController } from "./presentation/controllers/applicant.controller";
@@ -179,6 +182,10 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 			provide: UpdateInternalNoteUseCasePort,
 			useClass: UpdateInternalNoteUseCase,
 		},
+		{
+			provide: CleanupRecruitmentDataUseCasePort,
+			useClass: CleanupRecruitmentDataUseCase,
+		},
 
 		//! Outbound - Adapters
 		{ provide: UserIntegrationPort, useClass: PrismaUserIntegrationAdapter },
@@ -222,6 +229,7 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 		JobApplicationSubmittedListener,
 		JobApplicationStatusUpdatedListener,
 		JobApplicationWithdrawnListener,
+		UserAccountDeletingListener,
 
 		//! CRON Jobs
 		ExpireJobListingsCron,
