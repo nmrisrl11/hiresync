@@ -1,5 +1,7 @@
 # HireSync - Todos
 
+# Phase 1
+
 ## **IAM (Identity and Access Management) Module**
 
 ### Authentication
@@ -150,3 +152,16 @@
 
 - [ ] Manual OAuth Integration
   - Build custom authorization flows for Google, GitHub, Microsoft, etc., without relying on third-party UI libraries.
+
+# Phase 2
+
+### Employers
+- [ ] Company profile Allowing multiple User accounts (with a "Recruiter" role) to attach to a single Employer entity.
+
+### Applicants
+- [ ] Multiple Resumes - Allowing them to store up to 3–5 resumes and select which one to attach during the "Apply" flow significantly improves their experience.
+- [ ] Application History Timeline - A visual timeline on the applicant's side showing exactly when they applied, when the status changed, and when the employer left a note (if you choose to make certain notes public).
+
+### System & Compliance
+- [ ] Audit Logging (Activity History): Track "who did what and when" (e.g., "User A updated Job Listing B on Date C"). This is critical for resolving disputes or tracking recruiter activity.
+- [ ] Data Export (GDPR/CCPA): Since you already planned Account Deletion, adding a way for users to download their data payload as a JSON file completes the privacy compliance loop.

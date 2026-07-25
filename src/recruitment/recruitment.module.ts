@@ -115,10 +115,6 @@ import {
 	PrismaSavedJobRepository,
 } from "./infrastructure/adapters/persistence";
 import { ExpireJobListingsCron } from "./infrastructure/cron/expire-job-listings.cron";
-import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
-import { ApplicantController } from "./presentation/controllers/applicant.controller";
-import { EmployerController } from "./presentation/controllers/employer.controller";
-import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
 import {
 	ApplicantProfileCreatedListener,
 	EmployerProfileCreatedListener,
@@ -127,7 +123,11 @@ import {
 	JobApplicationWithdrawnListener,
 	JobListingClosedListener,
 	JobListingCreatedListener,
-} from "./presentation/event-listeners";
+} from "./infrastructure/events/listeners";
+import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
+import { ApplicantController } from "./presentation/controllers/applicant.controller";
+import { EmployerController } from "./presentation/controllers/employer.controller";
+import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
 
 @Module({
 	imports: [DatabaseModule, RecruitmentNotificationsModule],
