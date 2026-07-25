@@ -1,4 +1,6 @@
 import {
+	BulkUpdateApplicationStatusCommand,
+	BulkUpdateApplicationStatusUseCasePort,
 	GetEmployerApplicationsQuery,
 	GetEmployerApplicationsUseCasePort,
 	UpdateApplicationStatusCommand,
@@ -55,6 +57,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
 import {
+	BulkUpdateApplicationStatusDto,
 	CloseJobListingDto,
 	CreateEmployerProfileDto,
 	CreateJobListingDto,
@@ -86,6 +89,7 @@ export class EmployerController {
 		private readonly getEmployerApplicationsUseCase: GetEmployerApplicationsUseCasePort,
 		private readonly updateApplicationStatusUseCase: UpdateApplicationStatusUseCasePort,
 		private readonly getApplicantProfileForEmployerUseCase: GetApplicantProfileForEmployerUseCasePort,
+		private readonly bulkUpdateApplicationStatusUseCase: BulkUpdateApplicationStatusUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -317,6 +321,25 @@ export class EmployerController {
 		await this.updateApplicationStatusUseCase.execute(command);
 
 		return { message: "Application status updated successfully." };
+	}
+
+	@Patch("applications/bulk-status")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 10 } })
+	@ApiOperation({ summary: "Bulk update the status of multiple applications." })
+	public async bulkUpdateApplicationStatus(
+		@CurrentUser() user: JwtPayload,
+		@Body() dto: BulkUpdateApplicationStatusDto,
+	) {
+		const command = new BulkUpdateApplicationStatusCommand(
+			user.sub,
+			dto.applicationIds,
+			dto.newStatus,
+		);
+
+		await this.bulkUpdateApplicationStatusUseCase.execute(command);
+
+		return { message: "Applications successfully updated." };
 	}
 
 	@Get("applicants/:id")

@@ -35,6 +35,14 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 		return RecruitmentMapper.toJobApplicationDomain(application);
 	}
 
+	async findByIds(ids: JobApplicationId[]): Promise<JobApplication[]> {
+		const applications = await this.prisma.jobApplication.findMany({
+			where: { id: { in: ids.map((id) => id.getValue()) } },
+		});
+
+		return applications.map((app) => RecruitmentMapper.toJobApplicationDomain(app));
+	}
+
 	async findByApplicantAndJob(
 		applicantId: ApplicantId,
 		jobListingId: JobListingId,
@@ -88,5 +96,31 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 				updatedAt: application.updatedAt,
 			},
 		});
+	}
+
+	async saveMany(applications: JobApplication[]): Promise<void> {
+		//! Use a transaction to ensure all updates succeed or fail together
+		await this.prisma.$transaction(
+			applications.map((app) =>
+				this.prisma.jobApplication.upsert({
+					where: { id: app.id.getValue() },
+					update: {
+						status: app.status,
+						updatedAt: app.updatedAt,
+					},
+					create: {
+						id: app.id.getValue(),
+						applicantId: app.applicantId.getValue(),
+						jobListingId: app.jobListingId.getValue(),
+						employerId: app.employerId.getValue(),
+						resumeUrl: app.resumeUrl,
+						coverLetterUrl: app.coverLetterUrl,
+						status: app.status,
+						appliedAt: app.appliedAt,
+						updatedAt: app.updatedAt,
+					},
+				}),
+			),
+		);
 	}
 }

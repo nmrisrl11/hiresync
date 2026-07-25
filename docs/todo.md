@@ -90,7 +90,7 @@
 - Employers can:
     - [x] Get/View applications
     - [x] Update application status
-    - [ ] Bulk update application status
+    - [x] Bulk update application status
     - [ ] Internal application review/note
     - [x] Get/View applicants who applied for jobs
     - [ ] Review uploaded resumes and cover letters
@@ -116,7 +116,7 @@
 - [x] Implement rate limiting for API endpoints
 
 ### Background Queueing
-- [x] Integrate background queueing (NestJS BullMQ)
+- [x] Integrate background queueing (NestJS BullMQ + Redis)
 - [x] Implement background queueing for email notifications
 
 ### Event Driven
