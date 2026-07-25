@@ -27,7 +27,7 @@
 - [x] Get User by ID (Admin)
 - [x] Get User by ID (Public)
 - [x] Update User
-- [x] Delete User
+- [x] Delete User (Todo: Delete avatar, company logo, resume , cover letter)
 
 ### Role
 - [/] Create Role
@@ -91,7 +91,7 @@
     - [x] Get/View applications
     - [x] Update application status
     - [x] Bulk update application status
-    - [ ] Internal application review/note
+    - [x] Internal application review/note
     - [x] Get/View applicants who applied for jobs
     - [ ] Review uploaded resumes and cover letters
         #### Email Notifications

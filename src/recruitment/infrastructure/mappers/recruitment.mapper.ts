@@ -83,6 +83,7 @@ export class RecruitmentMapper {
 			raw.resumeUrl,
 			raw.coverLetterUrl,
 			raw.status,
+			raw.internalNote,
 			raw.appliedAt,
 			raw.updatedAt,
 		);

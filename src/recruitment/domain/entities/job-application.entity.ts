@@ -17,6 +17,7 @@ export class JobApplication extends AggregateRoot {
 		public resumeUrl: string,
 		public coverLetterUrl: string | null,
 		public status: ApplicationStatus,
+		public internalNote: string | null,
 		public readonly appliedAt: Date,
 		public updatedAt: Date,
 	) {
@@ -41,6 +42,7 @@ export class JobApplication extends AggregateRoot {
 			resumeUrl,
 			coverLetterUrl,
 			APPLICATION_STATUS.PENDING,
+			null,
 			now,
 			now,
 		);
@@ -91,5 +93,10 @@ export class JobApplication extends AggregateRoot {
 				this.employerId.getValue(),
 			),
 		);
+	}
+
+	public updateInternalNote(note: string | null): void {
+		this.internalNote = note;
+		this.updatedAt = new Date();
 	}
 }

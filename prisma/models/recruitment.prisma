@@ -98,6 +98,7 @@ model JobApplication {
     resumeUrl      String
     coverLetterUrl String?
     status         ApplicationStatus @default(PENDING)
+    internalNote String?  @db.Text
 
     appliedAt DateTime @default(now())
     updatedAt DateTime @updatedAt
