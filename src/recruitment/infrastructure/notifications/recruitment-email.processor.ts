@@ -1,5 +1,5 @@
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Processor, WorkerHost } from "@nestjs/bullmq";
-import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import { RecruitmentEmailService } from "./recruitment-email.service";
 import {
@@ -16,9 +16,10 @@ import {
 
 @Processor("recruitment-email")
 export class RecruitmentEmailProcessor extends WorkerHost {
-	private readonly logger = new Logger(RecruitmentEmailProcessor.name);
-
-	constructor(private readonly emailService: RecruitmentEmailService) {
+	constructor(
+		private readonly emailService: RecruitmentEmailService,
+		private readonly logger: LoggerPort,
+	) {
 		super();
 	}
 
@@ -106,7 +107,10 @@ export class RecruitmentEmailProcessor extends WorkerHost {
 			}
 			this.logger.log(`Recruitment Job ${job.id} completed successfully.`);
 		} catch (error) {
-			this.logger.error(`Failed to process Recruitment job ${job.id}:`, error);
+			this.logger.error(
+				`Failed to process Recruitment job ${job.id}:`,
+				error instanceof Error ? error.stack : "Unknown error",
+			);
 			throw error;
 		}
 	}

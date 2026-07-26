@@ -31,15 +31,17 @@ The scheduler acts as an infrastructure trigger for our Application Use Case. We
 **Location:** `src/recruitment/infrastructure/cron/expire-job-listings.cron.ts`
 
 ```typescript
-import { ExpireJobListingsUseCasePort } from "@/recruitment/application/ports/inbound/jobs/expire-job-listings.in-port";
-import { Injectable, Logger } from "@nestjs/common";
+import { ExpireJobListingsUseCasePort } from "@/recruitment/application/ports/inbound/jobs";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
+import { Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 
 @Injectable()
 export class ExpireJobListingsCron {
-	private readonly logger = new Logger(ExpireJobListingsCron.name);
-
-	constructor(private readonly expireJobListingsUseCase: ExpireJobListingsUseCasePort) {}
+	constructor(
+		private readonly expireJobListingsUseCase: ExpireJobListingsUseCasePort,
+		private readonly logger: LoggerPort,
+	) {}
 
 	// Runs automatically at 00:00 every day
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)

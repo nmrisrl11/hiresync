@@ -29,7 +29,7 @@
 - [x] Get User by ID (Admin)
 - [x] Get User by ID (Public)
 - [x] Update User
-- [x] Delete User (Todo: Delete avatar, company logo, resume , cover letter)
+- [x] Delete User (Delete avatar, company logo, resume , cover letter)
 
 ### Role
 - [/] Create Role
@@ -121,7 +121,7 @@
 - [x] Integrate background queueing (NestJS BullMQ + Redis)
 - [x] Implement background queueing for email notifications
 
-### Event Driven (Domain and Integration Events)
+### Event-Driven (Domain and Integration Events)
 - [x] Integrate with event-driven architecture (NestJS Event Emitter)
 - [x] Move email background queueing with event-driven
 
