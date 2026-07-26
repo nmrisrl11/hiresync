@@ -1,14 +1,16 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { EmailProviderPort } from "../ports/email-provider.port";
 import { env } from "@/env";
-import { Resend } from "resend";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
+import { Injectable, Logger } from "@nestjs/common";
 import * as fs from "fs/promises";
 import * as handlebars from "handlebars";
 import * as path from "path";
+import { Resend } from "resend";
+import { EmailProviderPort } from "../ports/email-provider.port";
 
 @Injectable()
 export class ResendAdapter implements EmailProviderPort {
-	private readonly logger = new Logger(ResendAdapter.name);
+	constructor(private readonly logger: LoggerPort) {}
+
 	private readonly resend = new Resend(env.RESEND_API_KEY);
 	private readonly fromEmail = env.FROM_EMAIL; //! Replace this on production with your own domain
 
