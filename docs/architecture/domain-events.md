@@ -1,80 +1,81 @@
-# Event-Driven Architecture: Domain Events & Side Effects
+# Domain Events: Intra-Module Architecture
 
 ## Overview
-Our application utilizes an Event-Driven Architecture (EDA) alongside our Hexagonal (Ports & Adapters) foundation. This design pattern strictly decouples our core domain logic (e.g., registering a user) from external side effects (e.g., sending an email or pushing to a Redis queue). 
+Domain Events are strictly internal to a single Bounded Context (module). They carry rich domain data and are used to trigger side effects *within the same module* (e.g., an IAM registration triggers an IAM email queue). 
 
-By using Domain Events, we guarantee that third-party failures (like an email provider outage) will never roll back or corrupt a successful core business transaction.
+By utilizing this architecture, we guarantee that external failures (like an email provider outage) do not roll back successful core business transactions.
 
 ---
 
 ## The Start-to-Finish Flow
-When a side-effect is triggered (such as sending a verification email upon registration), the system executes across three distinct phases.
+When an internal side-effect is triggered, the system executes across three distinct phases.
 
 ### Phase 1: The Core Transaction (Synchronous)
 1. **The Request:** The Next.js client sends a `POST /auth/register` request.
-2. **The Controller:** The `AuthController` maps the payload to a `RegisterUserCommand` and triggers the `RegisterUserUseCase`.
-3. **The Aggregate Root:** The `User` entity is instantiated via `User.createForRegistration()`. Internally, the entity records a `UserRegisteredDomainEvent` into its private `domainEvents` array. 
+2. **The Controller:** The `AuthController` maps the payload to a Command and triggers the Use Case.
+3. **The Aggregate Root:** The `User` entity is instantiated. Internally, it records a `UserRegisteredDomainEvent` into its private `domainEvents` array.
 4. **The Persistence:** The Use Case successfully commits the user data to PostgreSQL via Prisma.
-5. **The Dispatch:** The Use Case calls the injected `DomainEventDispatcherPort` to broadcast all collected events, then clears the entity's event queue.
-6. **The Response:** The Use Case immediately returns a success state (`{ userId: string }`) to the Controller, completing the HTTP request (Optimistic UI).
+5. **The Publish:** The Use Case calls the injected `DomainEventPublisherPort` to broadcast all collected events, then clears the entity's event queue.
+6. **The Response:** The Use Case immediately returns a success state to the Controller, completing the HTTP request (Optimistic UI).
 
 ### Phase 2: The Event Reaction (Asynchronous)
-7. **The Bus:** The `NestjsEventDispatcherAdapter` pushes the event across the internal Node.js event bus.
-8. **The Listener:** The `UserRegisteredListener` (acting as an inbound adapter in the Presentation Layer) catches the event.
-9. **The Command:** The listener formats an `EnqueueVerificationEmailCommand` and triggers the `EnqueueVerificationEmailUseCase`.
-10. **The Queue Adapter:** The Use Case maps the data and sends it to the `BullMqEmailQueueAdapter`, dropping a job into the local Redis `email` queue.
+7. **The Bus:** The `NestDomainEventPublisherAdapter` pushes the event across the internal Node.js event bus.
+8. **The Listener:** The `UserRegisteredListener` (located in the Infrastructure layer) catches the event.
+9. **The Command:** The listener formats an `EnqueueVerificationEmailCommand` and triggers the notification Use Case.
+10. **The Queue Adapter:** The Use Case sends the job to the BullMQ adapter, dropping it into the local Redis queue.
 
 ### Phase 3: The Background Worker (Isolated Process)
-11. **The Processor:** The `EmailProcessor` detects the new job in Redis.
-12. **The Delivery:** The processor calls the `EmailService`, which compiles the Handlebars template and executes the delivery via our chosen provider (Resend/Nodemailer).
+11. **The Processor:** The `EmailProcessor` detects the new job.
+12. **The Delivery:** The processor executes the delivery via the external provider.
 
 ---
 
 ## Layer-by-Layer Implementation Guide
 
-### 1. Domain Layer (`src/shared/domain/`)
-All entities that trigger events must extend the `AggregateRoot` base class, which provides the mechanism to store and clear events.
+### 1. Domain Layer (`src/*/domain/`)
+Entities that trigger events extend the `AggregateRoot`, which manages the event queue. 
 
 ```typescript
 // src/iam/domain/entities/user.entity.ts
 export class User extends AggregateRoot {
-	public static createForRegistration(/* args */): User {
-		const user = new User(/* ... */);
-		
-		// Record the event in memory; do not dispatch it yet.
-		user.addDomainEvent(new UserRegisteredDomainEvent(email, token, ttl));
-		return user;
+	public delete(): void {
+		this.addDomainEvent(new UserAccountDeletedDomainEvent(this.id.getValue(), this.email.getValue()));
 	}
 }
 ```
 
 ### 2. Application Layer (`src/shared/application/ports/outbound/`)
-The core Use Cases interact with an abstract dispatcher port, ensuring they remain completely unaware of the underlying framework (NestJS).
+Core Use Cases interact with abstract Publisher ports, remaining strictly agnostic to NestJS or EventEmitter.
 
 ```typescript
-export abstract class DomainEventDispatcherPort {
-	abstract dispatch(event: DomainEvent): Promise<void>;
-	abstract dispatchMultiple(events: DomainEvent[]): Promise<void>;
+export abstract class DomainEventPublisherPort {
+	abstract publish(event: DomainEvent): Promise<void>;
+	abstract publishMultiple(events: DomainEvent[]): Promise<void>;
 }
 ```
 
-### 3. Infrastructure Layer (`src/shared/infrastructure/adapters/outbound/`)
-The outbound adapter implements the dispatcher port using the `@nestjs/event-emitter` framework.
+### 3. Infrastructure Layer (`src/shared/infrastructure/adapters/events/`)
+The outbound adapter implements the publisher port using `@nestjs/event-emitter`. We route events using their class name dynamically.
 
 ```typescript
 @Injectable()
-export class NestjsEventDispatcherAdapter implements DomainEventDispatcherPort {
+export class NestDomainEventPublisherAdapter implements DomainEventPublisherPort {
 	constructor(private readonly eventEmitter: EventEmitter2) {}
 
-	public async dispatch(event: DomainEvent): Promise<void> {
+	public async publish(event: DomainEvent): Promise<void> {
 		await this.eventEmitter.emitAsync(event.constructor.name, event);
 	}
-    // ... dispatchMultiple implementation
+
+	public async publishMultiple(events: DomainEvent[]): Promise<void> {
+		for (const event of events) {
+			await this.publish(event);
+		}
+	}
 }
 ```
 
-### 4. Presentation Layer (`src/iam/presentation/event-listeners/`)
-Event listeners strictly belong in the Presentation Layer because they act exactly like HTTP Controllers: they are **entry points** that listen for external signals (events) and translate them into Commands for the Application layer.
+### 4. Infrastructure Layer (`src/*/infrastructure/events/listeners/`)
+Event listeners act as internal adapters that bridge the gap between the application's message bus and the Application Layer's Use Cases. 
 
 ```typescript
 @Injectable()
@@ -83,7 +84,7 @@ export class UserRegisteredListener {
 
 	@OnEvent("UserRegisteredDomainEvent", { async: true })
 	public async handle(event: UserRegisteredDomainEvent): Promise<void> {
-		const command = new EnqueueVerificationEmailCommand(/* args */);
+		const command = new EnqueueVerificationEmailCommand(event.email);
 		await this.enqueueEmailUseCase.execute(command);
 	}
 }
