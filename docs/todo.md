@@ -121,7 +121,7 @@
 - [x] Integrate background queueing (NestJS BullMQ + Redis)
 - [x] Implement background queueing for email notifications
 
-### Event Driven
+### Event Driven (Domain and Integration Events)
 - [x] Integrate with event-driven architecture (NestJS Event Emitter)
 - [x] Move email background queueing with event-driven
 

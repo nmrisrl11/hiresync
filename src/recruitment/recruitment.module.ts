@@ -49,6 +49,7 @@ import { CleanupRecruitmentDataUseCasePort } from "./application/ports/inbound/s
 import {
 	DocumentStoragePort,
 	ImageStoragePort,
+	RecruitmentAssetQueuePort,
 	RecruitmentEmailQueuePort,
 	UserIntegrationPort,
 } from "./application/ports/outbound";
@@ -104,6 +105,7 @@ import {
 	SavedJobRepository,
 } from "./domain/repositories";
 import {
+	BullMqRecruitmentAssetQueueAdapter,
 	BullMqRecruitmentEmailQueueAdapter,
 	CloudinaryDocumentStorageAdapter,
 	CloudinaryImageStorageAdapter,
@@ -128,12 +130,18 @@ import {
 	UserAccountDeletingListener,
 } from "./infrastructure/events/listeners";
 import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
+import { RecruitmentAssetProcessor } from "./infrastructure/queues";
 import { ApplicantController } from "./presentation/controllers/applicant.controller";
 import { EmployerController } from "./presentation/controllers/employer.controller";
 import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
+import { BullModule } from "@nestjs/bullmq";
 
 @Module({
-	imports: [DatabaseModule, RecruitmentNotificationsModule],
+	imports: [
+		DatabaseModule,
+		RecruitmentNotificationsModule,
+		BullModule.registerQueue({ name: "recruitment-asset-queue" }),
+	],
 	controllers: [EmployerController, RecruitmentController, ApplicantController],
 	providers: [
 		//! Repositories and Persistence
@@ -192,6 +200,7 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 		{ provide: RecruitmentEmailQueuePort, useClass: BullMqRecruitmentEmailQueueAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
 		{ provide: DocumentStoragePort, useClass: CloudinaryDocumentStorageAdapter },
+		{ provide: RecruitmentAssetQueuePort, useClass: BullMqRecruitmentAssetQueueAdapter },
 
 		//! Domain Event and Event Listeners
 		{
@@ -231,6 +240,8 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 		JobApplicationWithdrawnListener,
 		UserAccountDeletingListener,
 
+		//! Processors
+		RecruitmentAssetProcessor,
 		//! CRON Jobs
 		ExpireJobListingsCron,
 

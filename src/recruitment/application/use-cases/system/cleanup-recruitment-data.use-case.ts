@@ -5,7 +5,11 @@ import {
 } from "@/recruitment/domain/repositories";
 import { Injectable } from "@nestjs/common";
 import { CleanupRecruitmentDataUseCasePort } from "../../ports/inbound/system";
-import { DocumentStoragePort, ImageStoragePort } from "../../ports/outbound";
+import {
+	DocumentStoragePort,
+	ImageStoragePort,
+	RecruitmentAssetQueuePort,
+} from "../../ports/outbound";
 
 @Injectable()
 export class CleanupRecruitmentDataUseCase implements CleanupRecruitmentDataUseCasePort {
@@ -15,6 +19,7 @@ export class CleanupRecruitmentDataUseCase implements CleanupRecruitmentDataUseC
 		private readonly jobApplicationRepository: JobApplicationRepository,
 		private readonly imageStorage: ImageStoragePort,
 		private readonly documentStorage: DocumentStoragePort,
+		private readonly assetQueue: RecruitmentAssetQueuePort,
 	) {}
 
 	public async execute(userId: string): Promise<void> {
@@ -23,12 +28,19 @@ export class CleanupRecruitmentDataUseCase implements CleanupRecruitmentDataUseC
 			this.employerProfileRepository.findByUserId(userId),
 		]);
 
-		const deletePromises: Promise<void>[] = [];
+		const queuePromises: Promise<void>[] = [];
 
-		if (employer?.logoUrl) deletePromises.push(this.imageStorage.deleteImage(employer.logoUrl));
+		if (employer?.logoUrl)
+			queuePromises.push(
+				this.assetQueue.enqueueDeletion({
+					urls: [employer.logoUrl],
+					type: "image",
+				}),
+			);
 
 		if (applicant) {
 			const applications = await this.jobApplicationRepository.findAllByApplicantId(applicant.id);
+
 			//! Use a Set to ensure we don't try to delete the exact same Cloudinary file twice
 			const uniqueDocumentUrls = new Set<string>();
 
@@ -37,11 +49,15 @@ export class CleanupRecruitmentDataUseCase implements CleanupRecruitmentDataUseC
 				if (app.coverLetterUrl) uniqueDocumentUrls.add(app.coverLetterUrl);
 			}
 
-			uniqueDocumentUrls.forEach((url) => {
-				deletePromises.push(this.documentStorage.deleteDocument(url));
-			});
+			if (uniqueDocumentUrls.size > 0)
+				queuePromises.push(
+					this.assetQueue.enqueueDeletion({
+						urls: Array.from(uniqueDocumentUrls),
+						type: "document",
+					}),
+				);
 		}
 
-		await Promise.allSettled(deletePromises);
+		await Promise.allSettled(queuePromises);
 	}
 }

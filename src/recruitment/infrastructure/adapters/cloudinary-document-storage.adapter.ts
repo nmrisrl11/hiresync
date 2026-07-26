@@ -51,6 +51,11 @@ export class CloudinaryDocumentStorageAdapter implements DocumentStoragePort {
 	}
 
 	public async deleteDocument(publicId: string): Promise<void> {
-		await cloudinary.uploader.destroy(publicId);
+		const isCoverLetter = publicId.includes("/cover_letters") || publicId.endsWith(".txt");
+		const resourceType = isCoverLetter ? "raw" : "image";
+
+		await cloudinary.uploader.destroy(publicId, {
+			resource_type: resourceType,
+		});
 	}
 }
