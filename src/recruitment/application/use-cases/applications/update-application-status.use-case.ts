@@ -3,7 +3,7 @@ import {
 	JobApplicationRepository,
 } from "@/recruitment/domain/repositories";
 import { JobApplicationId } from "@/recruitment/domain/value-objects";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
 	EmployerProfileNotFoundException,
@@ -20,7 +20,7 @@ export class UpdateApplicationStatusUseCase implements UpdateApplicationStatusUs
 	constructor(
 		private readonly jobApplicationRepository: JobApplicationRepository,
 		private readonly employerProfileRepository: EmployerProfileRepository,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: UpdateApplicationStatusCommand): Promise<void> {
@@ -40,7 +40,7 @@ export class UpdateApplicationStatusUseCase implements UpdateApplicationStatusUs
 
 		await this.jobApplicationRepository.save(application);
 
-		await this.eventDispatcher.dispatchMultiple(application.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(application.domainEvents);
 		application.clearEvents();
 	}
 }

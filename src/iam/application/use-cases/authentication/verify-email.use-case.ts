@@ -1,5 +1,5 @@
 import { UserRepository } from "@/iam/domain/repositories";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { InvalidTokenException } from "../../exceptions";
 import {
@@ -15,7 +15,7 @@ export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 		private readonly userRepository: UserRepository,
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: VerifyEmailCommand): Promise<VerifyEmailResult> {
@@ -36,7 +36,7 @@ export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 
 		await this.userRepository.save(user);
 
-		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
 		user.clearEvents();
 
 		return {

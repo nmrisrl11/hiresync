@@ -14,7 +14,7 @@ export class UserRegisteredListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("UserRegisteredDomainEvent", { async: true })
+	@OnEvent(UserRegisteredDomainEvent.name, { async: true })
 	public async handle(event: UserRegisteredDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueVerificationEmailCommand(

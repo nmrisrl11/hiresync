@@ -5,7 +5,7 @@ import {
 } from "../../ports/inbound/employers";
 import { EmployerProfileRepository } from "@/recruitment/domain/repositories";
 import { EmployerProfileAlreadyExistsException } from "../../exceptions";
-import { DomainEventDispatcherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
 import { CompanyWebsite, EmployerId } from "@/recruitment/domain/value-objects";
 import { EmployerProfile } from "@/recruitment/domain/entities";
 
@@ -14,7 +14,7 @@ export class CreateEmployerProfileUseCase implements CreateEmployerProfileUseCas
 	constructor(
 		private readonly employerProfileRepository: EmployerProfileRepository,
 		private readonly idGenerator: IdGeneratorPort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: CreateEmployerProfileCommand): Promise<void> {
@@ -38,7 +38,7 @@ export class CreateEmployerProfileUseCase implements CreateEmployerProfileUseCas
 
 		await this.employerProfileRepository.save(profile);
 
-		await this.eventDispatcher.dispatchMultiple(profile.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(profile.domainEvents);
 		profile.clearEvents();
 	}
 }

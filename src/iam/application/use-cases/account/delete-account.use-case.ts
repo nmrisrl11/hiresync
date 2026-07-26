@@ -1,19 +1,19 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { UserId } from "@/iam/domain/value-objects";
 import {
-	DomainEventDispatcherPort,
+	DomainEventPublisherPort,
 	IntegrationEventPublisherPort,
 } from "@/shared/application/ports/outbound";
+import { UserAccountDeletingIntegrationEvent } from "@/shared/infrastructure/events/integration";
 import { Injectable } from "@nestjs/common";
 import { UserNotFoundException } from "../../exceptions";
 import { DeleteAccountCommand, DeleteAccountUseCasePort } from "../../ports/inbound/account";
-import { UserAccountDeletingIntegrationEvent } from "@/shared/infrastructure/events/integration";
 
 @Injectable()
 export class DeleteAccountUseCase implements DeleteAccountUseCasePort {
 	constructor(
 		private readonly userRepository: UserRepository,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 		private readonly integrationEventPublisher: IntegrationEventPublisherPort,
 	) {}
 
@@ -31,7 +31,7 @@ export class DeleteAccountUseCase implements DeleteAccountUseCasePort {
 
 		await this.userRepository.delete(userIdVo);
 
-		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
 		user.clearEvents();
 	}
 }

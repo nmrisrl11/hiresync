@@ -4,7 +4,7 @@ import {
 	JobApplicationRepository,
 } from "@/recruitment/domain/repositories";
 import { JobApplicationId } from "@/recruitment/domain/value-objects";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { DomainEvent } from "@/shared/domain/events/domain-event.base";
 import { Injectable } from "@nestjs/common";
 import {
@@ -21,7 +21,7 @@ export class BulkUpdateApplicationStatusUseCase implements BulkUpdateApplication
 	constructor(
 		private readonly employerProfileRepository: EmployerProfileRepository,
 		private readonly jobApplicationRepository: JobApplicationRepository,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: BulkUpdateApplicationStatusCommand): Promise<void> {
@@ -52,6 +52,6 @@ export class BulkUpdateApplicationStatusUseCase implements BulkUpdateApplication
 
 		await this.jobApplicationRepository.saveMany(updatedApplications);
 
-		if (allEvents.length > 0) await this.eventDispatcher.dispatchMultiple(allEvents);
+		if (allEvents.length > 0) await this.domainEventPublisher.publishMultipleAsync(allEvents);
 	}
 }

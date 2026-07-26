@@ -1,5 +1,5 @@
 import { ApplicantProfileRepository } from "@/recruitment/domain/repositories";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { ApplicantProfileNotFoundException } from "../../exceptions";
 import {
@@ -11,7 +11,7 @@ import {
 export class EditApplicantProfileUseCase implements EditApplicantProfileUseCasePort {
 	constructor(
 		private readonly applicantProfileRepository: ApplicantProfileRepository,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: EditApplicantProfileCommand): Promise<void> {
@@ -28,7 +28,7 @@ export class EditApplicantProfileUseCase implements EditApplicantProfileUseCaseP
 
 		await this.applicantProfileRepository.save(applicantProfile);
 
-		await this.eventDispatcher.dispatchMultiple(applicantProfile.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(applicantProfile.domainEvents);
 		applicantProfile.clearEvents();
 	}
 }

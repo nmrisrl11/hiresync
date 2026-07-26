@@ -14,7 +14,7 @@ export class JobListingCreatedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("JobListingCreatedDomainEvent", { async: true })
+	@OnEvent(JobListingCreatedDomainEvent.name, { async: true })
 	public async handle(event: JobListingCreatedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueJobCreatedEmailCommand(event.employerId, event.title);

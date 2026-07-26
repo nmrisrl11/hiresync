@@ -1,6 +1,6 @@
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { DatabaseModule } from "@/shared/database/database.module";
-import { NestjsEventDispatcherAdapter } from "@/shared/infrastructure/adapters";
+import { NestjsDomainEventPublisherAdapter } from "@/shared/infrastructure/adapters";
 import { Module } from "@nestjs/common";
 import {
 	CreateApplicantProfileUseCasePort,
@@ -246,7 +246,7 @@ import { BullModule } from "@nestjs/bullmq";
 		ExpireJobListingsCron,
 
 		//! Shared
-		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },
+		{ provide: DomainEventPublisherPort, useClass: NestjsDomainEventPublisherAdapter },
 	],
 })
 export class RecruitmentModule {}

@@ -1,6 +1,6 @@
 import { EmployerProfileRepository, JobListingRepository } from "@/recruitment/domain/repositories";
 import { JobListingId } from "@/recruitment/domain/value-objects";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
 	EmployerProfileNotFoundException,
@@ -14,7 +14,7 @@ export class CloseJobListingUseCase implements CloseJobListingUseCasePort {
 	constructor(
 		private readonly jobListingRepository: JobListingRepository,
 		private readonly employerProfileRepository: EmployerProfileRepository,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: CloseJobListingCommand): Promise<void> {
@@ -32,7 +32,7 @@ export class CloseJobListingUseCase implements CloseJobListingUseCasePort {
 
 		await this.jobListingRepository.save(jobListing);
 
-		await this.eventDispatcher.dispatchMultiple(jobListing.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(jobListing.domainEvents);
 		jobListing.clearEvents();
 	}
 }

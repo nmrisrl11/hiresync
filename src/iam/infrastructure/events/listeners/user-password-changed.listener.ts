@@ -14,7 +14,7 @@ export class UserPasswordChangedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("UserPasswordChangedDomainEvent", { async: true })
+	@OnEvent(UserPasswordChangedDomainEvent.name, { async: true })
 	public async handlePasswordChanged(event: UserPasswordChangedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueuePasswordChangedAlertCommand(event.email);

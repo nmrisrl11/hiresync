@@ -1,5 +1,5 @@
 import { EmployerProfileRepository } from "@/recruitment/domain/repositories";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { EmployerProfileNotFoundException } from "../../exceptions";
 import {
@@ -13,7 +13,7 @@ export class RemoveCompanyLogoUseCase implements RemoveCompanyLogoUseCasePort {
 	constructor(
 		private readonly employerProfileRepository: EmployerProfileRepository,
 		private readonly imageStorage: ImageStoragePort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: RemoveCompanyLogoCommand): Promise<void> {
@@ -29,7 +29,7 @@ export class RemoveCompanyLogoUseCase implements RemoveCompanyLogoUseCasePort {
 
 			await this.employerProfileRepository.save(employerProfile);
 
-			await this.eventDispatcher.dispatchMultiple(employerProfile.domainEvents);
+			await this.domainEventPublisher.publishMultipleAsync(employerProfile.domainEvents);
 			employerProfile.clearEvents();
 		}
 	}

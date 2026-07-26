@@ -14,7 +14,7 @@ export class EmailChangeRequestedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("EmailChangeRequestedDomainEvent", { async: true })
+	@OnEvent(EmailChangeRequestedDomainEvent.name, { async: true })
 	public async handleEmailChangeRequested(event: EmailChangeRequestedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueChangeEmailRequestCommand(

@@ -1,6 +1,6 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { UserId } from "@/iam/domain/value-objects";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { InvalidPasswordException, UserNotFoundException } from "../../exceptions";
 import { ChangePasswordCommand, ChangePasswordUseCasePort } from "../../ports/inbound/account";
@@ -11,7 +11,7 @@ export class ChangePasswordUseCase implements ChangePasswordUseCasePort {
 	constructor(
 		private readonly userRepository: UserRepository,
 		private readonly hashService: HashServicePort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: ChangePasswordCommand): Promise<void> {
@@ -34,7 +34,7 @@ export class ChangePasswordUseCase implements ChangePasswordUseCasePort {
 
 		await this.userRepository.save(user);
 
-		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
 		user.clearEvents();
 	}
 }

@@ -14,7 +14,7 @@ export class EmployerProfileCreatedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("EmployerProfileCreatedDomainEvent", { async: true })
+	@OnEvent(EmployerProfileCreatedDomainEvent.name, { async: true })
 	public async handle(event: EmployerProfileCreatedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueEmployerWelcomeEmailCommand(event.employerId, event.companyName);
