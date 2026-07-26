@@ -1,7 +1,7 @@
 import { ApplicantProfile } from "@/recruitment/domain/entities";
 import { ApplicantProfileRepository } from "@/recruitment/domain/repositories";
 import { ApplicantId } from "@/recruitment/domain/value-objects";
-import { DomainEventDispatcherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { ApplicantProfileAlreadyExistsException } from "../../exceptions";
 import {
@@ -14,7 +14,7 @@ export class CreateApplicantProfileUseCase implements CreateApplicantProfileUseC
 	constructor(
 		private readonly applicantProfileRepository: ApplicantProfileRepository,
 		private readonly idGenerator: IdGeneratorPort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: CreateApplicantProfileCommand): Promise<void> {
@@ -35,7 +35,7 @@ export class CreateApplicantProfileUseCase implements CreateApplicantProfileUseC
 
 		await this.applicantProfileRepository.save(applicantProfile);
 
-		await this.eventDispatcher.dispatchMultiple(applicantProfile.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(applicantProfile.domainEvents);
 		applicantProfile.clearEvents();
 	}
 }

@@ -1,6 +1,6 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { Email, UserId } from "@/iam/domain/value-objects";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { UserAlreadyExistsException, UserNotFoundException } from "../../exceptions";
 import {
@@ -20,7 +20,7 @@ export class RequestEmailChangeUseCase implements RequestEmailChangeUseCasePort 
 		private readonly verificationTokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: RequestEmailChangeCommand): Promise<void> {
@@ -44,7 +44,7 @@ export class RequestEmailChangeUseCase implements RequestEmailChangeUseCasePort 
 
 		await this.userRepository.save(user);
 
-		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
 		user.clearEvents();
 	}
 }

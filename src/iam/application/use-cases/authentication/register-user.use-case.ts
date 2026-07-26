@@ -1,7 +1,7 @@
 import { User } from "@/iam/domain/entities";
 import { RoleRepository, UserRepository } from "@/iam/domain/repositories";
 import { Email, RoleCode } from "@/iam/domain/value-objects";
-import { DomainEventDispatcherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
 	RoleNotFoundException,
@@ -30,7 +30,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 		private readonly verificationTokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: RegisterUserCommand): Promise<RegisterUserResult> {
@@ -65,7 +65,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 
 		await this.userRepository.save(newUser);
 
-		await this.eventDispatcher.dispatchMultiple(newUser.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(newUser.domainEvents);
 		newUser.clearEvents();
 
 		return { userId: newUser.id.getValue() };

@@ -14,7 +14,7 @@ export class UserEmailVerifiedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("UserEmailVerifiedDomainEvent", { async: true })
+	@OnEvent(UserEmailVerifiedDomainEvent.name, { async: true })
 	public async handleUserVerified(event: UserEmailVerifiedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueWelcomeEmailCommand(event.email);

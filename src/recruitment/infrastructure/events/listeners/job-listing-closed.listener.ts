@@ -14,7 +14,7 @@ export class JobListingClosedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("JobListingClosedDomainEvent", { async: true })
+	@OnEvent(JobListingClosedDomainEvent.name, { async: true })
 	public async handle(event: JobListingClosedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueJobClosedEmailCommand(

@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { JobListing } from "@/recruitment/domain/entities";
 import { EmployerProfileRepository, JobListingRepository } from "@/recruitment/domain/repositories";
 import { JobListingId, JobLocation, SalaryRange } from "@/recruitment/domain/value-objects";
-import { DomainEventDispatcherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
 import { EmployerProfileNotFoundException } from "../../exceptions";
 import { CreateJobListingCommand, CreateJobListingUseCasePort } from "../../ports/inbound/jobs";
 
@@ -12,7 +12,7 @@ export class CreateJobListingUseCase implements CreateJobListingUseCasePort {
 		private readonly jobListingRepository: JobListingRepository,
 		private readonly employerProfileRepository: EmployerProfileRepository,
 		private readonly idGenerator: IdGeneratorPort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: CreateJobListingCommand): Promise<string> {
@@ -44,7 +44,7 @@ export class CreateJobListingUseCase implements CreateJobListingUseCasePort {
 
 		await this.jobListingRepository.save(jobListing);
 
-		await this.eventDispatcher.dispatchMultiple(jobListing.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(jobListing.domainEvents);
 		jobListing.clearEvents();
 
 		return jobListing.id.getValue();

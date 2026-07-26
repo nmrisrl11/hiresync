@@ -14,7 +14,7 @@ export class UserEmailChangedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("UserEmailChangedDomainEvent", { async: true })
+	@OnEvent(UserEmailChangedDomainEvent.name, { async: true })
 	public async handleEmailChanged(event: UserEmailChangedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueEmailChangedAlertCommand(event.oldEmail, event.newEmail);

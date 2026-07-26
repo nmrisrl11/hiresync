@@ -1,5 +1,5 @@
 import { JobListingRepository } from "@/recruitment/domain/repositories";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { ExpireJobListingsUseCasePort } from "../../ports/inbound/jobs";
@@ -8,7 +8,7 @@ import { ExpireJobListingsUseCasePort } from "../../ports/inbound/jobs";
 export class ExpireJobListingsUseCase implements ExpireJobListingsUseCasePort {
 	constructor(
 		private readonly jobListingRepository: JobListingRepository,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 		private readonly logger: LoggerPort,
 	) {}
 
@@ -25,7 +25,7 @@ export class ExpireJobListingsUseCase implements ExpireJobListingsUseCasePort {
 				job.expire();
 
 				await this.jobListingRepository.save(job);
-				await this.eventDispatcher.dispatchMultiple(job.domainEvents);
+				await this.domainEventPublisher.publishMultipleAsync(job.domainEvents);
 
 				job.clearEvents();
 				this.logger.log(`Successfully expired job ID: ${job.id.getValue()}`);

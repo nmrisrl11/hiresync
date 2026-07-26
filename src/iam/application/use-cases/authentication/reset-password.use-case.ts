@@ -1,5 +1,5 @@
 import { UserRepository } from "@/iam/domain/repositories";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { InvalidTokenException } from "../../exceptions";
 import {
@@ -14,7 +14,7 @@ export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 	constructor(
 		private readonly userRepository: UserRepository,
 		private readonly hashService: HashServicePort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: ResetPasswordCommand): Promise<ResetPasswordResult> {
@@ -29,7 +29,7 @@ export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 
 		await this.userRepository.save(user);
 
-		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
 		user.clearEvents();
 
 		return { message: "Password reset successful. You can now login." };

@@ -14,7 +14,7 @@ export class PasswordResetRequestedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("PasswordResetRequestedDomainEvent", { async: true })
+	@OnEvent(PasswordResetRequestedDomainEvent.name, { async: true })
 	public async handlePasswordResetRequested(
 		event: PasswordResetRequestedDomainEvent,
 	): Promise<void> {

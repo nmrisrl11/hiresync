@@ -1,10 +1,10 @@
 import {
-	DomainEventDispatcherPort,
+	DomainEventPublisherPort,
 	IntegrationEventPublisherPort,
 } from "@/shared/application/ports/outbound";
 import { DatabaseModule } from "@/shared/database/database.module";
 import {
-	NestjsEventDispatcherAdapter,
+	NestjsDomainEventPublisherAdapter,
 	NestjsIntegrationEventPublisherAdapter,
 } from "@/shared/infrastructure/adapters";
 import { Module } from "@nestjs/common";
@@ -153,7 +153,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
 		{ provide: AuthConfigPort, useClass: EnvAuthConfigAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
-		{ provide: DomainEventDispatcherPort, useClass: NestjsEventDispatcherAdapter },
+		{ provide: DomainEventPublisherPort, useClass: NestjsDomainEventPublisherAdapter },
 
 		//! Persistence
 		{ provide: UserRepository, useClass: PrismaUserRepository },

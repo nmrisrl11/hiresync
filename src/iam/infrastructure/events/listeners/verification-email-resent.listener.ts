@@ -14,7 +14,7 @@ export class VerificationEmailResentListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent("VerificationEmailResentDomainEvent", { async: true })
+	@OnEvent(VerificationEmailResentDomainEvent.name, { async: true })
 	public async handleVerificationResent(event: VerificationEmailResentDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueVerificationEmailCommand(

@@ -3,7 +3,7 @@ import {
 	JobApplicationRepository,
 } from "@/recruitment/domain/repositories";
 import { JobApplicationId } from "@/recruitment/domain/value-objects";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
 	ApplicantProfileNotFoundException,
@@ -20,7 +20,7 @@ export class WithdrawApplicationUseCase implements WithdrawApplicationUseCasePor
 	constructor(
 		private readonly jobApplicationRepository: JobApplicationRepository,
 		private readonly applicantProfileRepository: ApplicantProfileRepository,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: WithdrawApplicationCommand): Promise<void> {
@@ -41,7 +41,7 @@ export class WithdrawApplicationUseCase implements WithdrawApplicationUseCasePor
 
 		await this.jobApplicationRepository.save(application);
 
-		await this.eventDispatcher.dispatchMultiple(application.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(application.domainEvents);
 		application.clearEvents();
 	}
 }

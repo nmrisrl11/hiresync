@@ -4,7 +4,7 @@ import {
 	EditEmployerProfileUseCasePort,
 } from "../../ports/inbound/employers";
 import { EmployerProfileRepository } from "@/recruitment/domain/repositories";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { EmployerProfileNotFoundException } from "../../exceptions";
 import { CompanyWebsite } from "@/recruitment/domain/value-objects";
 
@@ -12,7 +12,7 @@ import { CompanyWebsite } from "@/recruitment/domain/value-objects";
 export class EditEmployerProfileUseCase implements EditEmployerProfileUseCasePort {
 	constructor(
 		private readonly employerProfileRepository: EmployerProfileRepository,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: EditEmployerProfileCommand): Promise<void> {
@@ -30,7 +30,7 @@ export class EditEmployerProfileUseCase implements EditEmployerProfileUseCasePor
 
 		await this.employerProfileRepository.save(employerProfile);
 
-		await this.eventDispatcher.dispatchMultiple(employerProfile.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(employerProfile.domainEvents);
 		employerProfile.clearEvents();
 	}
 }

@@ -1,6 +1,6 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { Email } from "@/iam/domain/value-objects";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
 	ResendVerificationCommand,
@@ -20,7 +20,7 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 		private readonly tokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: ResendVerificationCommand): Promise<ResendVerificationResult> {
@@ -42,7 +42,7 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 		user.refreshVerificationToken(newVerificationToken, tokenExpiresInMs);
 		await this.userRepository.save(user);
 
-		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
 		user.clearEvents();
 
 		return { message: "A new verification email has been sent." };

@@ -6,7 +6,7 @@ import {
 } from "@/recruitment/domain/repositories";
 import { JOB_STATUS } from "@/recruitment/domain/types";
 import { JobApplicationId, JobListingId } from "@/recruitment/domain/value-objects";
-import { DomainEventDispatcherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
 	ApplicantProfileNotFoundException,
@@ -25,7 +25,7 @@ export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
 		private readonly applicantProfileRepository: ApplicantProfileRepository,
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly documentStorage: DocumentStoragePort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: ApplyForJobCommand): Promise<string> {
@@ -77,7 +77,7 @@ export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
 
 		await this.jobApplicationRepository.save(application);
 
-		await this.eventDispatcher.dispatchMultiple(application.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(application.domainEvents);
 		application.clearEvents();
 
 		return applicationId.getValue();

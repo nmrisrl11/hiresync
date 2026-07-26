@@ -1,5 +1,5 @@
 import { UserRepository } from "@/iam/domain/repositories";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import { InvalidTokenException } from "../../exceptions";
 import {
@@ -11,7 +11,7 @@ import {
 export class ConfirmEmailChangeUseCase implements ConfirmEmailChangeUseCasePort {
 	constructor(
 		private readonly userRepository: UserRepository,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: ConfirmEmailChangeCommand): Promise<void> {
@@ -23,7 +23,7 @@ export class ConfirmEmailChangeUseCase implements ConfirmEmailChangeUseCasePort 
 
 		await this.userRepository.save(user);
 
-		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
 		user.clearEvents();
 	}
 }

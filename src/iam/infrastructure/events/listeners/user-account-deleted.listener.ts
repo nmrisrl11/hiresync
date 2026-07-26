@@ -16,7 +16,7 @@ export class UserAccountDeletedListener {
 		private readonly imageStorage: ImageStoragePort,
 	) {}
 
-	@OnEvent("UserAccountDeletedDomainEvent", { async: true })
+	@OnEvent(UserAccountDeletedDomainEvent.name, { async: true })
 	public async handleAccountDeleted(event: UserAccountDeletedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueFarewellEmailCommand(event.email);

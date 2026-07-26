@@ -1,6 +1,6 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { Email } from "@/iam/domain/value-objects";
-import { DomainEventDispatcherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { Injectable } from "@nestjs/common";
 import {
 	ForgotPasswordCommand,
@@ -20,7 +20,7 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 		private readonly tokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly authConfig: AuthConfigPort,
-		private readonly eventDispatcher: DomainEventDispatcherPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: ForgotPasswordCommand): Promise<ForgotPasswordResult> {
@@ -40,7 +40,7 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 		user.setResetToken(resetToken, tokenExpiresInMs);
 		await this.userRepository.save(user);
 
-		await this.eventDispatcher.dispatchMultiple(user.domainEvents);
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
 		user.clearEvents();
 
 		return { message: "If account with that email exists, a reset link has been sent." };
