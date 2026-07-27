@@ -3,6 +3,8 @@ import { Processor, WorkerHost } from "@nestjs/bullmq";
 import { Job } from "bullmq";
 import { IamEmailService } from "./iam-email.service";
 import {
+	AccountDeletionScheduledEmailSchema,
+	AccountRestoredEmailSchema,
 	EmailChangedAlertSchema,
 	FarewellEmailSchema,
 	IamEmailJobPayload,
@@ -73,6 +75,19 @@ export class IamEmailProcessor extends WorkerHost {
 				case "send-farewell-email": {
 					const payload = FarewellEmailSchema.parse(job.data);
 					await this.emailService.sendFarewellEmail(payload.email);
+					break;
+				}
+				case "send-account-deletion-scheduled": {
+					const payload = AccountDeletionScheduledEmailSchema.parse(job.data);
+					await this.emailService.sendAccountDeletionScheduledEmail(
+						payload.email,
+						payload.scheduledDateIso,
+					);
+					break;
+				}
+				case "send-account-restored": {
+					const payload = AccountRestoredEmailSchema.parse(job.data);
+					await this.emailService.sendAccountRestoredEmail(payload.email);
 					break;
 				}
 				default:

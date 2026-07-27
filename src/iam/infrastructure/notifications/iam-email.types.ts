@@ -35,6 +35,15 @@ export const FarewellEmailSchema = z.object({
 	email: z.email().trim(),
 });
 
+export const AccountDeletionScheduledEmailSchema = z.object({
+	email: z.email().trim(),
+	scheduledDateIso: z.string().trim(),
+});
+
+export const AccountRestoredEmailSchema = z.object({
+	email: z.email().trim(),
+});
+
 export type IamEmailJobPayload =
 	| z.infer<typeof SendVerificationSchema>
 	| z.infer<typeof SendPasswordResetSchema>
@@ -42,4 +51,6 @@ export type IamEmailJobPayload =
 	| z.infer<typeof PasswordChangedAlertSchema>
 	| z.infer<typeof EmailChangedAlertSchema>
 	| z.infer<typeof WelcomeEmailSchema>
-	| z.infer<typeof FarewellEmailSchema>;
+	| z.infer<typeof FarewellEmailSchema>
+	| z.infer<typeof AccountDeletionScheduledEmailSchema>
+	| z.infer<typeof AccountRestoredEmailSchema>;

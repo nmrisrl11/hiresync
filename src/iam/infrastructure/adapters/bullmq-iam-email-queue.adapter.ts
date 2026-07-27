@@ -74,4 +74,23 @@ export class BullMqIamEmailQueueAdapter implements IamEmailQueuePort {
 			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
 		);
 	}
+
+	public async enqueueAccountDeletionScheduledEmail(
+		email: string,
+		scheduledDateIso: string,
+	): Promise<void> {
+		await this.emailQueue.add(
+			"send-account-deletion-scheduled",
+			{ email, scheduledDateIso },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
+
+	public async enqueueAccountRestoredEmail(email: string): Promise<void> {
+		await this.emailQueue.add(
+			"send-account-restored",
+			{ email },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
 }
