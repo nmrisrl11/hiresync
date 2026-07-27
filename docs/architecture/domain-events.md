@@ -44,7 +44,7 @@ export class User extends AggregateRoot {
 }
 ```
 
-### 2. Application Layer (`src/shared/application/ports/outbound/`)
+### 2. Shared Layer: Ports (`src/shared/events/ports/`)
 Core Use Cases interact with abstract Publisher ports, remaining strictly agnostic to NestJS or EventEmitter.
 
 ```typescript
@@ -54,7 +54,7 @@ export abstract class DomainEventPublisherPort {
 }
 ```
 
-### 3. Infrastructure Layer (`src/shared/infrastructure/adapters/events/`)
+### 3. Shared Layer: Adapters (`src/shared/events/adapters/`)
 The outbound adapter implements the publisher port using `@nestjs/event-emitter`. We route events using their class name dynamically.
 
 ```typescript

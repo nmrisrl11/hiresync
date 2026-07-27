@@ -19,16 +19,16 @@ If the database schema utilizes `onDelete: Cascade`, an asynchronous post-delete
 
 ## Layer-by-Layer Implementation Guide
 
-### 1. Shared Kernel (`src/shared/infrastructure/events/integration/`)
+### 1. Shared Kernel (`src/shared/events/`)
 Integration events extend a shared base class and live outside specific bounded contexts.
 
 ```typescript
-// src/shared/infrastructure/events/integration/integration-event.base.ts
+// src/shared/events/integration-event.base.ts
 export abstract class IntegrationEvent {
 	public readonly occurredOn: Date = new Date();
 }
 
-// src/shared/infrastructure/events/integration/user-account-deleting.integration-event.ts
+// src/shared/events/user-account-deleting.integration-event.ts
 export class UserAccountDeletingIntegrationEvent extends IntegrationEvent {
 	constructor(public readonly userId: string) {
 		super();
@@ -36,7 +36,7 @@ export class UserAccountDeletingIntegrationEvent extends IntegrationEvent {
 }
 ```
 
-### 2. Application Layer (`src/shared/application/ports/outbound/`)
+### 2. Shared Layer: Ports (`src/shared/events/ports/`)
 Similar to Domain Events, modules use an abstract port to publish Integration Events without knowing the framework details.
 
 ```typescript
@@ -46,7 +46,7 @@ export abstract class IntegrationEventPublisherPort {
 }
 ```
 
-### 3. Infrastructure Layer (`src/shared/infrastructure/adapters/events/`)
+### 3. Shared Layer: Adapters (`src/shared/events/adapters/`)
 The outbound adapter implements the publisher port, specifically designed for cross-boundary messaging.
 
 ```typescript
