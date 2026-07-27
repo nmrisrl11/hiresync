@@ -110,7 +110,12 @@ import { UserController } from "./presentation/controllers/user.controller";
 	imports: [DatabaseModule, IamNotificationsModule],
 	controllers: [AuthController, AccountController, AdminController, UserController, RoleController],
 	providers: [
-		//! Authentication
+		//! Repositories and Persistence
+		{ provide: UserRepository, useClass: PrismaUserRepository },
+		{ provide: RoleRepository, useClass: PrismaRoleRepository },
+
+		//! Use Cases
+		/** Auhentication **/
 		{ provide: RegisterUserUseCasePort, useClass: RegisterUserUseCase },
 		{ provide: VerifyEmailUseCasePort, useClass: VerifyEmailUseCase },
 		{ provide: LoginUseCasePort, useClass: LoginUseCase },
@@ -120,7 +125,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: RefreshTokenUseCasePort, useClass: RefreshTokenUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
 
-		//! Account
+		/** Account **/
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
 		{ provide: ChangePasswordUseCasePort, useClass: ChangePasswordUseCase },
 		{ provide: UpdateAccountUseCasePort, useClass: UpdateAccountUseCase },
@@ -130,11 +135,11 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: UploadAvatarUseCasePort, useClass: UploadAvatarUseCase },
 		{ provide: RemoveAvatarUseCasePort, useClass: RemoveAvatarUseCase },
 
-		//! Users
+		/** Users **/
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
 		{ provide: GetPublicUserProfileUseCasePort, useClass: GetPublicUserProfileUseCase },
 
-		//! Roles
+		/** Roles **/
 		{ provide: GetRolesUseCasePort, useClass: GetRolesUseCase },
 
 		//! Outbound - Adapters
@@ -145,10 +150,6 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
 		{ provide: AuthConfigPort, useClass: EnvAuthConfigAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
-
-		//! Persistence
-		{ provide: UserRepository, useClass: PrismaUserRepository },
-		{ provide: RoleRepository, useClass: PrismaRoleRepository },
 
 		//! Domain Event and Event Listeners
 		EmailChangeRequestedListener,
