@@ -1,4 +1,4 @@
-import { AggregateRoot } from "@/shared/domain/entities";
+import { AggregateRoot } from "@/shared/core";
 import { EmployerProfileCreatedDomainEvent, EmployerProfileUpdatedDomainEvent } from "../events";
 import { CompanyWebsite, EmployerId } from "../value-objects";
 

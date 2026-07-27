@@ -1,10 +1,7 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { UserId } from "@/iam/domain/value-objects";
-import {
-	DomainEventPublisherPort,
-	IntegrationEventPublisherPort,
-} from "@/shared/application/ports/outbound";
-import { UserAccountDeletingIntegrationEvent } from "@/shared/infrastructure/events/integration";
+import { UserAccountDeletingIntegrationEvent } from "@/shared/events";
+import { DomainEventPublisherPort, IntegrationEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
 import { UserNotFoundException } from "../../exceptions";
 import { DeleteAccountCommand, DeleteAccountUseCasePort } from "../../ports/inbound/account";

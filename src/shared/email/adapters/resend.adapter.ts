@@ -1,6 +1,6 @@
 import { env } from "@/env";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import * as fs from "fs/promises";
 import * as handlebars from "handlebars";
 import * as path from "path";

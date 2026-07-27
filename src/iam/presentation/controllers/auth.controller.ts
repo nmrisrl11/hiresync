@@ -17,9 +17,8 @@ import {
 	VerifyEmailCommand,
 	VerifyEmailUseCasePort,
 } from "@/iam/application/ports/inbound/authentication";
-import { type JwtPayload } from "@/shared/application/types";
-import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
-import { Public } from "@/shared/presentation/decorators/public.decorator";
+import { CurrentUser, Public } from "@/shared/http/decorators";
+import { type JwtPayload } from "@/shared/types";
 import {
 	Body,
 	Controller,

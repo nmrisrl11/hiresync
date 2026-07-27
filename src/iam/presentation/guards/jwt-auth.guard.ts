@@ -1,6 +1,6 @@
 import { env } from "@/env";
-import { JwtPayload } from "@/shared/application/types";
-import { IS_PUBLIC_KEY } from "@/shared/presentation/decorators/public.decorator";
+import { IS_PUBLIC_KEY } from "@/shared/http/decorators";
+import { JwtPayload } from "@/shared/types";
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";

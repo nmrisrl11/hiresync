@@ -1,6 +1,6 @@
 import { GetRolesUseCasePort } from "@/iam/application/ports/inbound/roles";
-import { ROLES } from "@/shared/domain/types/role.type";
-import { Roles } from "@/shared/presentation/decorators/roles.decorator";
+import { Roles } from "@/shared/http/decorators";
+import { ROLES } from "@/shared/types";
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 

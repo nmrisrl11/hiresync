@@ -1,6 +1,6 @@
 import { EmployerProfileRepository, JobListingRepository } from "@/recruitment/domain/repositories";
 import { JobListingId } from "@/recruitment/domain/value-objects";
-import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
 import {
 	EmployerProfileNotFoundException,

@@ -1,4 +1,4 @@
-import { ApplicationBaseException } from "@/shared/exceptions/base.exception";
+import { ApplicationBaseException } from "@/shared/core";
 
 export class InvalidLoginException extends ApplicationBaseException {
 	constructor(message: string = "Invalid email or password.") {

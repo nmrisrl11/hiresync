@@ -1,6 +1,6 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { Email } from "@/iam/domain/value-objects";
-import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
 import {
 	ForgotPasswordCommand,

@@ -1,4 +1,4 @@
-import { ApplicationBaseException } from "@/shared/exceptions/base.exception";
+import { ApplicationBaseException } from "@/shared/core";
 
 export class RoleNotFoundException extends ApplicationBaseException {
 	constructor(message: string = "The specified role does not exist.") {

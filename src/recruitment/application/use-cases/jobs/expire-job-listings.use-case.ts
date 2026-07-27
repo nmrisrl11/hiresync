@@ -1,5 +1,5 @@
 import { JobListingRepository } from "@/recruitment/domain/repositories";
-import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { ExpireJobListingsUseCasePort } from "../../ports/inbound/jobs";

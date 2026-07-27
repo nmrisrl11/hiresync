@@ -1,5 +1,5 @@
 import { UserRepository } from "@/iam/domain/repositories";
-import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
 import { InvalidTokenException } from "../../exceptions";
 import {

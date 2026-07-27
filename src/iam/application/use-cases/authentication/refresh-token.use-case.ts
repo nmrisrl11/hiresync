@@ -1,6 +1,6 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { UserId } from "@/iam/domain/value-objects";
-import { JwtPayload } from "@/shared/application/types";
+import { JwtPayload } from "@/shared/types";
 import { Injectable } from "@nestjs/common";
 import { InvalidLoginException, InvalidTokenException } from "../../exceptions";
 import {

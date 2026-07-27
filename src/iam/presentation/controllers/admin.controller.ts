@@ -1,7 +1,7 @@
 import { GetUserByIdQuery, GetUserByIdUseCasePort } from "@/iam/application/ports/inbound/account";
 import { GetUsersQuery, GetUsersUseCasePort } from "@/iam/application/ports/inbound/users";
-import { ROLES } from "@/shared/domain/types/role.type";
-import { Roles } from "@/shared/presentation/decorators/roles.decorator";
+import { Roles } from "@/shared/http/decorators";
+import { ROLES } from "@/shared/types";
 import { Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 

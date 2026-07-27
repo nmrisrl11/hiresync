@@ -1,4 +1,4 @@
-import { DomainBaseException } from "@/shared/exceptions/base.exception";
+import { DomainBaseException } from "@/shared/core";
 
 export class InvalidEmailFormatException extends DomainBaseException {
 	constructor(message: string = "The provided email format is invalid.") {

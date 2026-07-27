@@ -10,8 +10,7 @@ import { JwtAuthGuard } from "./iam/presentation/guards/jwt-auth.guard";
 import { RecruitmentModule } from "./recruitment/recruitment.module";
 import { DatabaseModule } from "./shared/database/database.module";
 import { EmailModule } from "./shared/email/email.module";
-import { RolesGuard } from "./shared/presentation/guards/roles.guard";
-import { UserThrottlerGuard } from "./shared/presentation/guards/user-throttler.guard";
+import { RolesGuard, UserThrottlerGuard } from "./shared/http/guards";
 import { QueueModule } from "./shared/queue/queue.module";
 import { SharedModule } from "./shared/shared.module";
 

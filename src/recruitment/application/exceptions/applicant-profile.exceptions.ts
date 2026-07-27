@@ -1,4 +1,4 @@
-import { ApplicationBaseException } from "@/shared/exceptions/base.exception";
+import { ApplicationBaseException } from "@/shared/core";
 
 export class ApplicantProfileAlreadyExistsException extends ApplicationBaseException {
 	constructor(message: string = "An applicant profile already exists for this user.") {
