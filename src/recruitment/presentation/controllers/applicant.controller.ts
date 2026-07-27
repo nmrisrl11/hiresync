@@ -18,10 +18,8 @@ import {
 	WithdrawApplicationCommand,
 	WithdrawApplicationUseCasePort,
 } from "@/recruitment/application/ports/inbound/applications";
-import { type JwtPayload } from "@/shared/application/types";
-import { ROLES } from "@/shared/domain/types/role.type";
-import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
-import { Roles } from "@/shared/presentation/decorators/roles.decorator";
+import { CurrentUser, Roles } from "@/shared/http/decorators";
+import { ROLES, type JwtPayload } from "@/shared/types";
 import {
 	Body,
 	Controller,

@@ -1,4 +1,4 @@
-import { DomainBaseException } from "@/shared/exceptions/base.exception";
+import { DomainBaseException } from "@/shared/core";
 
 export class JobNotUpdatableException extends DomainBaseException {
 	constructor(message: string = "Cannot update a closed or expired job listing.") {

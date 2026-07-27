@@ -1,4 +1,4 @@
-import { ApplicationBaseException } from "@/shared/exceptions/base.exception";
+import { ApplicationBaseException } from "@/shared/core";
 
 export class JobListingNotFoundException extends ApplicationBaseException {
 	constructor(message: string = "Job listing not found.") {

@@ -1,4 +1,4 @@
-import { AggregateRoot } from "@/shared/domain/entities";
+import { AggregateRoot } from "@/shared/core";
 import { ApplicantProfileCreatedDomainEvent, ApplicantProfileUpdatedDomainEvent } from "../events";
 import { ApplicantId } from "../value-objects";
 

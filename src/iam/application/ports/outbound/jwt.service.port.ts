@@ -1,4 +1,4 @@
-import { JwtPayload } from "@/shared/application/types";
+import { JwtPayload } from "@/shared/types";
 
 export type JwtTokens = {
 	accessToken: string;

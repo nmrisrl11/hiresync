@@ -1,5 +1,5 @@
 import { CleanupRecruitmentDataUseCasePort } from "@/recruitment/application/ports/inbound/system";
-import { UserAccountDeletingIntegrationEvent } from "@/shared/infrastructure/events/integration";
+import { UserAccountDeletingIntegrationEvent } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";

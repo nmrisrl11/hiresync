@@ -9,7 +9,7 @@ import {
 	SearchJobListingUseCasePort,
 } from "@/recruitment/application/ports/inbound/jobs";
 import { EMPLOYMENT_TYPE, JOB_STATUS, LOCATION_TYPE } from "@/recruitment/domain/types";
-import { Public } from "@/shared/presentation/decorators/public.decorator";
+import { Public } from "@/shared/http/decorators";
 import { Controller, Get, HttpCode, HttpStatus, Param, Query } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";

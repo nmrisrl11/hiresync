@@ -1,4 +1,4 @@
-import { DomainEvent } from "@/shared/domain/events/domain-event.base";
+import { DomainEvent } from "@/shared/events";
 import { ApplicationStatus } from "../types";
 
 export class JobApplicationStatusUpdatedDomainEvent extends DomainEvent {

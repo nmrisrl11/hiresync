@@ -16,8 +16,8 @@ import {
 	JobAlreadyClosedException,
 	JobNotUpdatableException,
 } from "@/recruitment/domain/exceptions";
-import { ApplicationBaseException, DomainBaseException } from "@/shared/exceptions/base.exception";
-import { BaseExceptionFilter } from "@/shared/presentation/filters/base-exception.filter";
+import { ApplicationBaseException, DomainBaseException } from "@/shared/core";
+import { BaseExceptionFilter } from "@/shared/http/filters/base-exception.filter";
 import { Catch, HttpStatus } from "@nestjs/common";
 
 @Catch(ApplicationBaseException, DomainBaseException)

@@ -3,7 +3,7 @@ import {
 	JobApplicationRepository,
 } from "@/recruitment/domain/repositories";
 import { JobApplicationId } from "@/recruitment/domain/value-objects";
-import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
 import {
 	EmployerProfileNotFoundException,

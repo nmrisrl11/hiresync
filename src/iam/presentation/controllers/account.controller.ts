@@ -16,9 +16,8 @@ import {
 	UploadAvatarCommand,
 	UploadAvatarUseCasePort,
 } from "@/iam/application/ports/inbound/account";
-import { type JwtPayload } from "@/shared/application/types";
-import { CurrentUser } from "@/shared/presentation/decorators/current-user.decorator";
-import { Public } from "@/shared/presentation/decorators/public.decorator";
+import { CurrentUser, Public } from "@/shared/http/decorators";
+import { type JwtPayload } from "@/shared/types";
 import {
 	Body,
 	Controller,

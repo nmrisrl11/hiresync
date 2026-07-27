@@ -1,12 +1,12 @@
+import { EmployerProfileRepository } from "@/recruitment/domain/repositories";
+import { CompanyWebsite } from "@/recruitment/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
+import { EmployerProfileNotFoundException } from "../../exceptions";
 import {
 	EditEmployerProfileCommand,
 	EditEmployerProfileUseCasePort,
 } from "../../ports/inbound/employers";
-import { EmployerProfileRepository } from "@/recruitment/domain/repositories";
-import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
-import { EmployerProfileNotFoundException } from "../../exceptions";
-import { CompanyWebsite } from "@/recruitment/domain/value-objects";
 
 @Injectable()
 export class EditEmployerProfileUseCase implements EditEmployerProfileUseCasePort {

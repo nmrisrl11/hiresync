@@ -6,7 +6,8 @@ import {
 } from "@/recruitment/domain/repositories";
 import { JOB_STATUS } from "@/recruitment/domain/types";
 import { JobApplicationId, JobListingId } from "@/recruitment/domain/value-objects";
-import { DomainEventPublisherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
+import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 import {
 	ApplicantProfileNotFoundException,

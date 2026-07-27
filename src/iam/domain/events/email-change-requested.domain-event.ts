@@ -1,4 +1,4 @@
-import { DomainEvent } from "@/shared/domain/events/domain-event.base";
+import { DomainEvent } from "@/shared/events";
 
 export class EmailChangeRequestedDomainEvent extends DomainEvent {
 	constructor(

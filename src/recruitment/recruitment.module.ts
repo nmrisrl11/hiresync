@@ -1,6 +1,5 @@
-import { DomainEventPublisherPort } from "@/shared/application/ports/outbound";
 import { DatabaseModule } from "@/shared/database/database.module";
-import { NestjsDomainEventPublisherAdapter } from "@/shared/infrastructure/adapters";
+import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import {
 	CreateApplicantProfileUseCasePort,
@@ -134,7 +133,6 @@ import { RecruitmentAssetProcessor } from "./infrastructure/queues";
 import { ApplicantController } from "./presentation/controllers/applicant.controller";
 import { EmployerController } from "./presentation/controllers/employer.controller";
 import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
-import { BullModule } from "@nestjs/bullmq";
 
 @Module({
 	imports: [
@@ -244,9 +242,6 @@ import { BullModule } from "@nestjs/bullmq";
 		RecruitmentAssetProcessor,
 		//! CRON Jobs
 		ExpireJobListingsCron,
-
-		//! Shared
-		{ provide: DomainEventPublisherPort, useClass: NestjsDomainEventPublisherAdapter },
 	],
 })
 export class RecruitmentModule {}

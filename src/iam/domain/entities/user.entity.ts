@@ -1,7 +1,4 @@
-import { NoAccountFoundException, NoPendingEmailChangeException } from "../exceptions";
-import { AccountId, Email, UserId } from "../value-objects";
-import { Account } from "./account.entity";
-import { Role } from "./role.entity";
+import { AggregateRoot } from "@/shared/core";
 import {
 	EmailChangeRequestedDomainEvent,
 	PasswordResetRequestedDomainEvent,
@@ -12,7 +9,10 @@ import {
 	UserRegisteredDomainEvent,
 	VerificationEmailResentDomainEvent,
 } from "../events";
-import { AggregateRoot } from "@/shared/domain/entities";
+import { NoAccountFoundException, NoPendingEmailChangeException } from "../exceptions";
+import { AccountId, Email, UserId } from "../value-objects";
+import { Account } from "./account.entity";
+import { Role } from "./role.entity";
 
 export class User extends AggregateRoot {
 	constructor(

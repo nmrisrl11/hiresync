@@ -1,7 +1,8 @@
 import { User } from "@/iam/domain/entities";
 import { RoleRepository, UserRepository } from "@/iam/domain/repositories";
 import { Email, RoleCode } from "@/iam/domain/value-objects";
-import { DomainEventPublisherPort, IdGeneratorPort } from "@/shared/application/ports/outbound";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
+import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 import {
 	RoleNotFoundException,
