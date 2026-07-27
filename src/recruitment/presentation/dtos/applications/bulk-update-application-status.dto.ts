@@ -1,5 +1,4 @@
-import { ApplicationStatus } from "@/generated/prisma/enums";
-import { APPLICATION_STATUS } from "@/recruitment/domain/types";
+import { APPLICATION_STATUS, type ApplicationStatus } from "@/recruitment/domain/types";
 import { ApiProperty } from "@nestjs/swagger";
 import { ArrayNotEmpty, IsArray, IsEnum, IsUUID } from "class-validator";
 

@@ -1,7 +1,7 @@
 import {
 	EMPLOYMENT_TYPE,
-	LOCATION_TYPE,
 	type EmploymentType,
+	LOCATION_TYPE,
 	type LocationType,
 } from "@/recruitment/domain/types";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";

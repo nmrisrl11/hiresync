@@ -42,7 +42,7 @@ import {
 	ResendVerificationDto,
 	ResetPasswordDto,
 	VerifyEmailDto,
-} from "../dtos";
+} from "../dtos/authentication";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import { ResponseMapper } from "../mappers/response.mapper";
 

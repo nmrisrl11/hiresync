@@ -1,7 +1,7 @@
 import { APPLICATION_STATUS, type ApplicationStatus } from "@/recruitment/domain/types";
+import { PaginationDto } from "@/shared/http/dtos";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsOptional, IsString, IsUUID } from "class-validator";
-import { PaginationDto } from "./pagination.dto";
 
 export class GetApplicationsDto extends PaginationDto {
 	@ApiPropertyOptional({ enum: APPLICATION_STATUS })

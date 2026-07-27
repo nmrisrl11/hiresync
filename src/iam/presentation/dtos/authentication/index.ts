@@ -4,6 +4,3 @@ export * from "./register.dto";
 export * from "./resend-verification.dto";
 export * from "./verify-email.dto";
 export * from "./reset-password.dto";
-export * from "./change-password.dto";
-export * from "./update-account.dto";
-export * from "./request-email-change.dto";

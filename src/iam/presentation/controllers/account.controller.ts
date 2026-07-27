@@ -39,7 +39,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
 import "multer";
-import { ChangePasswordDto, RequestEmailChangeDto, UpdateAccountDto } from "../dtos";
+import { ChangePasswordDto, RequestEmailChangeDto, UpdateAccountDto } from "../dtos/account";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import { ResponseMapper } from "../mappers/response.mapper";
 
