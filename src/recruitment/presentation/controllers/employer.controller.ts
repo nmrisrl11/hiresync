@@ -58,16 +58,17 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nes
 import { Throttle } from "@nestjs/throttler";
 import {
 	BulkUpdateApplicationStatusDto,
-	CloseJobListingDto,
-	CreateEmployerProfileDto,
-	CreateJobListingDto,
-	EditEmployerProfileDto,
-	EditJobListingDto,
 	GetApplicationsDto,
-	GetEmployerJobsDto,
 	UpdateApplicationStatusDto,
 	UpdateInternalNoteDto,
-} from "../dtos";
+} from "../dtos/applications";
+import { CreateEmployerProfileDto, EditEmployerProfileDto } from "../dtos/employers";
+import {
+	CloseJobListingDto,
+	CreateJobListingDto,
+	EditJobListingDto,
+	GetEmployerJobsDto,
+} from "../dtos/jobs";
 import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.filter";
 import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mapper";
 

@@ -4,9 +4,9 @@ import {
 	LOCATION_TYPE,
 	type LocationType,
 } from "@/recruitment/domain/types";
+import { PaginationDto } from "@/shared/http/dtos";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsOptional, IsString } from "class-validator";
-import { PaginationDto } from "./pagination.dto";
 
 export class SearchJobListingDto extends PaginationDto {
 	@ApiPropertyOptional({ description: "Search by job title or description" })

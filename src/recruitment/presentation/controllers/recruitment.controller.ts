@@ -13,7 +13,7 @@ import { Public } from "@/shared/http/decorators";
 import { Controller, Get, HttpCode, HttpStatus, Param, Query } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
-import { SearchJobListingDto } from "../dtos";
+import { SearchJobListingDto } from "../dtos/jobs";
 
 @ApiTags("Recruitment")
 @Controller("recruitments")

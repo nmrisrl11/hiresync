@@ -19,6 +19,7 @@ import {
 	WithdrawApplicationUseCasePort,
 } from "@/recruitment/application/ports/inbound/applications";
 import { CurrentUser, Roles } from "@/shared/http/decorators";
+import { PaginationDto } from "@/shared/http/dtos";
 import { ROLES, type JwtPayload } from "@/shared/types";
 import {
 	Body,
@@ -38,13 +39,8 @@ import {
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
-import {
-	ApplyForJobDto,
-	CreateApplicantProfileDto,
-	EditApplicantProfileDto,
-	GetApplicationsDto,
-	PaginationDto,
-} from "../dtos";
+import { CreateApplicantProfileDto, EditApplicantProfileDto } from "../dtos/applicants";
+import { ApplyForJobDto, GetApplicationsDto } from "../dtos/applications";
 import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.filter";
 import { DocumentValidationPipe } from "../pipes/document-validation.pipe";
 

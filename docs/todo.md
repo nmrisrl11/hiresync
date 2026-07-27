@@ -128,7 +128,7 @@
 ### Tasks Scheduling
 - [x] Integrate tasks scheduling (NestJS Cron/Schedule)
 - [x] Implement task scheduling to expire job listings
-- [ ] Remove expired tokens (verification & reset tokens)
+- [/] Remove expired tokens (verification & reset tokens)
 - [ ] Send reminder to employers about expiring job listings
 
 ## **To add on IAM (Identity and Access Management)**
@@ -140,6 +140,7 @@
 
 - [x] Account Deletion
   - A compliance-driven feature (GDPR/CCPA) that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.
+  - Give 7 or 14 days before permanently deleting the account. Set a flag to indicate the account is pending deletion. Then create a background job to delete the account after the grace period.
 
 - [ ] Account Lockout (Brute Force Protection)
   - Track consecutive failed login attempts and temporarily lock the account (e.g., 15 minutes) after exceeding a threshold.
