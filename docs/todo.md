@@ -139,8 +139,8 @@
   - A dual-step flow that generates a new verification token and sends it to the new email address before updating the actual database record, preventing accidental account lockouts.
 
 - [x] Account Deletion
-  - A compliance-driven feature (GDPR/CCPA) that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.
-  - Give 7 or 14 days before permanently deleting the account. Set a flag to indicate the account is pending deletion. Then create a background job to delete the account after the grace period.
+  - [x] A compliance-driven feature (GDPR/CCPA) that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.
+  - [x] Give 7 or 14 days before permanently deleting the account. Set a flag to indicate the account is pending deletion. Then create a background job to delete the account after the grace period.
 
 - [ ] Account Lockout (Brute Force Protection)
   - Track consecutive failed login attempts and temporarily lock the account (e.g., 15 minutes) after exceeding a threshold.
