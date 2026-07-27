@@ -150,6 +150,7 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 		{ provide: SavedJobRepository, useClass: PrismaSavedJobRepository },
 
 		//! Use Cases
+		/** Employer Profile **/
 		{ provide: CreateEmployerProfileUseCasePort, useClass: CreateEmployerProfileUseCase },
 		{ provide: EditEmployerProfileUseCasePort, useClass: EditEmployerProfileUseCase },
 		{ provide: UploadCompanyLogoUseCasePort, useClass: UploadCompanyLogoUseCase },
@@ -161,6 +162,7 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 			useClass: GetApplicantProfileForEmployerUseCase,
 		},
 
+		/** Job Listings **/
 		{ provide: CreateJobListingUseCasePort, useClass: CreateJobListingUseCase },
 		{ provide: EditJobListingUseCasePort, useClass: EditJobListingUseCase },
 		{ provide: CloseJobListingUseCasePort, useClass: CloseJobListingUseCase },
@@ -169,12 +171,14 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 		{ provide: ExpireJobListingsUseCasePort, useClass: ExpireJobListingsUseCase },
 		{ provide: SearchJobListingUseCasePort, useClass: SearchJobListingUseCase },
 
+		/** Applicant Profile **/
 		{ provide: CreateApplicantProfileUseCasePort, useClass: CreateApplicantProfileUseCase },
 		{ provide: EditApplicantProfileUseCasePort, useClass: EditApplicantProfileUseCase },
 		{ provide: GetApplicantProfileUseCasePort, useClass: GetApplicantProfileUseCase },
 		{ provide: ToggleSavedJobUseCasePort, useClass: ToggleSavedJobUseCase },
 		{ provide: GetSavedJobsUseCasePort, useClass: GetSavedJobsUseCase },
 
+		/** Applications **/
 		{ provide: ApplyForJobUseCasePort, useClass: ApplyForJobUseCase },
 		{ provide: GetApplicantApplicationsUseCasePort, useClass: GetApplicantApplicationsUseCase },
 		{ provide: GetEmployerApplicationsUseCasePort, useClass: GetEmployerApplicationsUseCase },
