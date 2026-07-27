@@ -25,6 +25,7 @@ export class IamMapper {
 					raw.account.resetToken,
 					raw.account.resetTokenExpiresAt,
 					raw.account.refreshTokenHash,
+					raw.account.scheduledForDeletionAt,
 				)
 			: null;
 

@@ -29,3 +29,9 @@ export class InvalidPasswordException extends ApplicationBaseException {
 		super(message);
 	}
 }
+
+export class AccountPendingDeletionException extends ApplicationBaseException {
+	constructor(public readonly scheduledDate: Date) {
+		super(`Account is scheduled for deletion on ${scheduledDate.toISOString()}`);
+	}
+}

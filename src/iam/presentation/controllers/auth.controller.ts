@@ -1,5 +1,9 @@
 import { env } from "@/env";
 import {
+	RestoreAccountCommand,
+	RestoreAccountUseCasePort,
+} from "@/iam/application/ports/inbound/account";
+import {
 	ForgotPasswordCommand,
 	ForgotPasswordUseCasePort,
 	LoginCommand,
@@ -41,6 +45,7 @@ import {
 	RegisterDto,
 	ResendVerificationDto,
 	ResetPasswordDto,
+	RestoreAccountDto,
 	VerifyEmailDto,
 } from "../dtos/authentication";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
@@ -59,6 +64,7 @@ export class AuthController {
 		private readonly resetPasswordUseCase: ResetPasswordUseCasePort,
 		private readonly resendVerificationUseCase: ResendVerificationUseCasePort,
 		private readonly refreshTokenUseCase: RefreshTokenUseCasePort,
+		private readonly restoreAccountUseCase: RestoreAccountUseCasePort,
 	) {}
 
 	private readonly refreshCookieMaxAge = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
@@ -194,5 +200,30 @@ export class AuthController {
 	public async resendVerification(@Body() dto: ResendVerificationDto) {
 		const command = new ResendVerificationCommand(dto.email);
 		return await this.resendVerificationUseCase.execute(command);
+	}
+
+	@Public()
+	@Post("account/restore")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 5 } })
+	@ApiOperation({ summary: "Cancel a scheduled deletion and restore the account." })
+	public async restoreAccount(
+		@Body() dto: RestoreAccountDto,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		const command = new RestoreAccountCommand(dto.email, dto.password);
+		const result = await this.restoreAccountUseCase.execute(command);
+
+		res.cookie("refresh_token", result.refreshToken, {
+			httpOnly: true,
+			secure: this.isProduction,
+			sameSite: "lax",
+			maxAge: this.refreshCookieMaxAge,
+		});
+
+		return {
+			message: "Account successfully restored.",
+			accessToken: result.accessToken,
+		};
 	}
 }

@@ -3,6 +3,8 @@ import {
 	EmailChangeRequestedDomainEvent,
 	PasswordResetRequestedDomainEvent,
 	UserAccountDeletedDomainEvent,
+	UserAccountDeletionScheduledDomainEvent,
+	UserAccountRestoredDomainEvent,
 	UserEmailChangedDomainEvent,
 	UserEmailVerifiedDomainEvent,
 	UserPasswordChangedDomainEvent,
@@ -146,5 +148,26 @@ export class User extends AggregateRoot {
 		this.addDomainEvent(
 			new UserAccountDeletedDomainEvent(this.id.getValue(), this.email.getValue(), this.image),
 		);
+	}
+
+	public scheduleDeletion(gracePeriodMs: number): void {
+		if (!this.account) throw new NoAccountFoundException();
+
+		this.account.scheduleDeletion(gracePeriodMs);
+
+		this.addDomainEvent(
+			new UserAccountDeletionScheduledDomainEvent(
+				this.email.getValue(),
+				this.account.getScheduledForDeletionAt(),
+			),
+		);
+	}
+
+	public cancelDeletion(): void {
+		if (!this.account) throw new NoAccountFoundException();
+
+		this.account.cancelDeletion();
+
+		this.addDomainEvent(new UserAccountRestoredDomainEvent(this.email.getValue()));
 	}
 }

@@ -3,14 +3,14 @@ import {
 	ChangePasswordUseCasePort,
 	ConfirmEmailChangeCommand,
 	ConfirmEmailChangeUseCasePort,
-	DeleteAccountCommand,
-	DeleteAccountUseCasePort,
 	GetUserByIdQuery,
 	GetUserByIdUseCasePort,
 	RemoveAvatarCommand,
 	RemoveAvatarUseCasePort,
 	RequestEmailChangeCommand,
 	RequestEmailChangeUseCasePort,
+	ScheduleAccountDeletionCommand,
+	ScheduleAccountDeletionUseCasePort,
 	UpdateAccountCommand,
 	UpdateAccountUseCasePort,
 	UploadAvatarCommand,
@@ -52,11 +52,11 @@ export class AccountController {
 		private readonly getUserByIdUseCase: GetUserByIdUseCasePort,
 		private readonly changePasswordUseCase: ChangePasswordUseCasePort,
 		private readonly updateAccountUseCase: UpdateAccountUseCasePort,
-		private readonly deleteAccountUseCase: DeleteAccountUseCasePort,
 		private readonly requestEmailChangeUseCase: RequestEmailChangeUseCasePort,
 		private readonly confirmEmailChangeUseCase: ConfirmEmailChangeUseCasePort,
 		private readonly uploadAvatarUseCase: UploadAvatarUseCasePort,
 		private readonly removeAvatarUseCase: RemoveAvatarUseCasePort,
+		private readonly scheduleAccountDeletionUseCase: ScheduleAccountDeletionUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -168,10 +168,10 @@ export class AccountController {
 	@Delete()
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@Throttle({ default: { ttl: 60000, limit: 3 } })
-	@ApiOperation({ summary: "Delete the current authenticated user's account permanently." })
+	@ApiOperation({ summary: "Schedule the current authenticated user's account for deletion." })
 	public async deleteAccount(@CurrentUser() userPayload: JwtPayload): Promise<void> {
-		const command = new DeleteAccountCommand(userPayload.sub);
+		const command = new ScheduleAccountDeletionCommand(userPayload.sub);
 
-		await this.deleteAccountUseCase.execute(command);
+		await this.scheduleAccountDeletionUseCase.execute(command);
 	}
 }
