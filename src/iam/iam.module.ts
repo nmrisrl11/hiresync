@@ -4,9 +4,12 @@ import {
 	ChangePasswordUseCasePort,
 	ConfirmEmailChangeUseCasePort,
 	DeleteAccountUseCasePort,
+	ExecuteHardDeletionUseCasePort,
 	GetUserByIdUseCasePort,
 	RemoveAvatarUseCasePort,
 	RequestEmailChangeUseCasePort,
+	RestoreAccountUseCasePort,
+	ScheduleAccountDeletionUseCasePort,
 	UpdateAccountUseCasePort,
 	UploadAvatarUseCasePort,
 } from "./application/ports/inbound/account";
@@ -49,9 +52,12 @@ import {
 	ChangePasswordUseCase,
 	ConfirmEmailChangeUseCase,
 	DeleteAccountUseCase,
+	ExecuteHardDeletionUseCase,
 	GetUserByIdUseCase,
 	RemoveAvatarUseCase,
 	RequestEmailChangeUseCase,
+	RestoreAccountUseCase,
+	ScheduleAccountDeletionUseCase,
 	UpdateAccountUseCase,
 	UploadAvatarUseCase,
 } from "./application/use-cases/account";
@@ -100,6 +106,7 @@ import {
 	VerificationEmailResentListener,
 } from "./infrastructure/events/listeners";
 import { IamNotificationsModule } from "./infrastructure/notifications/iam-notifications.module";
+import { ExecutePendingDeletionsTask } from "./infrastructure/tasks/execute-pending-deletions.task";
 import { AccountController } from "./presentation/controllers/account.controller";
 import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
@@ -124,6 +131,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: ResetPasswordUseCasePort, useClass: ResetPasswordUseCase },
 		{ provide: RefreshTokenUseCasePort, useClass: RefreshTokenUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
+		{ provide: RestoreAccountUseCasePort, useClass: RestoreAccountUseCase },
 
 		/** Account **/
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
@@ -134,6 +142,8 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: ConfirmEmailChangeUseCasePort, useClass: ConfirmEmailChangeUseCase },
 		{ provide: UploadAvatarUseCasePort, useClass: UploadAvatarUseCase },
 		{ provide: RemoveAvatarUseCasePort, useClass: RemoveAvatarUseCase },
+		{ provide: ScheduleAccountDeletionUseCasePort, useClass: ScheduleAccountDeletionUseCase },
+		{ provide: ExecuteHardDeletionUseCasePort, useClass: ExecuteHardDeletionUseCase },
 
 		/** Users **/
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
@@ -170,6 +180,9 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: EnqueueEmailChangedAlertUseCasePort, useClass: EnqueueEmailChangedAlertUseCase },
 		{ provide: EnqueueWelcomeEmailUseCasePort, useClass: EnqueueWelcomeEmailUseCase },
 		{ provide: EnqueueFarewellEmailUseCasePort, useClass: EnqueueFarewellEmailUseCase },
+
+		//! Tasks
+		ExecutePendingDeletionsTask,
 	],
 })
 export class IamModule {}

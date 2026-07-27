@@ -15,6 +15,7 @@ export class Account {
 		private resetToken: string | null = null,
 		private resetTokenExpiresAt: Date | null = null,
 		private refreshTokenHash: string | null = null,
+		private scheduledForDeletionAt: Date | null = null,
 	) {}
 
 	public getPasswordHash(): string {
@@ -82,5 +83,17 @@ export class Account {
 
 	public setPasswordHash(newHash: string): void {
 		this.passwordHash = newHash;
+	}
+
+	public getScheduledForDeletionAt(): Date | null {
+		return this.scheduledForDeletionAt;
+	}
+
+	public scheduleDeletion(gracePeriodMs: number): void {
+		this.scheduledForDeletionAt = new Date(Date.now() + gracePeriodMs);
+	}
+
+	public cancelDeletion(): void {
+		this.scheduledForDeletionAt = null;
 	}
 }

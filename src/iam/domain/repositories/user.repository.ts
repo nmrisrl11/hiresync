@@ -8,6 +8,7 @@ export abstract class UserRepository {
 	abstract findByEmail(email: Email): Promise<User | null>;
 	abstract findByVerificationToken(verificationToken: string): Promise<User | null>;
 	abstract findByResetToken(resetToken: string): Promise<User | null>;
+	abstract findPendingDeletions(date: Date): Promise<User[]>;
 	abstract delete(id: UserId): Promise<void>;
 	abstract save(user: User): Promise<void>;
 }

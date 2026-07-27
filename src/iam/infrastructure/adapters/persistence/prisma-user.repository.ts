@@ -64,6 +64,19 @@ export class PrismaUserRepository implements UserRepository {
 		return IamMapper.toDomain(user);
 	}
 
+	async findPendingDeletions(date: Date): Promise<User[]> {
+		const users = await this.prisma.user.findMany({
+			where: {
+				account: {
+					scheduledForDeletionAt: { lte: date },
+				},
+			},
+			include: { role: true, account: true },
+		});
+
+		return users.map((user) => IamMapper.toDomain(user));
+	}
+
 	async delete(id: UserId): Promise<void> {
 		await this.prisma.$transaction([
 			this.prisma.account.deleteMany({
@@ -95,6 +108,7 @@ export class PrismaUserRepository implements UserRepository {
 						resetToken: user.account.getResetToken(),
 						resetTokenExpiresAt: user.account.getResetTokenExpiresAt(),
 						refreshTokenHash: user.account.getRefreshTokenHash(),
+						scheduledForDeletionAt: user.account.getScheduledForDeletionAt(),
 					},
 				},
 			},

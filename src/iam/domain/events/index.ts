@@ -6,3 +6,6 @@ export * from "./user-password-changed.domain-event";
 export * from "./user-email-changed.domain-event";
 export * from "./user-email-verified.domain-event";
 export * from "./user-account-deleted.domain-event";
+
+export * from "./user-account-deletion-scheduled.domain-event";
+export * from "./user-account-restored.domain-event";

@@ -6,3 +6,7 @@ export * from "./request-email-change.in-port";
 export * from "./confirm-email-change.in-port";
 export * from "./upload-avatar.in-port";
 export * from "./remove-avatar.in-port";
+
+export * from "./schedule-account-deletion.in-port";
+export * from "./restore-account.in-port";
+export * from "./execute-hard-deletion.in-port";

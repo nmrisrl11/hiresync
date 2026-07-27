@@ -1,9 +1,10 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { Email } from "@/iam/domain/value-objects";
 import { Injectable } from "@nestjs/common";
-import { InvalidLoginException } from "../../exceptions";
+import { AccountPendingDeletionException, InvalidLoginException } from "../../exceptions";
 import { LoginCommand, LoginResult, LoginUseCasePort } from "../../ports/inbound/authentication";
 import { HashServicePort, JwtServicePort } from "../../ports/outbound";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 
 @Injectable()
 export class LoginUseCase implements LoginUseCasePort {
@@ -11,6 +12,7 @@ export class LoginUseCase implements LoginUseCasePort {
 		private readonly userRepository: UserRepository,
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
+		private readonly logger: LoggerPort,
 	) {}
 
 	public async execute(command: LoginCommand): Promise<LoginResult> {
@@ -26,6 +28,11 @@ export class LoginUseCase implements LoginUseCasePort {
 		);
 
 		if (!passwordMatch) throw new InvalidLoginException();
+
+		const scheduledForDeletionDate = user.account.getScheduledForDeletionAt();
+		this.logger.log(String(scheduledForDeletionDate));
+		if (scheduledForDeletionDate)
+			throw new AccountPendingDeletionException(scheduledForDeletionDate);
 
 		if (!user.isVerified)
 			throw new InvalidLoginException("Please verify your email address before logging in.");

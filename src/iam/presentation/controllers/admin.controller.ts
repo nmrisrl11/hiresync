@@ -1,8 +1,22 @@
-import { GetUserByIdQuery, GetUserByIdUseCasePort } from "@/iam/application/ports/inbound/account";
+import {
+	DeleteAccountCommand,
+	DeleteAccountUseCasePort,
+	GetUserByIdQuery,
+	GetUserByIdUseCasePort,
+} from "@/iam/application/ports/inbound/account";
 import { GetUsersQuery, GetUsersUseCasePort } from "@/iam/application/ports/inbound/users";
 import { Roles } from "@/shared/http/decorators";
 import { ROLES } from "@/shared/types";
-import { Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Query } from "@nestjs/common";
+import {
+	Controller,
+	Delete,
+	Get,
+	HttpCode,
+	HttpStatus,
+	Param,
+	ParseUUIDPipe,
+	Query,
+} from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 
 @ApiBearerAuth()
@@ -13,6 +27,7 @@ export class AdminController {
 	constructor(
 		private readonly getUsersUseCase: GetUsersUseCasePort,
 		private readonly getUserByIdUseCase: GetUserByIdUseCasePort,
+		private readonly deleteAccountUseCase: DeleteAccountUseCasePort,
 	) {}
 
 	@Get("users")
@@ -46,5 +61,14 @@ export class AdminController {
 		const query = new GetUserByIdQuery(id);
 
 		return await this.getUserByIdUseCase.execute(query);
+	}
+
+	@Delete("users/:id")
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiOperation({ summary: "Delete a user account instantly and permanently (admin only)" })
+	public async forceDeleteUser(@Param("id", ParseUUIDPipe) id: string) {
+		const command = new DeleteAccountCommand(id);
+
+		await this.deleteAccountUseCase.execute(command);
 	}
 }
