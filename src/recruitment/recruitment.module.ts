@@ -117,7 +117,6 @@ import {
 	PrismaJobListingRepository,
 	PrismaSavedJobRepository,
 } from "./infrastructure/adapters/persistence";
-import { ExpireJobListingsCron } from "./infrastructure/cron/expire-job-listings.cron";
 import {
 	ApplicantProfileCreatedListener,
 	EmployerProfileCreatedListener,
@@ -130,6 +129,7 @@ import {
 } from "./infrastructure/events/listeners";
 import { RecruitmentNotificationsModule } from "./infrastructure/notifications/recruitment-notifications.module";
 import { RecruitmentAssetProcessor } from "./infrastructure/queues";
+import { ExpireJobListingsTask } from "./infrastructure/tasks/expire-job-listings.task";
 import { ApplicantController } from "./presentation/controllers/applicant.controller";
 import { EmployerController } from "./presentation/controllers/employer.controller";
 import { RecruitmentController } from "./presentation/controllers/recruitment.controller";
@@ -244,8 +244,9 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 
 		//! Processors
 		RecruitmentAssetProcessor,
-		//! CRON Jobs
-		ExpireJobListingsCron,
+
+		//! Tasks
+		ExpireJobListingsTask,
 	],
 })
 export class RecruitmentModule {}
