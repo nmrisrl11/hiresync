@@ -24,4 +24,11 @@ export abstract class IamEmailQueuePort {
 	abstract enqueueWelcomeEmail(email: string): Promise<void>;
 
 	abstract enqueueFarewellEmail(email: string): Promise<void>;
+
+	abstract enqueueAccountDeletionScheduledEmail(
+		email: string,
+		scheduledDateIso: string,
+	): Promise<void>;
+
+	abstract enqueueAccountRestoredEmail(email: string): Promise<void>;
 }

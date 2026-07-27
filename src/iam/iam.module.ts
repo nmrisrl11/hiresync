@@ -14,6 +14,8 @@ import {
 	UploadAvatarUseCasePort,
 } from "./application/ports/inbound/account";
 import {
+	EnqueueAccountDeletionScheduledEmailUseCasePort,
+	EnqueueAccountRestoredEmailUseCasePort,
 	EnqueueChangeEmailRequestUseCasePort,
 	EnqueueEmailChangedAlertUseCasePort,
 	EnqueueFarewellEmailUseCasePort,
@@ -62,6 +64,8 @@ import {
 	UploadAvatarUseCase,
 } from "./application/use-cases/account";
 import {
+	EnqueueAccountDeletionScheduledEmailUseCase,
+	EnqueueAccountRestoredEmailUseCase,
 	EnqueueChangeEmailRequestUseCase,
 	EnqueueEmailChangedAlertUseCase,
 	EnqueueFarewellEmailUseCase,
@@ -99,6 +103,8 @@ import {
 	EmailChangeRequestedListener,
 	PasswordResetRequestedListener,
 	UserAccountDeletedListener,
+	UserAccountDeletionScheduledListener,
+	UserAccountRestoredListener,
 	UserEmailChangedListener,
 	UserEmailVerifiedListener,
 	UserPasswordChangedListener,
@@ -170,6 +176,8 @@ import { UserController } from "./presentation/controllers/user.controller";
 		UserPasswordChangedListener,
 		VerificationEmailResentListener,
 		UserRegisteredListener,
+		UserAccountDeletionScheduledListener,
+		UserAccountRestoredListener,
 		{ provide: EnqueueVerificationEmailUseCasePort, useClass: EnqueueVerificationEmailUseCase },
 		{ provide: EnqueuePasswordResetEmailUseCasePort, useClass: EnqueuePasswordResetEmailUseCase },
 		{ provide: EnqueueChangeEmailRequestUseCasePort, useClass: EnqueueChangeEmailRequestUseCase },
@@ -180,6 +188,14 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: EnqueueEmailChangedAlertUseCasePort, useClass: EnqueueEmailChangedAlertUseCase },
 		{ provide: EnqueueWelcomeEmailUseCasePort, useClass: EnqueueWelcomeEmailUseCase },
 		{ provide: EnqueueFarewellEmailUseCasePort, useClass: EnqueueFarewellEmailUseCase },
+		{
+			provide: EnqueueAccountDeletionScheduledEmailUseCasePort,
+			useClass: EnqueueAccountDeletionScheduledEmailUseCase,
+		},
+		{
+			provide: EnqueueAccountRestoredEmailUseCasePort,
+			useClass: EnqueueAccountRestoredEmailUseCase,
+		},
 
 		//! Tasks
 		ExecutePendingDeletionsTask,

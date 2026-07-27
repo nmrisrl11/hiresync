@@ -6,3 +6,5 @@ export * from "./user-email-verified.listener";
 export * from "./user-password-changed.listener";
 export * from "./user-registered.listener";
 export * from "./verification-email-resent.listener";
+export * from "./user-account-deletion-scheduled.listener";
+export * from "./user-account-restored.listener";

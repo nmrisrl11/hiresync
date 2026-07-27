@@ -82,4 +82,24 @@ export class IamEmailService {
 			context: {},
 		});
 	}
+
+	async sendAccountDeletionScheduledEmail(email: string, scheduledDateIso: string) {
+		const formattedDate = new Date(scheduledDateIso).toLocaleDateString();
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: "Your account is scheduled for deletion",
+			template: "iam/account-deletion-scheduled",
+			context: { formattedDate },
+		});
+	}
+
+	async sendAccountRestoredEmail(email: string) {
+		await this.mailer.sendEmail({
+			to: email,
+			subject: "Your account has been successfully restored",
+			template: "iam/account-restored",
+			context: {},
+		});
+	}
 }
