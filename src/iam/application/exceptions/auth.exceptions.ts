@@ -35,3 +35,11 @@ export class AccountPendingDeletionException extends ApplicationBaseException {
 		super(`Account is scheduled for deletion on ${scheduledDate.toISOString()}`);
 	}
 }
+
+export class AccountLockedException extends ApplicationBaseException {
+	constructor(public readonly lockedUntil: Date) {
+		super(
+			`Account is temporarily locked due to multiple failed login attempts. Please try again after ${lockedUntil.toLocaleTimeString()}.`,
+		);
+	}
+}

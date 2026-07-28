@@ -1,4 +1,5 @@
 import {
+	AccountLockedException,
 	AccountPendingDeletionException,
 	InvalidLoginException,
 	InvalidPasswordException,
@@ -64,6 +65,8 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 
 	private getApplicationStatus(exception: ApplicationBaseException): HttpStatus {
 		switch (exception.constructor) {
+			case AccountLockedException:
+				return HttpStatus.TOO_MANY_REQUESTS;
 			case InvalidLoginException:
 				return HttpStatus.UNAUTHORIZED;
 			case InvalidTokenException:
