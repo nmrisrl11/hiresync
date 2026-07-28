@@ -4,7 +4,7 @@ import {
 	InvalidResetTokenException,
 	InvalidVerificationTokenException,
 } from "../exceptions";
-import { AccountId } from "../value-objects";
+import { AccountId, FailedLoginState } from "../value-objects";
 
 export class Account {
 	constructor(
@@ -16,6 +16,7 @@ export class Account {
 		private resetTokenExpiresAt: Date | null = null,
 		private refreshTokenHash: string | null = null,
 		private scheduledForDeletionAt: Date | null = null,
+		private failedLoginState: FailedLoginState = new FailedLoginState(),
 	) {}
 
 	public getPasswordHash(): string {
@@ -95,5 +96,28 @@ export class Account {
 
 	public cancelDeletion(): void {
 		this.scheduledForDeletionAt = null;
+	}
+
+	public getFailedLoginState(): FailedLoginState {
+		return this.failedLoginState;
+	}
+
+	public isLocked(): boolean {
+		if (this.failedLoginState.isLocked()) return true;
+
+		//! If the lock has naturally expired based on time, silently clear the state
+		if (this.failedLoginState.getLockedUntil() !== null)
+			this.failedLoginState = this.failedLoginState.reset();
+
+		return false;
+	}
+
+	public handleFailedLogin(maxAttempts: number, lockoutDurationMs: number): void {
+		this.failedLoginState = this.failedLoginState.recordFailure(maxAttempts, lockoutDurationMs);
+	}
+
+	public resetFailedLogins(): void {
+		if (this.failedLoginState.getCount() > 0 || this.failedLoginState.getLockedUntil() !== null)
+			this.failedLoginState = this.failedLoginState.reset();
 	}
 }

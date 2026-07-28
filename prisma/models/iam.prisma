@@ -13,8 +13,8 @@ model User {
     roleId String
     role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict)
 
-    account Account? // 1:1 relationship with Account
-    employerProfile EmployerProfile? // 1:1 relationship with EmployerProfile
+    account          Account? // 1:1 relationship with Account
+    employerProfile  EmployerProfile? // 1:1 relationship with EmployerProfile
     applicantProfile ApplicantProfile? // 1:1 relationship with ApplicantProfile
 
     createdAt DateTime @default(now())
@@ -39,7 +39,9 @@ model Account {
     resetTokenExpiresAt        DateTime?
     refreshTokenHash           String?
 
-    scheduledForDeletionAt     DateTime?
+    scheduledForDeletionAt DateTime?
+    failedLoginAttempts    Int       @default(0)
+    lockedUntil            DateTime?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

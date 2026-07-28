@@ -131,7 +131,9 @@
 - [/] Remove expired tokens (verification & reset tokens)
 - [ ] Send reminder to employers about expiring job listings
 
-## **To add on IAM (Identity and Access Management)**
+# Phase 2
+
+### IAM (Identity and Access Management) 
 - [x] Update Password (Authenticated)
   - A secure flow for logged-in users to change their password by validating their old password hash before accepting a new password.
 
@@ -153,8 +155,6 @@
 
 - [ ] Manual OAuth Integration
   - Build custom authorization flows for Google, GitHub, Microsoft, etc., without relying on third-party UI libraries.
-
-# Phase 2
 
 ### Employers
 - [ ] Company profile Allowing multiple User accounts (with a "Recruiter" role) to attach to a single Employer entity.

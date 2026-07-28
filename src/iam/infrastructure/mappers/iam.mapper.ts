@@ -4,7 +4,14 @@ import {
 	Role as PrismaRole,
 } from "@/generated/prisma/client";
 import { Account, Role, User } from "@/iam/domain/entities";
-import { AccountId, Email, RoleCode, RoleId, UserId } from "@/iam/domain/value-objects";
+import {
+	AccountId,
+	Email,
+	FailedLoginState,
+	RoleCode,
+	RoleId,
+	UserId,
+} from "@/iam/domain/value-objects";
 
 type PrismaUserWithRelations = PrismaUser & { role: PrismaRole; account: PrismaAccount | null };
 
@@ -26,6 +33,7 @@ export class IamMapper {
 					raw.account.resetTokenExpiresAt,
 					raw.account.refreshTokenHash,
 					raw.account.scheduledForDeletionAt,
+					new FailedLoginState(raw.account.failedLoginAttempts, raw.account.lockedUntil),
 				)
 			: null;
 
