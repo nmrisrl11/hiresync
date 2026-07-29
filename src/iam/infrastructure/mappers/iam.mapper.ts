@@ -1,19 +1,25 @@
 import {
-	User as PrismaUser,
 	Account as PrismaAccount,
 	Role as PrismaRole,
+	Session as PrismaSession,
+	User as PrismaUser,
 } from "@/generated/prisma/client";
-import { Account, Role, User } from "@/iam/domain/entities";
+import { Account, Role, Session, User } from "@/iam/domain/entities";
 import {
 	AccountId,
 	Email,
 	FailedLoginState,
 	RoleCode,
 	RoleId,
+	SessionId,
 	UserId,
 } from "@/iam/domain/value-objects";
 
-type PrismaUserWithRelations = PrismaUser & { role: PrismaRole; account: PrismaAccount | null };
+type PrismaUserWithRelations = PrismaUser & {
+	role: PrismaRole;
+	account: PrismaAccount | null;
+	sessions: PrismaSession[];
+};
 
 export class IamMapper {
 	public static toDomain(raw: PrismaUserWithRelations): User {
@@ -31,11 +37,27 @@ export class IamMapper {
 					raw.account.verificationTokenExpiresAt,
 					raw.account.resetToken,
 					raw.account.resetTokenExpiresAt,
-					raw.account.refreshTokenHash,
 					raw.account.scheduledForDeletionAt,
 					new FailedLoginState(raw.account.failedLoginAttempts, raw.account.lockedUntil),
 				)
 			: null;
+
+		const sessions = Array.isArray(raw.sessions)
+			? raw.sessions.map(
+					(s) =>
+						new Session(
+							new SessionId(s.id),
+							new UserId(s.userId),
+							s.refreshTokenHash,
+							s.userAgent,
+							s.ipAddress,
+							s.isRevoked,
+							s.lastActiveAt,
+							s.expiresAt,
+							s.createdAt,
+						),
+				)
+			: [];
 
 		return new User(
 			new UserId(raw.id),
@@ -47,6 +69,7 @@ export class IamMapper {
 			raw.image,
 			raw.createdAt,
 			raw.pendingEmail,
+			sessions,
 		);
 	}
 }

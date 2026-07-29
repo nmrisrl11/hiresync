@@ -1,5 +1,5 @@
 import { UserRepository } from "@/iam/domain/repositories";
-import { UserId } from "@/iam/domain/value-objects";
+import { SessionId, UserId } from "@/iam/domain/value-objects";
 import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
 import { InvalidPasswordException, UserNotFoundException } from "../../exceptions";
@@ -31,6 +31,10 @@ export class ChangePasswordUseCase implements ChangePasswordUseCasePort {
 		//! Hash the new password and update the entity
 		const newPasswordHash = await this.hashService.hash(command.newPassword, 12);
 		user.updatePassword(newPasswordHash);
+
+		//! Revoke all other devices immediately for security
+		const currentSessionIdVo = new SessionId(command.currentSessionId);
+		user.revokeAllOtherSessions(currentSessionIdVo);
 
 		await this.userRepository.save(user);
 

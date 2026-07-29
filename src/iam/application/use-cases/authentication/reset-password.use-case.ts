@@ -27,6 +27,8 @@ export class ResetPasswordUseCase implements ResetPasswordUseCasePort {
 
 		user.changePassword(command.token, passwordHash);
 
+		user.revokeAllSessions();
+
 		await this.userRepository.save(user);
 
 		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);

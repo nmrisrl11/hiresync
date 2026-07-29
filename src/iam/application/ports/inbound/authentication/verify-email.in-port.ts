@@ -1,5 +1,9 @@
 export class VerifyEmailCommand {
-	constructor(public readonly token: string) {}
+	constructor(
+		public readonly token: string,
+		public readonly userAgent: string | null = null,
+		public readonly ipAddress: string | null = null,
+	) {}
 }
 
 export type VerifyEmailResult = {

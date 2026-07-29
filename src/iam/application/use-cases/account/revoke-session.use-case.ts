@@ -2,20 +2,19 @@ import { UserRepository } from "@/iam/domain/repositories";
 import { SessionId, UserId } from "@/iam/domain/value-objects";
 import { Injectable } from "@nestjs/common";
 import { UserNotFoundException } from "../../exceptions";
-import { LogoutCommand, LogoutUseCasePort } from "../../ports/inbound/authentication";
+import { RevokeSessionCommand, RevokeSessionUseCasePort } from "../../ports/inbound/account";
 
 @Injectable()
-export class LogoutUseCase implements LogoutUseCasePort {
+export class RevokeSessionUseCase implements RevokeSessionUseCasePort {
 	constructor(private readonly userRepository: UserRepository) {}
 
-	public async execute(command: LogoutCommand): Promise<void> {
+	public async execute(command: RevokeSessionCommand): Promise<void> {
 		const userIdVo = new UserId(command.userId);
 		const user = await this.userRepository.findById(userIdVo);
 
 		if (!user) throw new UserNotFoundException();
 
-		//! Revoke specific session
-		const sessionIdVo = new SessionId(command.sessionId);
+		const sessionIdVo = new SessionId(command.targetSessionId);
 		user.revokeSession(sessionIdVo);
 
 		await this.userRepository.save(user);

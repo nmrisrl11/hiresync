@@ -10,3 +10,7 @@ export * from "./remove-avatar.use-case";
 export * from "./schedule-account-deletion.use-case";
 export * from "./restore-account.use-case";
 export * from "./execute-hard-deletion.use-case";
+
+export * from "./get-active-sessions.use-case";
+export * from "./revoke-session.use-case";
+export * from "./revoke-all-other-sessions.use-case";
