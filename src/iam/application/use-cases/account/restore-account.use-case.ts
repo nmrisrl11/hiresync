@@ -1,10 +1,17 @@
-import { Injectable } from "@nestjs/common";
-import { RestoreAccountCommand, RestoreAccountUseCasePort } from "../../ports/inbound/account";
+import { Session } from "@/iam/domain/entities";
 import { UserRepository } from "@/iam/domain/repositories";
+import { Email, SessionId } from "@/iam/domain/value-objects";
 import { DomainEventPublisherPort } from "@/shared/events/ports";
-import { HashServicePort, JwtServicePort } from "../../ports/outbound";
-import { Email } from "@/iam/domain/value-objects";
+import { IdGeneratorPort } from "@/shared/utils/ports";
+import { Injectable } from "@nestjs/common";
 import { InvalidLoginException } from "../../exceptions";
+import { RestoreAccountCommand, RestoreAccountUseCasePort } from "../../ports/inbound/account";
+import {
+	AuthConfigPort,
+	HashServicePort,
+	JwtServicePort,
+	TimeFormatterPort,
+} from "../../ports/outbound";
 
 @Injectable()
 export class RestoreAccountUseCase implements RestoreAccountUseCasePort {
@@ -12,6 +19,9 @@ export class RestoreAccountUseCase implements RestoreAccountUseCasePort {
 		private readonly userRepository: UserRepository,
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
+		private readonly idGenerator: IdGeneratorPort,
+		private readonly authConfig: AuthConfigPort,
+		private readonly timeFormatter: TimeFormatterPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -31,15 +41,31 @@ export class RestoreAccountUseCase implements RestoreAccountUseCasePort {
 
 		user.cancelDeletion();
 
+		const sessionIdStr = this.idGenerator.generateId();
 		const tokens = await this.jwtService.generateTokens({
 			sub: user.id.getValue(),
 			email: user.email.getValue(),
 			role: user.role.code.getValue(),
+			sessionId: sessionIdStr,
 		});
 
 		const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
-		user.updateRefreshToken(refreshTokenHash);
+		const expiresInEnv = this.authConfig.getRefreshTokenExpiration();
+		const expiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 
+		const session = new Session(
+			new SessionId(sessionIdStr),
+			user.id,
+			refreshTokenHash,
+			command.userAgent,
+			command.ipAddress,
+			false,
+			new Date(),
+			new Date(Date.now() + expiresInMs),
+			new Date(),
+		);
+
+		user.addSession(session);
 		await this.userRepository.save(user);
 
 		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);

@@ -134,26 +134,38 @@
 # Phase 2
 
 ### IAM (Identity and Access Management) 
-- [x] Update Password (Authenticated)
-  - A secure flow for logged-in users to change their password by validating their old password hash before accepting a new password.
 
-- [x] Update Email Address
-  - A dual-step flow that generates a new verification token and sends it to the new email address before updating the actual database record, preventing accidental account lockouts.
+Update Password (Authenticated)
+- [x] Allow logged-in users to change their password
+- [x] Validate old password hash before accepting a new password
 
-- [x] Account Deletion
-  - [x] A compliance-driven feature (GDPR/CCPA) that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.
-  - [x] Give 7 or 14 days before permanently deleting the account. Set a flag to indicate the account is pending deletion. Then create a background job to delete the account after the grace period.
+Update Email Address
+- [x] Allow logged-in users to update their email address
+- [x] Validate old email address before accepting a new one
+- [x] Send verification email to the old email address before updating
 
-- [ ] Account Lockout (Brute Force Protection)
-  - Track consecutive failed login attempts and temporarily lock the account (e.g., 15 minutes) after exceeding a threshold.
+Account Deletion
+- [x] User account deletion that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.  
+- [x] 14 days before permanently deleting the account
+- [x] Background job to delete the account after the grace period
 
-- [ ] Multi-Factor Authentication (MFA / 2FA)
+Account Lockout (Brute Force Protection)
+- [x] Track consecutive failed login attempts
+- [x] Lockout after consecutive failed login attempts (e.g., 5 consecutive failures)
+- [x] Locked until 15 minutes after consecutive failed login attempts
+- [x] Unlock account after successful login
+
+Multi-Device Session Management
+- [x] Get active sessions
+- [x] Revoke all sessions
+- [x] Revoke specific session
+- [x] Revoke session when password is changed
+- [x] Revoke session when password is reset  
+
+Multi-Factor Authentication (MFA / 2FA)
   - Implement TOTP authentication using apps like Google Authenticator or Authy.
 
-- [ ] Multi-Device Session Management
-  - Replace the single refreshTokenHash with a Session entity (one-to-many) to allow users to manage active sessions.
-
-- [ ] Manual OAuth Integration
+Manual OAuth Integration
   - Build custom authorization flows for Google, GitHub, Microsoft, etc., without relying on third-party UI libraries.
 
 ### Employers

@@ -3,6 +3,7 @@ export class ChangePasswordCommand {
 		public readonly userId: string,
 		public readonly currentPassword: string,
 		public readonly newPassword: string,
+		public readonly currentSessionId: string,
 	) {}
 }
 

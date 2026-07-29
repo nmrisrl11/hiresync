@@ -1,6 +1,6 @@
 import { User } from "@/iam/domain/entities";
 import { UserRepository } from "@/iam/domain/repositories";
-import { UserId, Email } from "@/iam/domain/value-objects";
+import { Email, UserId } from "@/iam/domain/value-objects";
 import { PrismaService } from "@/shared/database/prisma.service";
 import { Injectable } from "@nestjs/common";
 import { IamMapper } from "../../mappers/iam.mapper";
@@ -14,7 +14,7 @@ export class PrismaUserRepository implements UserRepository {
 			take: limit,
 			skip: offset,
 			orderBy: { createdAt: "desc" },
-			include: { role: true, account: true },
+			include: { role: true, account: true, sessions: true },
 		});
 
 		return users.map((user) => IamMapper.toDomain(user));
@@ -27,7 +27,7 @@ export class PrismaUserRepository implements UserRepository {
 	async findById(id: UserId): Promise<User | null> {
 		const user = await this.prisma.user.findUnique({
 			where: { id: id.getValue() },
-			include: { role: true, account: true },
+			include: { role: true, account: true, sessions: true },
 		});
 
 		if (!user) return null;
@@ -37,7 +37,7 @@ export class PrismaUserRepository implements UserRepository {
 	async findByEmail(email: Email): Promise<User | null> {
 		const user = await this.prisma.user.findUnique({
 			where: { email: email.getValue() },
-			include: { role: true, account: true },
+			include: { role: true, account: true, sessions: true },
 		});
 
 		if (!user) return null;
@@ -47,7 +47,7 @@ export class PrismaUserRepository implements UserRepository {
 	async findByVerificationToken(verificationToken: string): Promise<User | null> {
 		const user = await this.prisma.user.findFirst({
 			where: { account: { verificationToken } },
-			include: { role: true, account: true },
+			include: { role: true, account: true, sessions: true },
 		});
 
 		if (!user) return null;
@@ -57,7 +57,7 @@ export class PrismaUserRepository implements UserRepository {
 	async findByResetToken(resetToken: string): Promise<User | null> {
 		const user = await this.prisma.user.findFirst({
 			where: { account: { resetToken } },
-			include: { role: true, account: true },
+			include: { role: true, account: true, sessions: true },
 		});
 
 		if (!user) return null;
@@ -71,7 +71,7 @@ export class PrismaUserRepository implements UserRepository {
 					scheduledForDeletionAt: { lte: date },
 				},
 			},
-			include: { role: true, account: true },
+			include: { role: true, account: true, sessions: true },
 		});
 
 		return users.map((user) => IamMapper.toDomain(user));
@@ -91,6 +91,27 @@ export class PrismaUserRepository implements UserRepository {
 	async save(user: User): Promise<void> {
 		if (!user.account) throw new Error("Cannot persist a new user without an account.");
 
+		const sessionUpserts = user.getSessions().map((session) => ({
+			where: { id: session.id.getValue() },
+			update: {
+				refreshTokenHash: session.getRefreshTokenHash(),
+				userAgent: session.userAgent,
+				ipAddress: session.ipAddress,
+				isRevoked: session.getIsRevoked(),
+				lastActiveAt: session.getLastActiveAt(),
+				expiresAt: session.expiresAt,
+			},
+			create: {
+				id: session.id.getValue(),
+				refreshTokenHash: session.getRefreshTokenHash(),
+				userAgent: session.userAgent,
+				ipAddress: session.ipAddress,
+				isRevoked: session.getIsRevoked(),
+				lastActiveAt: session.getLastActiveAt(),
+				expiresAt: session.expiresAt,
+			},
+		}));
+
 		await this.prisma.user.upsert({
 			where: { id: user.id.getValue() },
 			update: {
@@ -107,11 +128,13 @@ export class PrismaUserRepository implements UserRepository {
 						verificationTokenExpiresAt: user.account.getVerificationTokenExpiresAt(),
 						resetToken: user.account.getResetToken(),
 						resetTokenExpiresAt: user.account.getResetTokenExpiresAt(),
-						refreshTokenHash: user.account.getRefreshTokenHash(),
 						scheduledForDeletionAt: user.account.getScheduledForDeletionAt(),
 						failedLoginAttempts: user.account.getFailedLoginState().getCount(),
 						lockedUntil: user.account.getFailedLoginState().getLockedUntil(),
 					},
+				},
+				sessions: {
+					upsert: sessionUpserts,
 				},
 			},
 			create: {
@@ -127,10 +150,20 @@ export class PrismaUserRepository implements UserRepository {
 						passwordHash: user.account.getPasswordHash(),
 						verificationToken: user.account.getVerificationToken(),
 						verificationTokenExpiresAt: user.account.getVerificationTokenExpiresAt(),
-						refreshTokenHash: user.account.getRefreshTokenHash(),
 						failedLoginAttempts: user.account.getFailedLoginState().getCount(),
 						lockedUntil: user.account.getFailedLoginState().getLockedUntil(),
 					},
+				},
+				sessions: {
+					create: user.getSessions().map((session) => ({
+						id: session.id.getValue(),
+						refreshTokenHash: session.getRefreshTokenHash(),
+						userAgent: session.userAgent,
+						ipAddress: session.ipAddress,
+						isRevoked: session.getIsRevoked(),
+						lastActiveAt: session.getLastActiveAt(),
+						expiresAt: session.expiresAt,
+					})),
 				},
 			},
 		});

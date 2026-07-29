@@ -11,4 +11,8 @@ export class EnvAuthConfigAdapter implements AuthConfigPort {
 	public getPasswordResetTokenExpiration(): string {
 		return env.PASSWORD_RESET_TOKEN_EXPIRES_IN;
 	}
+
+	public getRefreshTokenExpiration(): string {
+		return env.JWT_REFRESH_EXPIRES_IN;
+	}
 }

@@ -12,9 +12,10 @@ import {
 	VerificationEmailResentDomainEvent,
 } from "../events";
 import { NoAccountFoundException, NoPendingEmailChangeException } from "../exceptions";
-import { AccountId, Email, UserId } from "../value-objects";
+import { AccountId, Email, SessionId, UserId } from "../value-objects";
 import { Account } from "./account.entity";
 import { Role } from "./role.entity";
+import { Session } from "./session.entity";
 
 export class User extends AggregateRoot {
 	constructor(
@@ -27,6 +28,7 @@ export class User extends AggregateRoot {
 		public image: string | null,
 		public readonly createdAt: Date,
 		public pendingEmail: string | null,
+		private sessions: Session[] = [],
 	) {
 		super();
 	}
@@ -89,11 +91,6 @@ export class User extends AggregateRoot {
 		this.addDomainEvent(
 			new PasswordResetRequestedDomainEvent(this.email.getValue(), token, tokenExpiresInMs),
 		);
-	}
-
-	public updateRefreshToken(hash: string | null): void {
-		if (!this.account) throw new NoAccountFoundException();
-		this.account.updateRefreshTokenHash(hash);
 	}
 
 	public changePassword(token: string, password: string): void {
@@ -169,5 +166,39 @@ export class User extends AggregateRoot {
 		this.account.cancelDeletion();
 
 		this.addDomainEvent(new UserAccountRestoredDomainEvent(this.email.getValue()));
+	}
+
+	//! Session Management Methods
+	public getSessions(): Session[] {
+		return this.sessions;
+	}
+
+	public getActiveSessions(): Session[] {
+		return this.sessions.filter((session) => session.isValid());
+	}
+
+	public addSession(session: Session): void {
+		this.sessions.push(session);
+	}
+
+	public revokeSession(sessionId: SessionId): void {
+		const session = this.sessions.find((s) => s.id.equals(sessionId));
+		if (session) {
+			session.revoke();
+		}
+	}
+
+	public revokeAllSessions(): void {
+		for (const session of this.sessions) {
+			session.revoke();
+		}
+	}
+
+	public revokeAllOtherSessions(currentSessionId: SessionId): void {
+		for (const session of this.sessions) {
+			if (!session.id.equals(currentSessionId)) {
+				session.revoke();
+			}
+		}
 	}
 }

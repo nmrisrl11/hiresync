@@ -3,12 +3,18 @@ import {
 	ChangePasswordUseCasePort,
 	ConfirmEmailChangeCommand,
 	ConfirmEmailChangeUseCasePort,
+	GetActiveSessionsQuery,
+	GetActiveSessionsUseCasePort,
 	GetUserByIdQuery,
 	GetUserByIdUseCasePort,
 	RemoveAvatarCommand,
 	RemoveAvatarUseCasePort,
 	RequestEmailChangeCommand,
 	RequestEmailChangeUseCasePort,
+	RevokeAllOtherSessionsCommand,
+	RevokeAllOtherSessionsUseCasePort,
+	RevokeSessionCommand,
+	RevokeSessionUseCasePort,
 	ScheduleAccountDeletionCommand,
 	ScheduleAccountDeletionUseCasePort,
 	UpdateAccountCommand,
@@ -57,6 +63,9 @@ export class AccountController {
 		private readonly uploadAvatarUseCase: UploadAvatarUseCasePort,
 		private readonly removeAvatarUseCase: RemoveAvatarUseCasePort,
 		private readonly scheduleAccountDeletionUseCase: ScheduleAccountDeletionUseCasePort,
+		private readonly getActiveSessionsUseCase: GetActiveSessionsUseCasePort,
+		private readonly revokeSessionUseCase: RevokeSessionUseCasePort,
+		private readonly revokeAllOtherSessionsUseCase: RevokeAllOtherSessionsUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -135,6 +144,7 @@ export class AccountController {
 			userPayload.sub,
 			dto.currentPassword,
 			dto.newPassword,
+			userPayload.sessionId,
 		);
 
 		await this.changePasswordUseCase.execute(command);
@@ -173,5 +183,32 @@ export class AccountController {
 		const command = new ScheduleAccountDeletionCommand(userPayload.sub);
 
 		await this.scheduleAccountDeletionUseCase.execute(command);
+	}
+
+	@Get("sessions")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Get all active login sessions for the current user." })
+	public async getSessions(@CurrentUser() userPayload: JwtPayload) {
+		const query = new GetActiveSessionsQuery(userPayload.sub);
+		return await this.getActiveSessionsUseCase.execute(query, userPayload.sessionId);
+	}
+
+	@Delete("sessions/others")
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiOperation({ summary: "Revoke all sessions except the current one." })
+	public async revokeOtherSessions(@CurrentUser() userPayload: JwtPayload): Promise<void> {
+		const command = new RevokeAllOtherSessionsCommand(userPayload.sub, userPayload.sessionId);
+		await this.revokeAllOtherSessionsUseCase.execute(command);
+	}
+
+	@Delete("sessions/:id")
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@ApiOperation({ summary: "Revoke a specific login session." })
+	public async revokeSession(
+		@CurrentUser() userPayload: JwtPayload,
+		@Param("id") targetSessionId: string,
+	): Promise<void> {
+		const command = new RevokeSessionCommand(userPayload.sub, targetSessionId);
+		await this.revokeSessionUseCase.execute(command);
 	}
 }

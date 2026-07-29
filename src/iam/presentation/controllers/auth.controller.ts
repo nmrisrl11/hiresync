@@ -28,6 +28,7 @@ import {
 	Controller,
 	HttpCode,
 	HttpStatus,
+	Ip,
 	Post,
 	Req,
 	Res,
@@ -88,8 +89,14 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Verify email address and auto login." })
-	public async verifyEmail(@Body() dto: VerifyEmailDto, @Res({ passthrough: true }) res: Response) {
-		const command = new VerifyEmailCommand(dto.token);
+	public async verifyEmail(
+		@Body() dto: VerifyEmailDto,
+		@Ip() ipAddress: string,
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		const userAgent = req.headers["user-agent"] || "Unknown Device";
+		const command = new VerifyEmailCommand(dto.token, userAgent, ipAddress);
 		const result = await this.verifyEmailUseCase.execute(command);
 
 		res.cookie("refresh_token", result.refreshToken, {
@@ -111,8 +118,14 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Login and receive access and refresh tokens." })
-	public async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
-		const command = new LoginCommand(dto.email, dto.password);
+	public async login(
+		@Body() dto: LoginDto,
+		@Ip() ipAddress: string,
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		const userAgent = req.headers["user-agent"] || "Unknown Device";
+		const command = new LoginCommand(dto.email, dto.password, userAgent, ipAddress);
 		const result = await this.loginUseCase.execute(command);
 
 		res.cookie("refresh_token", result.refreshToken, {
@@ -136,7 +149,7 @@ export class AuthController {
 		@CurrentUser() userPayload: JwtPayload,
 		@Res({ passthrough: true }) res: Response,
 	) {
-		const command = new LogoutCommand(userPayload.sub);
+		const command = new LogoutCommand(userPayload.sub, userPayload.sessionId);
 
 		await this.logoutUseCase.execute(command);
 
@@ -209,9 +222,12 @@ export class AuthController {
 	@ApiOperation({ summary: "Cancel a scheduled deletion and restore the account." })
 	public async restoreAccount(
 		@Body() dto: RestoreAccountDto,
+		@Ip() ipAddress: string,
+		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response,
 	) {
-		const command = new RestoreAccountCommand(dto.email, dto.password);
+		const userAgent = req.headers["user-agent"] || "Unknown Device";
+		const command = new RestoreAccountCommand(dto.email, dto.password, userAgent, ipAddress);
 		const result = await this.restoreAccountUseCase.execute(command);
 
 		res.cookie("refresh_token", result.refreshToken, {

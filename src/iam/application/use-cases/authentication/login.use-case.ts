@@ -1,5 +1,7 @@
+import { Session } from "@/iam/domain/entities";
 import { UserRepository } from "@/iam/domain/repositories";
-import { Email } from "@/iam/domain/value-objects";
+import { Email, SessionId } from "@/iam/domain/value-objects";
+import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 import {
 	AccountLockedException,
@@ -7,7 +9,12 @@ import {
 	InvalidLoginException,
 } from "../../exceptions";
 import { LoginCommand, LoginResult, LoginUseCasePort } from "../../ports/inbound/authentication";
-import { HashServicePort, JwtServicePort } from "../../ports/outbound";
+import {
+	AuthConfigPort,
+	HashServicePort,
+	JwtServicePort,
+	TimeFormatterPort,
+} from "../../ports/outbound";
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 Minutes
@@ -18,6 +25,9 @@ export class LoginUseCase implements LoginUseCasePort {
 		private readonly userRepository: UserRepository,
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
+		private readonly idGenerator: IdGeneratorPort,
+		private readonly authConfig: AuthConfigPort,
+		private readonly timeFormatter: TimeFormatterPort,
 	) {}
 
 	public async execute(command: LoginCommand): Promise<LoginResult> {
@@ -63,16 +73,35 @@ export class LoginUseCase implements LoginUseCasePort {
 			throw new InvalidLoginException("Please verify your email address before logging in.");
 		}
 
+		//! Generate session ID
+		const sessionIdStr = this.idGenerator.generateId();
+
 		//! Generate tokens and update session
 		const tokens = await this.jwtService.generateTokens({
 			sub: user.id.getValue(),
 			email: user.email.getValue(),
 			role: user.role.code.getValue(),
+			sessionId: sessionIdStr,
 		});
 
 		const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
-		user.updateRefreshToken(refreshTokenHash);
+		const expiresInEnv = this.authConfig.getRefreshTokenExpiration();
+		const expiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
+		const expiresAt = new Date(Date.now() + expiresInMs);
 
+		const session = new Session(
+			new SessionId(sessionIdStr),
+			user.id,
+			refreshTokenHash,
+			command.userAgent,
+			command.ipAddress,
+			false, // isRevoked
+			new Date(), // lastActiveAt
+			expiresAt,
+			new Date(), // createdAt
+		);
+
+		user.addSession(session);
 		await this.userRepository.save(user);
 
 		return {

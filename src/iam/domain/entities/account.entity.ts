@@ -14,7 +14,6 @@ export class Account {
 		private verificationTokenExpiresAt: Date | null,
 		private resetToken: string | null = null,
 		private resetTokenExpiresAt: Date | null = null,
-		private refreshTokenHash: string | null = null,
 		private scheduledForDeletionAt: Date | null = null,
 		private failedLoginState: FailedLoginState = new FailedLoginState(),
 	) {}
@@ -39,10 +38,6 @@ export class Account {
 		return this.resetTokenExpiresAt;
 	}
 
-	public getRefreshTokenHash(): string | null {
-		return this.refreshTokenHash;
-	}
-
 	public verify(token: string): void {
 		if (this.verificationToken !== token) throw new InvalidVerificationTokenException();
 
@@ -63,10 +58,6 @@ export class Account {
 	public updateResetToken(token: string, tokenExpiresInMs: number): void {
 		this.resetToken = token;
 		this.resetTokenExpiresAt = new Date(Date.now() + tokenExpiresInMs);
-	}
-
-	public updateRefreshTokenHash(hash: string | null): void {
-		this.refreshTokenHash = hash;
 	}
 
 	public updatePasswordHash(token: string, password: string) {
