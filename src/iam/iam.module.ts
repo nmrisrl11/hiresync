@@ -4,7 +4,6 @@ import {
 	ChangePasswordUseCasePort,
 	ConfirmEmailChangeUseCasePort,
 	DeleteAccountUseCasePort,
-	ExecuteHardDeletionUseCasePort,
 	GetActiveSessionsUseCasePort,
 	GetUserByIdUseCasePort,
 	RemoveAvatarUseCasePort,
@@ -24,6 +23,10 @@ import {
 	EnqueueFarewellEmailUseCasePort,
 	EnqueuePasswordChangedAlertUseCasePort,
 } from "./application/ports/inbound/account/notifications";
+import {
+	CleanExpiredSessionsUseCasePort,
+	ExecuteHardDeletionUseCasePort,
+} from "./application/ports/inbound/account/tasks";
 import {
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
@@ -57,7 +60,6 @@ import {
 	ChangePasswordUseCase,
 	ConfirmEmailChangeUseCase,
 	DeleteAccountUseCase,
-	ExecuteHardDeletionUseCase,
 	GetActiveSessionsUseCase,
 	GetUserByIdUseCase,
 	RemoveAvatarUseCase,
@@ -77,6 +79,10 @@ import {
 	EnqueueFarewellEmailUseCase,
 	EnqueuePasswordChangedAlertUseCase,
 } from "./application/use-cases/account/notifications";
+import {
+	CleanExpiredSessionsUseCase,
+	ExecuteHardDeletionUseCase,
+} from "./application/use-cases/account/tasks";
 import {
 	ForgotPasswordUseCase,
 	LoginUseCase,
@@ -118,7 +124,7 @@ import {
 	VerificationEmailResentListener,
 } from "./infrastructure/events/listeners";
 import { IamNotificationsModule } from "./infrastructure/notifications/iam-notifications.module";
-import { ExecutePendingDeletionsTask } from "./infrastructure/tasks/execute-pending-deletions.task";
+import { CleanExpiredSessionsTask, ExecutePendingDeletionsTask } from "./infrastructure/tasks";
 import { AccountController } from "./presentation/controllers/account.controller";
 import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
@@ -155,7 +161,6 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: UploadAvatarUseCasePort, useClass: UploadAvatarUseCase },
 		{ provide: RemoveAvatarUseCasePort, useClass: RemoveAvatarUseCase },
 		{ provide: ScheduleAccountDeletionUseCasePort, useClass: ScheduleAccountDeletionUseCase },
-		{ provide: ExecuteHardDeletionUseCasePort, useClass: ExecuteHardDeletionUseCase },
 		{ provide: GetActiveSessionsUseCasePort, useClass: GetActiveSessionsUseCase },
 		{ provide: RevokeSessionUseCasePort, useClass: RevokeSessionUseCase },
 		{ provide: RevokeAllOtherSessionsUseCasePort, useClass: RevokeAllOtherSessionsUseCase },
@@ -208,6 +213,9 @@ import { UserController } from "./presentation/controllers/user.controller";
 
 		//! Tasks
 		ExecutePendingDeletionsTask,
+		CleanExpiredSessionsTask,
+		{ provide: ExecuteHardDeletionUseCasePort, useClass: ExecuteHardDeletionUseCase },
+		{ provide: CleanExpiredSessionsUseCasePort, useClass: CleanExpiredSessionsUseCase },
 	],
 })
 export class IamModule {}

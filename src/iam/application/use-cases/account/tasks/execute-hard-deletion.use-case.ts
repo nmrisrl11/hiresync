@@ -1,9 +1,9 @@
+import { ExecuteHardDeletionUseCasePort } from "@/iam/application/ports/inbound/account/tasks";
 import { UserRepository } from "@/iam/domain/repositories";
 import { UserAccountDeletingIntegrationEvent } from "@/shared/events";
 import { DomainEventPublisherPort, IntegrationEventPublisherPort } from "@/shared/events/ports";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
-import { ExecuteHardDeletionUseCasePort } from "../../ports/inbound/account";
 
 @Injectable()
 export class ExecuteHardDeletionUseCase implements ExecuteHardDeletionUseCasePort {

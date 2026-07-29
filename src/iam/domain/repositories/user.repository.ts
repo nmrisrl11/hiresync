@@ -9,6 +9,7 @@ export abstract class UserRepository {
 	abstract findByVerificationToken(verificationToken: string): Promise<User | null>;
 	abstract findByResetToken(resetToken: string): Promise<User | null>;
 	abstract findPendingDeletions(date: Date): Promise<User[]>;
+	abstract deleteExpiredSessions(date: Date): Promise<number>;
 	abstract delete(id: UserId): Promise<void>;
 	abstract save(user: User): Promise<void>;
 }

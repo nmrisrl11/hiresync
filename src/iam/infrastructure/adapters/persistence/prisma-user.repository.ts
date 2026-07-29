@@ -77,6 +77,15 @@ export class PrismaUserRepository implements UserRepository {
 		return users.map((user) => IamMapper.toDomain(user));
 	}
 
+	async deleteExpiredSessions(date: Date): Promise<number> {
+		const result = await this.prisma.session.deleteMany({
+			where: {
+				expiresAt: { lte: date },
+			},
+		});
+		return result.count;
+	}
+
 	async delete(id: UserId): Promise<void> {
 		await this.prisma.$transaction([
 			this.prisma.account.deleteMany({
