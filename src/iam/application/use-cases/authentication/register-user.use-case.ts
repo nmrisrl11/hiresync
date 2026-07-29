@@ -15,7 +15,7 @@ import {
 	RegisterUserUseCasePort,
 } from "../../ports/inbound/authentication";
 import {
-	AuthConfigPort,
+	EnvConfigPort,
 	HashServicePort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
@@ -30,7 +30,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly verificationTokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
-		private readonly authConfig: AuthConfigPort,
+		private readonly envConfig: EnvConfigPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -50,7 +50,7 @@ export class RegisterUserUseCase implements RegisterUserUseCasePort {
 
 		const verificationToken = this.verificationTokenGenerator.generateHexToken(32);
 
-		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
+		const expiresInEnv = this.envConfig.getVerificationTokenExpiration();
 		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 
 		const newUser = User.createForRegistration(

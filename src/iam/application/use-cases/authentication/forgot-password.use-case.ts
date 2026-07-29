@@ -8,7 +8,7 @@ import {
 	ForgotPasswordUseCasePort,
 } from "../../ports/inbound/authentication";
 import {
-	AuthConfigPort,
+	EnvConfigPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../../ports/outbound";
@@ -19,7 +19,7 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 		private readonly userRepository: UserRepository,
 		private readonly tokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
-		private readonly authConfig: AuthConfigPort,
+		private readonly envConfig: EnvConfigPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -34,7 +34,7 @@ export class ForgotPasswordUseCase implements ForgotPasswordUseCasePort {
 
 		const resetToken = this.tokenGenerator.generateHexToken(32);
 
-		const expiresInEnv = this.authConfig.getPasswordResetTokenExpiration();
+		const expiresInEnv = this.envConfig.getPasswordResetTokenExpiration();
 		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 
 		user.setResetToken(resetToken, tokenExpiresInMs);
