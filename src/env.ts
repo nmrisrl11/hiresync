@@ -24,6 +24,10 @@ export const env = createEnv({
 		VERIFICATION_TOKEN_EXPIRES_IN: z.string().default("24h"),
 		PASSWORD_RESET_TOKEN_EXPIRES_IN: z.string().default("1h"),
 
+		GRACE_PERIOD_ACCOUNT_DELETION: z.string().default("14d"),
+		MAX_LOGIN_ATTEMPTS: z.coerce.number().default(5),
+		ACCOUNT_LOCKOUT_DURATION: z.string().default("15m"),
+
 		REDIS_URL: z.url().optional(),
 
 		RESEND_API_KEY: z.string().optional(),

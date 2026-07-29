@@ -7,13 +7,14 @@ import {
 	ScheduleAccountDeletionCommand,
 	ScheduleAccountDeletionUseCasePort,
 } from "../../ports/inbound/account";
-
-const GRACE_PERIOD_MS = 14 * 24 * 60 * 60 * 1000; //! 14 Days
+import { EnvConfigPort, TimeFormatterPort } from "../../ports/outbound";
 
 @Injectable()
 export class ScheduleAccountDeletionUseCase implements ScheduleAccountDeletionUseCasePort {
 	constructor(
 		private readonly userRepository: UserRepository,
+		private readonly envConfig: EnvConfigPort,
+		private readonly timeFormatter: TimeFormatterPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -23,7 +24,10 @@ export class ScheduleAccountDeletionUseCase implements ScheduleAccountDeletionUs
 
 		if (!user) throw new UserNotFoundException();
 
-		user.scheduleDeletion(GRACE_PERIOD_MS);
+		const gracePeriodInEnv = this.envConfig.getGracePeriodAccountDeletion();
+		const gracePeriodMs = this.timeFormatter.parseToMilliseconds(gracePeriodInEnv);
+
+		user.scheduleDeletion(gracePeriodMs);
 
 		await this.userRepository.save(user);
 

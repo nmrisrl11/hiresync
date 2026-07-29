@@ -10,14 +10,11 @@ import {
 } from "../../exceptions";
 import { LoginCommand, LoginResult, LoginUseCasePort } from "../../ports/inbound/authentication";
 import {
-	AuthConfigPort,
+	EnvConfigPort,
 	HashServicePort,
 	JwtServicePort,
 	TimeFormatterPort,
 } from "../../ports/outbound";
-
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 Minutes
 
 @Injectable()
 export class LoginUseCase implements LoginUseCasePort {
@@ -26,7 +23,7 @@ export class LoginUseCase implements LoginUseCasePort {
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
 		private readonly idGenerator: IdGeneratorPort,
-		private readonly authConfig: AuthConfigPort,
+		private readonly envConfig: EnvConfigPort,
 		private readonly timeFormatter: TimeFormatterPort,
 	) {}
 
@@ -50,7 +47,12 @@ export class LoginUseCase implements LoginUseCasePort {
 
 		if (!passwordMatch) {
 			//! Record the failed login attempt and save the user
-			user.account.handleFailedLogin(MAX_LOGIN_ATTEMPTS, LOCKOUT_DURATION_MS);
+			const maxLoginAttempts = this.envConfig.getMaxLoginAttempts();
+			const lockOutDurationInEnv = this.envConfig.getAccountLockoutDuration();
+			const lockOutDurationInMs = this.timeFormatter.parseToMilliseconds(lockOutDurationInEnv);
+
+			user.account.handleFailedLogin(maxLoginAttempts, lockOutDurationInMs);
+
 			await this.userRepository.save(user);
 			throw new InvalidLoginException();
 		}
@@ -85,7 +87,7 @@ export class LoginUseCase implements LoginUseCasePort {
 		});
 
 		const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
-		const expiresInEnv = this.authConfig.getRefreshTokenExpiration();
+		const expiresInEnv = this.envConfig.getRefreshTokenExpiration();
 		const expiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 		const expiresAt = new Date(Date.now() + expiresInMs);
 

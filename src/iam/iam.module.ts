@@ -48,7 +48,7 @@ import {
 	GetUsersUseCasePort,
 } from "./application/ports/inbound/users";
 import {
-	AuthConfigPort,
+	EnvConfigPort,
 	HashServicePort,
 	IamEmailQueuePort,
 	ImageStoragePort,
@@ -105,7 +105,7 @@ import {
 	BcryptHashAdapter,
 	BullMqIamEmailQueueAdapter,
 	CloudinaryImageStorageAdapter,
-	EnvAuthConfigAdapter,
+	EnvConfigAdapter,
 	MsTimeFormatterAdapter,
 	NestjsJwtAdapter,
 	NodeCryptoAdapter,
@@ -178,7 +178,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: VerificationTokenGeneratorPort, useClass: NodeCryptoAdapter },
 		{ provide: IamEmailQueuePort, useClass: BullMqIamEmailQueueAdapter },
 		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
-		{ provide: AuthConfigPort, useClass: EnvAuthConfigAdapter },
+		{ provide: EnvConfigPort, useClass: EnvConfigAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
 
 		//! Domain Event and Event Listeners

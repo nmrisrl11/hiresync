@@ -8,7 +8,7 @@ import {
 	RequestEmailChangeUseCasePort,
 } from "../../ports/inbound/account";
 import {
-	AuthConfigPort,
+	EnvConfigPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../../ports/outbound";
@@ -19,7 +19,7 @@ export class RequestEmailChangeUseCase implements RequestEmailChangeUseCasePort 
 		private readonly userRepository: UserRepository,
 		private readonly verificationTokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
-		private readonly authConfig: AuthConfigPort,
+		private readonly envConfig: EnvConfigPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -37,7 +37,7 @@ export class RequestEmailChangeUseCase implements RequestEmailChangeUseCasePort 
 		const verificationToken = this.verificationTokenGenerator.generateHexToken(32);
 
 		//! Generate new verification token expiration
-		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
+		const expiresInEnv = this.envConfig.getVerificationTokenExpiration();
 		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 
 		user.requestEmailChange(command.newEmail, verificationToken, tokenExpiresInMs);

@@ -11,7 +11,7 @@ import {
 	VerifyEmailUseCasePort,
 } from "../../ports/inbound/authentication";
 import {
-	AuthConfigPort,
+	EnvConfigPort,
 	HashServicePort,
 	JwtServicePort,
 	TimeFormatterPort,
@@ -24,7 +24,7 @@ export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
 		private readonly idGenerator: IdGeneratorPort,
-		private readonly authConfig: AuthConfigPort,
+		private readonly envConfig: EnvConfigPort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
@@ -46,7 +46,7 @@ export class VerifyEmailUseCase implements VerifyEmailUseCasePort {
 		});
 
 		const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
-		const expiresInEnv = this.authConfig.getRefreshTokenExpiration();
+		const expiresInEnv = this.envConfig.getRefreshTokenExpiration();
 		const expiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 
 		const session = new Session(

@@ -7,7 +7,7 @@ import { Injectable } from "@nestjs/common";
 import { InvalidLoginException } from "../../exceptions";
 import { RestoreAccountCommand, RestoreAccountUseCasePort } from "../../ports/inbound/account";
 import {
-	AuthConfigPort,
+	EnvConfigPort,
 	HashServicePort,
 	JwtServicePort,
 	TimeFormatterPort,
@@ -20,7 +20,7 @@ export class RestoreAccountUseCase implements RestoreAccountUseCasePort {
 		private readonly jwtService: JwtServicePort,
 		private readonly hashService: HashServicePort,
 		private readonly idGenerator: IdGeneratorPort,
-		private readonly authConfig: AuthConfigPort,
+		private readonly envConfig: EnvConfigPort,
 		private readonly timeFormatter: TimeFormatterPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
@@ -50,7 +50,7 @@ export class RestoreAccountUseCase implements RestoreAccountUseCasePort {
 		});
 
 		const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
-		const expiresInEnv = this.authConfig.getRefreshTokenExpiration();
+		const expiresInEnv = this.envConfig.getRefreshTokenExpiration();
 		const expiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 
 		const session = new Session(

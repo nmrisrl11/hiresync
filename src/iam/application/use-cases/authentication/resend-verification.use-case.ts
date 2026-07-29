@@ -8,7 +8,7 @@ import {
 	ResendVerificationUseCasePort,
 } from "../../ports/inbound/authentication";
 import {
-	AuthConfigPort,
+	EnvConfigPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "../../ports/outbound";
@@ -19,7 +19,7 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 		private readonly userRepository: UserRepository,
 		private readonly tokenGenerator: VerificationTokenGeneratorPort,
 		private readonly timeFormatter: TimeFormatterPort,
-		private readonly authConfig: AuthConfigPort,
+		private readonly envConfig: EnvConfigPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -36,7 +36,7 @@ export class ResendVerificationUsecase implements ResendVerificationUseCasePort 
 
 		const newVerificationToken = this.tokenGenerator.generateHexToken(32);
 
-		const expiresInEnv = this.authConfig.getVerificationTokenExpiration();
+		const expiresInEnv = this.envConfig.getVerificationTokenExpiration();
 		const tokenExpiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
 
 		user.refreshVerificationToken(newVerificationToken, tokenExpiresInMs);
