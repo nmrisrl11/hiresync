@@ -1,4 +1,4 @@
-import { ExecuteHardDeletionUseCasePort } from "@/iam/application/ports/inbound/account";
+import { ExecuteHardDeletionUseCasePort } from "@/iam/application/ports/inbound/account/tasks";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";

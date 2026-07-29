@@ -14,7 +14,7 @@ The task queries the database for any accounts where the `scheduledForDeletionAt
 **Location:** `src/iam/infrastructure/tasks/execute-pending-deletions.task.ts`
 
 ```typescript
-import { ExecuteHardDeletionUseCasePort } from "@/iam/application/ports/inbound/account";
+import { ExecuteHardDeletionUseCasePort } from "@/iam/application/ports/inbound/account/tasks";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
@@ -50,7 +50,7 @@ The Task service must be registered as a provider within the IAM module.
 **Location:** `src/iam/iam.module.ts`
 
 ```typescript
-import { ExecutePendingDeletionsTask } from "./infrastructure/tasks/execute-pending-deletions.task";
+import { ExecutePendingDeletionsTask } from "./infrastructure/tasks";
 
 @Module({
 	providers: [

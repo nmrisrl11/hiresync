@@ -161,6 +161,7 @@ Multi-Device Session Management
 - [x] Revoke specific session
 - [x] Revoke session when password is changed
 - [x] Revoke session when password is reset  
+- [x] Schedule task to clean expired sessions from the database
 
 Multi-Factor Authentication (MFA / 2FA)
   - Implement TOTP authentication using apps like Google Authenticator or Authy.
