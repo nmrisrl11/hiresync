@@ -27,4 +27,8 @@ export class EnvConfigAdapter implements EnvConfigPort {
 	public getAccountLockoutDuration(): string {
 		return env.ACCOUNT_LOCKOUT_DURATION;
 	}
+
+	public getMfaChallengeTokenExpiration(): string {
+		return env.MFA_CHALLENGE_TOKEN_EXPIRES_IN;
+	}
 }

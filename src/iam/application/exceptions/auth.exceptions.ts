@@ -43,3 +43,9 @@ export class AccountLockedException extends ApplicationBaseException {
 		);
 	}
 }
+
+export class InvalidMfaChallengeException extends ApplicationBaseException {
+	constructor(message = "Invalid or expired MFA challenge token.") {
+		super(message);
+	}
+}

@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { JwtServicePort, JwtTokens } from "@/iam/application/ports/outbound";
+import { JwtServicePort, JwtTokens, MfaChallengePayload } from "@/iam/application/ports/outbound";
 import { JwtPayload } from "@/shared/types";
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
@@ -28,6 +28,19 @@ export class NestjsJwtAdapter implements JwtServicePort {
 	public async verifyRefreshToken(token: string): Promise<JwtPayload> {
 		return await this.jwtService.verifyAsync<JwtPayload>(token, {
 			secret: env.JWT_REFRESH_SECRET,
+		});
+	}
+
+	public async signMfaChallengeToken(payload: MfaChallengePayload): Promise<string> {
+		return await this.jwtService.signAsync(payload, {
+			secret: env.JWT_ACCESS_SECRET,
+			expiresIn: env.MFA_CHALLENGE_TOKEN_EXPIRES_IN as StringValue,
+		});
+	}
+
+	public async verifyMfaChallengeToken(token: string): Promise<MfaChallengePayload> {
+		return await this.jwtService.verifyAsync<MfaChallengePayload>(token, {
+			secret: env.JWT_ACCESS_SECRET,
 		});
 	}
 }
