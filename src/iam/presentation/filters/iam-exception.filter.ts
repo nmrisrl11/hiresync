@@ -2,6 +2,7 @@ import {
 	AccountLockedException,
 	AccountPendingDeletionException,
 	InvalidLoginException,
+	InvalidMfaChallengeException,
 	InvalidPasswordException,
 	InvalidTokenException,
 	RoleNotFoundException,
@@ -78,6 +79,7 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 			case AccountLockedException:
 				return HttpStatus.TOO_MANY_REQUESTS;
 			case InvalidLoginException:
+			case InvalidMfaChallengeException:
 				return HttpStatus.UNAUTHORIZED;
 			case InvalidTokenException:
 			case RoleNotFoundException:

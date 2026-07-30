@@ -5,3 +5,6 @@ export * from "./resend-verification.dto";
 export * from "./verify-email.dto";
 export * from "./reset-password.dto";
 export * from "./restore-account.dto";
+export * from "./mfa-login.dto";
+export * from "./enable-mfa.dto";
+export * from "./disable-mfa.dto";

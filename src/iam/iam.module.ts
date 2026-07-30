@@ -36,6 +36,7 @@ import {
 	ForgotPasswordUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
+	MfaLoginUseCasePort,
 	RefreshTokenUseCasePort,
 	RegisterUserUseCasePort,
 	ResendVerificationUseCasePort,
@@ -99,6 +100,7 @@ import {
 	ForgotPasswordUseCase,
 	LoginUseCase,
 	LogoutUseCase,
+	MfaLoginUseCase,
 	RefreshTokenUseCase,
 	RegisterUserUseCase,
 	ResendVerificationUsecase,
@@ -163,6 +165,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: RefreshTokenUseCasePort, useClass: RefreshTokenUseCase },
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
 		{ provide: RestoreAccountUseCasePort, useClass: RestoreAccountUseCase },
+		{ provide: MfaLoginUseCasePort, useClass: MfaLoginUseCase },
 
 		/** Account **/
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },

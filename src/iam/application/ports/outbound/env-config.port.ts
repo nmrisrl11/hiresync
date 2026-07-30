@@ -5,4 +5,5 @@ export abstract class EnvConfigPort {
 	abstract getGracePeriodAccountDeletion(): string;
 	abstract getMaxLoginAttempts(): number;
 	abstract getAccountLockoutDuration(): string;
+	abstract getMfaChallengeTokenExpiration(): string;
 }

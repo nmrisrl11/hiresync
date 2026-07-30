@@ -75,6 +75,19 @@ export class LoginUseCase implements LoginUseCasePort {
 			throw new InvalidLoginException("Please verify your email address before logging in.");
 		}
 
+		//! Multi-factor Authentication Interception
+		if (user.isMfaEnabled()) {
+			await this.userRepository.save(user);
+
+			const mfaChallengeToken = await this.jwtService.signMfaChallengeToken({
+				sub: user.id.getValue(),
+				email: user.email.getValue(),
+				type: "MFA_CHALLENGE",
+			});
+
+			return { mfaRequired: true, mfaChallengeToken };
+		}
+
 		//! Generate session ID
 		const sessionIdStr = this.idGenerator.generateId();
 
@@ -107,6 +120,7 @@ export class LoginUseCase implements LoginUseCasePort {
 		await this.userRepository.save(user);
 
 		return {
+			mfaRequired: false,
 			accessToken: tokens.accessToken,
 			refreshToken: tokens.refreshToken,
 			user: {

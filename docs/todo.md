@@ -135,27 +135,27 @@
 
 ### IAM (Identity and Access Management) 
 
-Update Password (Authenticated)
+### Update Password (Authenticated)
 - [x] Allow logged-in users to change their password
 - [x] Validate old password hash before accepting a new password
 
-Update Email Address
+### Update Email Address
 - [x] Allow logged-in users to update their email address
 - [x] Validate old email address before accepting a new one
 - [x] Send verification email to the old email address before updating
 
-Account Deletion
+### Account Deletion
 - [x] User account deletion that permanently deletes the user's identity, invalidates all tokens, and scrubs associated account data.  
 - [x] 14 days before permanently deleting the account
 - [x] Background job to delete the account after the grace period
 
-Account Lockout (Brute Force Protection)
+### Account Lockout (Brute Force Protection)
 - [x] Track consecutive failed login attempts
 - [x] Lockout after consecutive failed login attempts (e.g., 5 consecutive failures)
 - [x] Locked until 15 minutes after consecutive failed login attempts
 - [x] Unlock account after successful login
 
-Multi-Device Session Management
+### Multi-Device Session Management
 - [x] Get active sessions
 - [x] Revoke all sessions
 - [x] Revoke specific session
@@ -165,8 +165,17 @@ Multi-Device Session Management
 - [ ] Detect unusual activity (new country, impossible travel, etc.)
 - [ ] Limit the number of active sessions per user
 
-Multi-Factor Authentication (MFA / 2FA)
-  - Implement TOTP authentication using apps like Google Authenticator or Authy.
+### Multi-Factor Authentication (MFA / 2FA)
+- [x] Implement TOTP authentication with Speakeasy
+- [x] Generating MFA secret key
+- [x] Generating QR code for MFA setup
+- [x] Generating of 10 backup codes when enabled
+- [x] Disabling of MFA
+- [x] Intercept Login flow when MFA is enabled
+- [x] Login with MFA
+    ### Email Notifications
+    - [ ] Send email when MFA is enabled
+    - [ ] Send email when MFA is disabled
 
 Manual OAuth Integration
   - Build custom authorization flows for Google, GitHub, Microsoft, etc., without relying on third-party UI libraries.

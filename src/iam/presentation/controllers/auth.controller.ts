@@ -10,6 +10,8 @@ import {
 	LoginUseCasePort,
 	LogoutCommand,
 	LogoutUseCasePort,
+	MfaLoginCommand,
+	MfaLoginUseCasePort,
 	RefreshTokenCommand,
 	RefreshTokenUseCasePort,
 	RegisterUserCommand,
@@ -43,6 +45,7 @@ import ms from "ms";
 import {
 	ForgotPasswordDto,
 	LoginDto,
+	MfaLoginDto,
 	RegisterDto,
 	ResendVerificationDto,
 	ResetPasswordDto,
@@ -66,6 +69,7 @@ export class AuthController {
 		private readonly resendVerificationUseCase: ResendVerificationUseCasePort,
 		private readonly refreshTokenUseCase: RefreshTokenUseCasePort,
 		private readonly restoreAccountUseCase: RestoreAccountUseCasePort,
+		private readonly mfaLoginUseCase: MfaLoginUseCasePort,
 	) {}
 
 	private readonly refreshCookieMaxAge = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
@@ -117,7 +121,9 @@ export class AuthController {
 	@Post("login")
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 5 } })
-	@ApiOperation({ summary: "Login and receive access and refresh tokens." })
+	@ApiOperation({
+		summary: "Login with credentials. Returns MFA challenge token if 2FA is enabled.",
+	})
 	public async login(
 		@Body() dto: LoginDto,
 		@Ip() ipAddress: string,
@@ -127,6 +133,45 @@ export class AuthController {
 		const userAgent = req.headers["user-agent"] || "Unknown Device";
 		const command = new LoginCommand(dto.email, dto.password, userAgent, ipAddress);
 		const result = await this.loginUseCase.execute(command);
+
+		//! If MFA is enabled, do NOT set the refresh cookie. Return the challenge token.
+		if (result.mfaRequired) {
+			return {
+				mfaRequired: true,
+				mfaChallengeToken: result.mfaChallengeToken,
+			};
+		}
+
+		res.cookie("refresh_token", result.refreshToken, {
+			httpOnly: true,
+			secure: this.isProduction,
+			sameSite: "lax",
+			maxAge: this.refreshCookieMaxAge,
+		});
+
+		return {
+			accessToken: result.accessToken,
+			user: result.user,
+		};
+	}
+
+	@Public()
+	@Post("login/mfa")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 5 } })
+	@ApiOperation({
+		summary: "Verify MFA code or recovery backup code and complete authentication.",
+	})
+	public async loginMfa(
+		@Body() dto: MfaLoginDto,
+		@Ip() ipAddress: string,
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		const userAgent = req.headers["user-agent"] || "Unknown Device";
+		const command = new MfaLoginCommand(dto.mfaChallengeToken, dto.code, userAgent, ipAddress);
+
+		const result = await this.mfaLoginUseCase.execute(command);
 
 		res.cookie("refresh_token", result.refreshToken, {
 			httpOnly: true,

@@ -8,9 +8,11 @@ export class LoginCommand {
 }
 
 export type LoginResult = {
-	accessToken: string;
-	refreshToken: string;
-	user: {
+	mfaRequired: boolean;
+	mfaChallengeToken?: string; //! Issued ONLY if mfaRequired === true
+	accessToken?: string; //! Issued ONLY if mfaRequired === false
+	refreshToken?: string; //! Issued ONLY if mfaRequired === false
+	user?: {
 		id: string;
 		email: string;
 		name: string;

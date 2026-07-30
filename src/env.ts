@@ -27,6 +27,7 @@ export const env = createEnv({
 		GRACE_PERIOD_ACCOUNT_DELETION: z.string().default("14d"),
 		MAX_LOGIN_ATTEMPTS: z.coerce.number().default(5),
 		ACCOUNT_LOCKOUT_DURATION: z.string().default("15m"),
+		MFA_CHALLENGE_TOKEN_EXPIRES_IN: z.string().default("5m"),
 
 		REDIS_URL: z.url().optional(),
 
