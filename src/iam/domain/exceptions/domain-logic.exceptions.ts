@@ -41,3 +41,27 @@ export class NoPendingEmailChangeException extends DomainBaseException {
 		super(message);
 	}
 }
+
+export class InvalidMfaConfigurationException extends DomainBaseException {
+	constructor(message = "Invalid MFA configuration state.") {
+		super(message);
+	}
+}
+
+export class InvalidMfaTokenException extends DomainBaseException {
+	constructor(message = "Invalid or expired MFA verification code.") {
+		super(message);
+	}
+}
+
+export class InvalidMfaRecoveryCodeException extends DomainBaseException {
+	constructor(message = "Invalid or already consumed backup recovery code.") {
+		super(message);
+	}
+}
+
+export class MfaNotEnabledException extends DomainBaseException {
+	constructor(message = "Multi-factor authentication is not enabled for this account.") {
+		super(message);
+	}
+}

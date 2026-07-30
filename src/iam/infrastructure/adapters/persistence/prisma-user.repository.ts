@@ -100,6 +100,8 @@ export class PrismaUserRepository implements UserRepository {
 	async save(user: User): Promise<void> {
 		if (!user.account) throw new Error("Cannot persist a new user without an account.");
 
+		const mfaConfiguration = user.account.getMfaConfiguration();
+
 		const sessionUpserts = user.getSessions().map((session) => ({
 			where: { id: session.id.getValue() },
 			update: {
@@ -140,6 +142,10 @@ export class PrismaUserRepository implements UserRepository {
 						scheduledForDeletionAt: user.account.getScheduledForDeletionAt(),
 						failedLoginAttempts: user.account.getFailedLoginState().getCount(),
 						lockedUntil: user.account.getFailedLoginState().getLockedUntil(),
+						isMfaEnabled: mfaConfiguration.getIsEnabled(),
+						mfaSecret: mfaConfiguration.getSecret(),
+						mfaPendingSecret: mfaConfiguration.getPendingSecret(),
+						mfaBackupCodes: mfaConfiguration.getBackupCodes(),
 					},
 				},
 				sessions: {
@@ -161,6 +167,10 @@ export class PrismaUserRepository implements UserRepository {
 						verificationTokenExpiresAt: user.account.getVerificationTokenExpiresAt(),
 						failedLoginAttempts: user.account.getFailedLoginState().getCount(),
 						lockedUntil: user.account.getFailedLoginState().getLockedUntil(),
+						isMfaEnabled: mfaConfiguration.getIsEnabled(),
+						mfaSecret: mfaConfiguration.getSecret(),
+						mfaPendingSecret: mfaConfiguration.getPendingSecret(),
+						mfaBackupCodes: mfaConfiguration.getBackupCodes(),
 					},
 				},
 				sessions: {

@@ -39,7 +39,16 @@ model Account {
     resetToken                 String?   @unique
     resetTokenExpiresAt        DateTime?
 
+    // MFA / 2FA Configuration
+    isMfaEnabled               Boolean   @default(false)
+    mfaSecret                  String?   // Base32 TOTP secret (live)
+    mfaPendingSecret           String?   // Temporary secret during enrollment/setup
+    mfaBackupCodes             String[]  // Hashed backup/recovery codes
+
+    // Scheduled Deletion
     scheduledForDeletionAt DateTime?
+
+    // Login Attempts and Lockout
     failedLoginAttempts    Int       @default(0)
     lockedUntil            DateTime?
 
