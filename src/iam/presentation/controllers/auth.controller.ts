@@ -75,6 +75,15 @@ export class AuthController {
 	private readonly refreshCookieMaxAge = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
 	private readonly isProduction = env.NODE_ENV === "production";
 
+	private setRefreshTokenCookie(res: Response, token: string): void {
+		res.cookie("refresh_token", token, {
+			httpOnly: true,
+			secure: this.isProduction,
+			sameSite: "lax",
+			maxAge: this.refreshCookieMaxAge,
+		});
+	}
+
 	@Public()
 	@Post("register")
 	@HttpCode(HttpStatus.CREATED)
@@ -103,12 +112,7 @@ export class AuthController {
 		const command = new VerifyEmailCommand(dto.token, userAgent, ipAddress);
 		const result = await this.verifyEmailUseCase.execute(command);
 
-		res.cookie("refresh_token", result.refreshToken, {
-			httpOnly: true,
-			secure: this.isProduction,
-			sameSite: "lax",
-			maxAge: this.refreshCookieMaxAge,
-		});
+		this.setRefreshTokenCookie(res, result.refreshToken);
 
 		return {
 			message: result.message,
@@ -142,12 +146,7 @@ export class AuthController {
 			};
 		}
 
-		res.cookie("refresh_token", result.refreshToken, {
-			httpOnly: true,
-			secure: this.isProduction,
-			sameSite: "lax",
-			maxAge: this.refreshCookieMaxAge,
-		});
+		this.setRefreshTokenCookie(res, result.refreshToken!);
 
 		return {
 			accessToken: result.accessToken,
@@ -173,12 +172,7 @@ export class AuthController {
 
 		const result = await this.mfaLoginUseCase.execute(command);
 
-		res.cookie("refresh_token", result.refreshToken, {
-			httpOnly: true,
-			secure: this.isProduction,
-			sameSite: "lax",
-			maxAge: this.refreshCookieMaxAge,
-		});
+		this.setRefreshTokenCookie(res, result.refreshToken);
 
 		return {
 			accessToken: result.accessToken,
@@ -219,12 +213,7 @@ export class AuthController {
 
 		const result = await this.refreshTokenUseCase.execute(command);
 
-		res.cookie("refresh_token", result.refreshToken, {
-			httpOnly: true,
-			secure: this.isProduction,
-			sameSite: "lax",
-			maxAge: this.refreshCookieMaxAge,
-		});
+		this.setRefreshTokenCookie(res, result.refreshToken);
 
 		return { accessToken: result.accessToken };
 	}
@@ -275,12 +264,7 @@ export class AuthController {
 		const command = new RestoreAccountCommand(dto.email, dto.password, userAgent, ipAddress);
 		const result = await this.restoreAccountUseCase.execute(command);
 
-		res.cookie("refresh_token", result.refreshToken, {
-			httpOnly: true,
-			secure: this.isProduction,
-			sameSite: "lax",
-			maxAge: this.refreshCookieMaxAge,
-		});
+		this.setRefreshTokenCookie(res, result.refreshToken);
 
 		return {
 			message: "Account successfully restored.",
