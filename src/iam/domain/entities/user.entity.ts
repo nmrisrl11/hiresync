@@ -7,6 +7,8 @@ import {
 	UserAccountRestoredDomainEvent,
 	UserEmailChangedDomainEvent,
 	UserEmailVerifiedDomainEvent,
+	UserMfaDisabledDomainEvent,
+	UserMfaEnabledDomainEvent,
 	UserPasswordChangedDomainEvent,
 	UserRegisteredDomainEvent,
 	VerificationEmailResentDomainEvent,
@@ -200,5 +202,35 @@ export class User extends AggregateRoot {
 				session.revoke();
 			}
 		}
+	}
+
+	//! MFA Methods
+	public isMfaEnabled(): boolean {
+		if (!this.account) throw new NoAccountFoundException();
+		return this.account.isMfaEnabled();
+	}
+
+	public initiateMfaSetup(pendingSecret: string): void {
+		if (!this.account) throw new NoAccountFoundException();
+		this.account.initiateMfaSetup(pendingSecret);
+	}
+
+	public enableMfa(hashedBackupCodes: string[]): void {
+		if (!this.account) throw new NoAccountFoundException();
+		this.account.enableMfa(hashedBackupCodes);
+
+		this.addDomainEvent(new UserMfaEnabledDomainEvent(this.email.getValue()));
+	}
+
+	public disableMfa(): void {
+		if (!this.account) throw new NoAccountFoundException();
+		this.account.disableMfa();
+
+		this.addDomainEvent(new UserMfaDisabledDomainEvent(this.email.getValue()));
+	}
+
+	public consumeMfaBackupCode(matchedHashedCode: string): void {
+		if (!this.account) throw new NoAccountFoundException();
+		this.account.consumeMfaBackupCode(matchedHashedCode);
 	}
 }

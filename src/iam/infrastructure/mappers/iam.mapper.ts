@@ -9,6 +9,7 @@ import {
 	AccountId,
 	Email,
 	FailedLoginState,
+	MfaConfiguration,
 	RoleCode,
 	RoleId,
 	SessionId,
@@ -29,6 +30,15 @@ export class IamMapper {
 			raw.role.description,
 		);
 
+		const mfaConfiguration = raw.account
+			? new MfaConfiguration(
+					raw.account.isMfaEnabled ?? false,
+					raw.account.mfaSecret ?? null,
+					raw.account.mfaPendingSecret ?? null,
+					raw.account.mfaBackupCodes ?? [],
+				)
+			: MfaConfiguration.empty();
+
 		const account = raw.account
 			? new Account(
 					new AccountId(raw.account.id),
@@ -39,6 +49,7 @@ export class IamMapper {
 					raw.account.resetTokenExpiresAt,
 					raw.account.scheduledForDeletionAt,
 					new FailedLoginState(raw.account.failedLoginAttempts, raw.account.lockedUntil),
+					mfaConfiguration,
 				)
 			: null;
 

@@ -16,6 +16,11 @@ import {
 	UploadAvatarUseCasePort,
 } from "./application/ports/inbound/account";
 import {
+	DisableMfaUseCasePort,
+	EnableMfaUseCasePort,
+	InitiateMfaSetupUseCasePort,
+} from "./application/ports/inbound/account/mfa";
+import {
 	EnqueueAccountDeletionScheduledEmailUseCasePort,
 	EnqueueAccountRestoredEmailUseCasePort,
 	EnqueueChangeEmailRequestUseCasePort,
@@ -48,11 +53,13 @@ import {
 	GetUsersUseCasePort,
 } from "./application/ports/inbound/users";
 import {
+	BackupCodesGeneratorPort,
 	EnvConfigPort,
 	HashServicePort,
 	IamEmailQueuePort,
 	ImageStoragePort,
 	JwtServicePort,
+	MfaServicePort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "./application/ports/outbound";
@@ -71,6 +78,11 @@ import {
 	UpdateAccountUseCase,
 	UploadAvatarUseCase,
 } from "./application/use-cases/account";
+import {
+	DisableMfaUseCase,
+	EnableMfaUseCase,
+	InitiateMfaSetupUseCase,
+} from "./application/use-cases/account/mfa";
 import {
 	EnqueueAccountDeletionScheduledEmailUseCase,
 	EnqueueAccountRestoredEmailUseCase,
@@ -109,6 +121,7 @@ import {
 	MsTimeFormatterAdapter,
 	NestjsJwtAdapter,
 	NodeCryptoAdapter,
+	SpeakeasyMfaAdapter,
 } from "./infrastructure/adapters";
 import { PrismaRoleRepository, PrismaUserRepository } from "./infrastructure/adapters/persistence";
 import {
@@ -164,6 +177,9 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: GetActiveSessionsUseCasePort, useClass: GetActiveSessionsUseCase },
 		{ provide: RevokeSessionUseCasePort, useClass: RevokeSessionUseCase },
 		{ provide: RevokeAllOtherSessionsUseCasePort, useClass: RevokeAllOtherSessionsUseCase },
+		{ provide: InitiateMfaSetupUseCasePort, useClass: InitiateMfaSetupUseCase },
+		{ provide: EnableMfaUseCasePort, useClass: EnableMfaUseCase },
+		{ provide: DisableMfaUseCasePort, useClass: DisableMfaUseCase },
 
 		/** Users **/
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },
@@ -176,10 +192,12 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: HashServicePort, useClass: BcryptHashAdapter },
 		{ provide: JwtServicePort, useClass: NestjsJwtAdapter },
 		{ provide: VerificationTokenGeneratorPort, useClass: NodeCryptoAdapter },
+		{ provide: BackupCodesGeneratorPort, useClass: NodeCryptoAdapter },
 		{ provide: IamEmailQueuePort, useClass: BullMqIamEmailQueueAdapter },
 		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
 		{ provide: EnvConfigPort, useClass: EnvConfigAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
+		{ provide: MfaServicePort, useClass: SpeakeasyMfaAdapter },
 
 		//! Domain Event and Event Listeners
 		EmailChangeRequestedListener,

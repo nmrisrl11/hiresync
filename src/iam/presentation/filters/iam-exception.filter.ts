@@ -13,8 +13,12 @@ import {
 	ExpiredResetTokenException,
 	ExpiredVerificationTokenException,
 	InvalidEmailFormatException,
+	InvalidMfaConfigurationException,
+	InvalidMfaRecoveryCodeException,
+	InvalidMfaTokenException,
 	InvalidResetTokenException,
 	InvalidVerificationTokenException,
+	MfaNotEnabledException,
 	NoAccountFoundException,
 	NoPendingEmailChangeException,
 } from "@/iam/domain/exceptions";
@@ -58,6 +62,12 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 				return HttpStatus.BAD_REQUEST;
 			case NoAccountFoundException:
 				return HttpStatus.NOT_FOUND;
+			case InvalidMfaConfigurationException:
+			case MfaNotEnabledException:
+				return HttpStatus.CONFLICT;
+			case InvalidMfaTokenException:
+			case InvalidMfaRecoveryCodeException:
+				return HttpStatus.UNAUTHORIZED;
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;
 		}

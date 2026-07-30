@@ -3,8 +3,9 @@ import {
 	ExpiredVerificationTokenException,
 	InvalidResetTokenException,
 	InvalidVerificationTokenException,
+	MfaNotEnabledException,
 } from "../exceptions";
-import { AccountId, FailedLoginState } from "../value-objects";
+import { AccountId, FailedLoginState, MfaConfiguration } from "../value-objects";
 
 export class Account {
 	constructor(
@@ -16,6 +17,7 @@ export class Account {
 		private resetTokenExpiresAt: Date | null = null,
 		private scheduledForDeletionAt: Date | null = null,
 		private failedLoginState: FailedLoginState = new FailedLoginState(),
+		private mfaConfiguration: MfaConfiguration = MfaConfiguration.empty(),
 	) {}
 
 	public getPasswordHash(): string {
@@ -110,5 +112,32 @@ export class Account {
 	public resetFailedLogins(): void {
 		if (this.failedLoginState.getCount() > 0 || this.failedLoginState.getLockedUntil() !== null)
 			this.failedLoginState = this.failedLoginState.reset();
+	}
+
+	//! MFA Methods
+	public getMfaConfiguration(): MfaConfiguration {
+		return this.mfaConfiguration;
+	}
+
+	public isMfaEnabled(): boolean {
+		return this.mfaConfiguration.getIsEnabled();
+	}
+
+	public initiateMfaSetup(pendingSecret: string): void {
+		this.mfaConfiguration = this.mfaConfiguration.initiateSetup(pendingSecret);
+	}
+
+	public enableMfa(hashedBackupCodes: string[]): void {
+		this.mfaConfiguration = this.mfaConfiguration.enable(hashedBackupCodes);
+	}
+
+	public disableMfa(): void {
+		if (!this.isMfaEnabled()) throw new MfaNotEnabledException();
+		this.mfaConfiguration = this.mfaConfiguration.disable();
+	}
+
+	public consumeMfaBackupCode(matchedHashedCode: string): void {
+		if (!this.isMfaEnabled()) throw new MfaNotEnabledException();
+		this.mfaConfiguration = this.mfaConfiguration.consumeBackupCode(matchedHashedCode);
 	}
 }

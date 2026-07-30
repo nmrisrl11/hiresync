@@ -5,3 +5,4 @@ export * from "./role-code.value-object";
 export * from "./account-id.value-object";
 export * from "./failed-login-state.value-object";
 export * from "./session-id.value-object";
+export * from "./mfa-configuration.value-object";
