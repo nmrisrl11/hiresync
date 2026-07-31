@@ -12,11 +12,7 @@ export class BullMqIamEmailQueueAdapter implements IamEmailQueuePort {
 		token: string,
 		expiresInText: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-verification",
-			{ email, token, expiresInText },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-verification", { email, token, expiresInText });
 	}
 
 	public async enqueuePasswordResetEmail(
@@ -24,11 +20,7 @@ export class BullMqIamEmailQueueAdapter implements IamEmailQueuePort {
 		token: string,
 		expiresInText: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-password-reset",
-			{ email, token, expiresInText },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-password-reset", { email, token, expiresInText });
 	}
 
 	public async enqueueChangeEmailRequestEmail(
@@ -36,77 +28,41 @@ export class BullMqIamEmailQueueAdapter implements IamEmailQueuePort {
 		token: string,
 		expiresInText: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-change-email",
-			{ email, token, expiresInText },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-change-email", { email, token, expiresInText });
 	}
 
 	public async enqueuePasswordChangedAlertEmail(email: string): Promise<void> {
-		await this.emailQueue.add(
-			"send-password-changed-alert",
-			{ email },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-password-changed-alert", { email });
 	}
 
 	public async enqueueEmailChangedAlertEmail(oldEmail: string, newEmail: string): Promise<void> {
-		await this.emailQueue.add(
-			"send-email-changed-alert",
-			{ oldEmail, newEmail },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-email-changed-alert", { oldEmail, newEmail });
 	}
 
 	public async enqueueWelcomeEmail(email: string): Promise<void> {
-		await this.emailQueue.add(
-			"send-welcome-email",
-			{ email },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-welcome-email", { email });
 	}
 
 	public async enqueueFarewellEmail(email: string): Promise<void> {
-		await this.emailQueue.add(
-			"send-farewell-email",
-			{ email },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-farewell-email", { email });
 	}
 
 	public async enqueueAccountDeletionScheduledEmail(
 		email: string,
 		scheduledDateIso: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-account-deletion-scheduled",
-			{ email, scheduledDateIso },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-account-deletion-scheduled", { email, scheduledDateIso });
 	}
 
 	public async enqueueAccountRestoredEmail(email: string): Promise<void> {
-		await this.emailQueue.add(
-			"send-account-restored",
-			{ email },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-account-restored", { email });
 	}
 
 	public async enqueueMfaEnabledAlertEmail(email: string): Promise<void> {
-		await this.emailQueue.add(
-			"send-mfa-enabled-alert",
-			{ email },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-mfa-enabled-alert", { email });
 	}
 
 	public async enqueueMfaDisabledAlertEmail(email: string): Promise<void> {
-		await this.emailQueue.add(
-			"send-mfa-disabled-alert",
-			{ email },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-mfa-disabled-alert", { email });
 	}
 }
