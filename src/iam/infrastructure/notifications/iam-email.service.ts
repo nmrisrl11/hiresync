@@ -1,76 +1,62 @@
-import { env } from "@/env";
 import { EmailProviderPort } from "@/shared/email/ports/email-provider.port";
+import { AppLinks } from "@/shared/utils/app-links";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class IamEmailService {
 	constructor(private readonly mailer: EmailProviderPort) {}
 
-	private readonly appUrl = env.APP_URL;
-
 	async sendVerificationEmail(email: string, token: string, expiresInText: string) {
-		const verificationUrl = `${this.appUrl}/api/auth/verify-email?token=${token}`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Verify your email address",
 			template: "iam/verify-email",
-			context: { verificationUrl, expiresInText },
+			context: { verificationUrl: AppLinks.iam.verifyEmail(token), expiresInText },
 		});
 	}
 
 	async sendPasswordResetEmail(email: string, token: string, expiresInText: string) {
-		const resetUrl = `${this.appUrl}/api/auth/reset-password?token=${token}`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Reset your password",
 			template: "iam/reset-password",
-			context: { resetUrl, expiresInText },
+			context: { resetUrl: AppLinks.iam.resetPassword(token), expiresInText },
 		});
 	}
 
 	async sendChangeEmailRequestEmail(email: string, token: string, expiresInText: string) {
-		const confirmEmailChangeUrl = `${this.appUrl}/api/account/change-email?token=${token}`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Change your email address",
 			template: "iam/change-email",
-			context: { confirmEmailChangeUrl, expiresInText },
+			context: { confirmEmailChangeUrl: AppLinks.iam.confirmEmailChange(token), expiresInText },
 		});
 	}
 
 	async sendPasswordChangedAlertEmail(email: string) {
-		const loginUrl = `${this.appUrl}/login`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Security Alert: Your password was changed",
 			template: "iam/password-changed-alert",
-			context: { loginUrl },
+			context: { loginUrl: AppLinks.iam.login },
 		});
 	}
 
 	async sendEmailChangedAlertEmail(oldEmail: string, newEmail: string) {
-		const supportUrl = `${this.appUrl}/support`;
-
 		await this.mailer.sendEmail({
 			to: oldEmail,
 			subject: "Security Alert: Your account email was changed",
 			template: "iam/email-changed-alert",
-			context: { newEmail, supportUrl },
+			context: { newEmail, supportUrl: AppLinks.iam.support },
 		});
 	}
 
 	async sendWelcomeEmail(email: string) {
-		const dashboardUrl = `${this.appUrl}/dashboard`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Welcome to our platform!",
 			template: "iam/welcome-email",
-			context: { dashboardUrl },
+			context: { dashboardUrl: AppLinks.iam.dashboard },
 		});
 	}
 
@@ -104,25 +90,23 @@ export class IamEmailService {
 	}
 
 	async sendMfaEnabledAlertEmail(email: string) {
-		const accountSettingsUrl = `${this.appUrl}/account/security`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Security Alert: Two-Factor Authentication Enabled",
 			template: "iam/mfa-enabled-alert",
-			context: { accountSettingsUrl },
+			context: { accountSettingsUrl: AppLinks.iam.accountSecurity },
 		});
 	}
 
 	async sendMfaDisabledAlertEmail(email: string) {
-		const accountSettingsUrl = `${this.appUrl}/account/security`;
-		const supportUrl = `${this.appUrl}/support`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Security Alert: Two-Factor Authentication Disabled",
 			template: "iam/mfa-disabled-alert",
-			context: { accountSettingsUrl, supportUrl },
+			context: {
+				accountSettingsUrl: AppLinks.iam.accountSecurity,
+				supportUrl: AppLinks.iam.support,
+			},
 		});
 	}
 }
