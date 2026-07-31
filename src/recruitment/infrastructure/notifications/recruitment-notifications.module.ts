@@ -9,7 +9,19 @@ import { RecruitmentEmailService } from "./recruitment-email.service";
 	imports: [
 		QueueModule,
 		EmailModule,
-		...(hasRedis ? [BullModule.registerQueue({ name: "recruitment-email" })] : []),
+		...(hasRedis
+			? [
+					BullModule.registerQueue({
+						name: "recruitment-email",
+						defaultJobOptions: {
+							attempts: 3,
+							backoff: { type: "exponential", delay: 2000 },
+							removeOnComplete: true,
+							removeOnFail: false,
+						},
+					}),
+				]
+			: []),
 	],
 	providers: [
 		RecruitmentEmailService,

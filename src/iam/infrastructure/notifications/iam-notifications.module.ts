@@ -9,7 +9,19 @@ import { IamEmailService } from "./iam-email.service";
 	imports: [
 		QueueModule,
 		EmailModule,
-		...(hasRedis ? [BullModule.registerQueue({ name: "iam-email" })] : []), //! Register a specific queue named "iam-email"
+		...(hasRedis
+			? [
+					BullModule.registerQueue({
+						name: "iam-email",
+						defaultJobOptions: {
+							attempts: 3,
+							backoff: { type: "exponential", delay: 2000 },
+							removeOnComplete: true,
+							removeOnFail: false,
+						},
+					}),
+				]
+			: []), //! Register a specific queue named "iam-email"
 	],
 	providers: [
 		IamEmailService,

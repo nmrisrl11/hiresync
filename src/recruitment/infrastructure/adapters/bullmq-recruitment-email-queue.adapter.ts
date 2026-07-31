@@ -8,22 +8,14 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 	constructor(@InjectQueue("recruitment-email") private readonly emailQueue: Queue) {}
 
 	public async enqueueEmployerWelcomeEmail(email: string, companyName: string): Promise<void> {
-		await this.emailQueue.add(
-			"send-employer-welcome",
-			{ email, companyName },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-employer-welcome", { email, companyName });
 	}
 	public async enqueueJobCreatedEmail(
 		email: string,
 		companyName: string,
 		jobTitle: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-job-created",
-			{ email, companyName, jobTitle },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-job-created", { email, companyName, jobTitle });
 	}
 
 	public async enqueueJobClosedEmail(
@@ -33,11 +25,7 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 		reason: string,
 	): Promise<void> {
 		console.log(email, companyName, jobTitle, reason);
-		await this.emailQueue.add(
-			"send-job-closed",
-			{ email, companyName, jobTitle, reason },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-job-closed", { email, companyName, jobTitle, reason });
 	}
 
 	public async enqueueApplicantWelcomeEmail(
@@ -45,11 +33,7 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 		firstName: string,
 		lastName: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-applicant-welcome",
-			{ email, firstName, lastName },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-applicant-welcome", { email, firstName, lastName });
 	}
 
 	public async enqueueApplicationSubmittedEmail(
@@ -58,11 +42,12 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 		jobTitle: string,
 		companyName: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-application-submitted",
-			{ email, applicantName, jobTitle, companyName },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-application-submitted", {
+			email,
+			applicantName,
+			jobTitle,
+			companyName,
+		});
 	}
 
 	public async enqueueApplicationReceivedEmail(
@@ -71,11 +56,12 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 		applicantName: string,
 		jobTitle: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-application-received",
-			{ email, companyName, applicantName, jobTitle },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-application-received", {
+			email,
+			companyName,
+			applicantName,
+			jobTitle,
+		});
 	}
 
 	public async enqueueApplicationStatusUpdatedEmail(
@@ -85,11 +71,13 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 		companyName: string,
 		newStatus: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-application-status-updated",
-			{ email, applicantName, jobTitle, companyName, newStatus },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-application-status-updated", {
+			email,
+			applicantName,
+			jobTitle,
+			companyName,
+			newStatus,
+		});
 	}
 
 	public async enqueueApplicationWithdrawnEmail(
@@ -98,10 +86,11 @@ export class BullMqRecruitmentEmailQueueAdapter implements RecruitmentEmailQueue
 		applicantName: string,
 		jobTitle: string,
 	): Promise<void> {
-		await this.emailQueue.add(
-			"send-application-withdrawn",
-			{ email, companyName, applicantName, jobTitle },
-			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
-		);
+		await this.emailQueue.add("send-application-withdrawn", {
+			email,
+			companyName,
+			applicantName,
+			jobTitle,
+		});
 	}
 }
