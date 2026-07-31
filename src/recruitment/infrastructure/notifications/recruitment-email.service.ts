@@ -1,21 +1,17 @@
-import { env } from "@/env";
 import { EmailProviderPort } from "@/shared/email/ports/email-provider.port";
+import { AppLinks } from "@/shared/utils/app-links";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class RecruitmentEmailService {
 	constructor(private readonly mailer: EmailProviderPort) {}
 
-	private readonly appUrl = env.APP_URL;
-
 	public async sendEmployerWelcomeEmail(email: string, companyName: string): Promise<void> {
-		const dashboardUrl = `${this.appUrl}/employer/dashboard`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Welcome to the Employer Portal!",
 			template: "recruitment/employer-welcome",
-			context: { dashboardUrl, companyName },
+			context: { dashboardUrl: AppLinks.recruitment.employerDashboard, companyName },
 		});
 	}
 
@@ -24,13 +20,11 @@ export class RecruitmentEmailService {
 		companyName: string,
 		jobTitle: string,
 	): Promise<void> {
-		const jobsUrl = `${this.appUrl}/employer/jobs`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: `Job Posted: ${jobTitle}`,
 			template: "recruitment/job-created",
-			context: { jobsUrl, companyName, jobTitle },
+			context: { jobsUrl: AppLinks.recruitment.employerJobs, companyName, jobTitle },
 		});
 	}
 
@@ -40,13 +34,11 @@ export class RecruitmentEmailService {
 		jobTitle: string,
 		reason: string,
 	): Promise<void> {
-		const jobsUrl = `${this.appUrl}/employer/jobs`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: `Job Closed: ${jobTitle}`,
 			template: "recruitment/job-closed",
-			context: { jobsUrl, companyName, jobTitle, reason },
+			context: { jobsUrl: AppLinks.recruitment.employerJobs, companyName, jobTitle, reason },
 		});
 	}
 
@@ -55,13 +47,11 @@ export class RecruitmentEmailService {
 		firstName: string,
 		lastName: string,
 	): Promise<void> {
-		const jobsUrl = `${this.appUrl}/jobs`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: "Welcome to your Applicant Profile!",
 			template: "recruitment/applicant-welcome",
-			context: { jobsUrl, firstName, lastName },
+			context: { jobsUrl: AppLinks.recruitment.applicantJobs, firstName, lastName },
 		});
 	}
 
@@ -71,13 +61,16 @@ export class RecruitmentEmailService {
 		jobTitle: string,
 		companyName: string,
 	): Promise<void> {
-		const applicationsUrl = `${this.appUrl}/applicant/applications`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: `Application Submitted: ${jobTitle} at ${companyName}`,
 			template: "recruitment/application-submitted",
-			context: { applicationsUrl, applicantName, jobTitle, companyName },
+			context: {
+				applicationsUrl: AppLinks.recruitment.applicantApplications,
+				applicantName,
+				jobTitle,
+				companyName,
+			},
 		});
 	}
 
@@ -87,13 +80,16 @@ export class RecruitmentEmailService {
 		applicantName: string,
 		jobTitle: string,
 	): Promise<void> {
-		const employerApplicationsUrl = `${this.appUrl}/employer/applications`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: `New Application Received for ${jobTitle}`,
 			template: "recruitment/application-received",
-			context: { employerApplicationsUrl, companyName, applicantName, jobTitle },
+			context: {
+				employerApplicationsUrl: AppLinks.recruitment.employerApplications,
+				companyName,
+				applicantName,
+				jobTitle,
+			},
 		});
 	}
 
@@ -104,13 +100,17 @@ export class RecruitmentEmailService {
 		companyName: string,
 		newStatus: string,
 	): Promise<void> {
-		const applicationsUrl = `${this.appUrl}/applicant/applications`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: `Application Update: ${jobTitle} at ${companyName}`,
 			template: "recruitment/application-status-updated",
-			context: { applicationsUrl, applicantName, jobTitle, companyName, newStatus },
+			context: {
+				applicationsUrl: AppLinks.recruitment.applicantApplications,
+				applicantName,
+				jobTitle,
+				companyName,
+				newStatus,
+			},
 		});
 	}
 
@@ -120,13 +120,16 @@ export class RecruitmentEmailService {
 		applicantName: string,
 		jobTitle: string,
 	): Promise<void> {
-		const employerApplicationsUrl = `${this.appUrl}/employer/applications`;
-
 		await this.mailer.sendEmail({
 			to: email,
 			subject: `Application Withdrawn: ${applicantName} for ${jobTitle}`,
 			template: "recruitment/application-withdrawn",
-			context: { employerApplicationsUrl, companyName, applicantName, jobTitle },
+			context: {
+				employerApplicationsUrl: AppLinks.recruitment.employerApplications,
+				companyName,
+				applicantName,
+				jobTitle,
+			},
 		});
 	}
 }
