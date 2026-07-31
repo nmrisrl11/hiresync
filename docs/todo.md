@@ -174,8 +174,8 @@
 - [x] Intercept Login flow when MFA is enabled
 - [x] Login with MFA
     ### Email Notifications
-    - [ ] Send email when MFA is enabled
-    - [ ] Send email when MFA is disabled
+    - [x] Send email when MFA is enabled
+    - [x] Send email when MFA is disabled
 
 Manual OAuth Integration
   - Build custom authorization flows for Google, GitHub, Microsoft, etc., without relying on third-party UI libraries.

@@ -4,3 +4,5 @@ export * from "./enqueue-farewell-email.use-case";
 export * from "./enqueue-password-changed-alert.use-case";
 export * from "./enqueue-account-deletion-scheduled-email.use-case";
 export * from "./enqueue-account-restored-email.use-case";
+export * from "./enqueue-mfa-enabled-alert-email.use-case";
+export * from "./enqueue-mfa-disabled-alert-email.use-case";

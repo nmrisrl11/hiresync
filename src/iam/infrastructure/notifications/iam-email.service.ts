@@ -102,4 +102,27 @@ export class IamEmailService {
 			context: {},
 		});
 	}
+
+	async sendMfaEnabledAlertEmail(email: string) {
+		const accountSettingsUrl = `${this.appUrl}/account/security`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: "Security Alert: Two-Factor Authentication Enabled",
+			template: "iam/mfa-enabled-alert",
+			context: { accountSettingsUrl },
+		});
+	}
+
+	async sendMfaDisabledAlertEmail(email: string) {
+		const accountSettingsUrl = `${this.appUrl}/account/security`;
+		const supportUrl = `${this.appUrl}/support`;
+
+		await this.mailer.sendEmail({
+			to: email,
+			subject: "Security Alert: Two-Factor Authentication Disabled",
+			template: "iam/mfa-disabled-alert",
+			context: { accountSettingsUrl, supportUrl },
+		});
+	}
 }

@@ -31,4 +31,8 @@ export abstract class IamEmailQueuePort {
 	): Promise<void>;
 
 	abstract enqueueAccountRestoredEmail(email: string): Promise<void>;
+
+	abstract enqueueMfaEnabledAlertEmail(email: string): Promise<void>;
+
+	abstract enqueueMfaDisabledAlertEmail(email: string): Promise<void>;
 }

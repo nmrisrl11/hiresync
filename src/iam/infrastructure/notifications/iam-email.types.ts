@@ -44,6 +44,14 @@ export const AccountRestoredEmailSchema = z.object({
 	email: z.email().trim(),
 });
 
+export const MfaEnabledAlertSchema = z.object({
+	email: z.email().trim(),
+});
+
+export const MfaDisabledAlertSchema = z.object({
+	email: z.email().trim(),
+});
+
 export type IamEmailJobPayload =
 	| z.infer<typeof SendVerificationSchema>
 	| z.infer<typeof SendPasswordResetSchema>
@@ -53,4 +61,6 @@ export type IamEmailJobPayload =
 	| z.infer<typeof WelcomeEmailSchema>
 	| z.infer<typeof FarewellEmailSchema>
 	| z.infer<typeof AccountDeletionScheduledEmailSchema>
-	| z.infer<typeof AccountRestoredEmailSchema>;
+	| z.infer<typeof AccountRestoredEmailSchema>
+	| z.infer<typeof MfaEnabledAlertSchema>
+	| z.infer<typeof MfaDisabledAlertSchema>;

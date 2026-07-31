@@ -8,6 +8,8 @@ import {
 	EmailChangedAlertSchema,
 	FarewellEmailSchema,
 	IamEmailJobPayload,
+	MfaDisabledAlertSchema,
+	MfaEnabledAlertSchema,
 	PasswordChangedAlertSchema,
 	SendChangeEmailRequestSchema,
 	SendPasswordResetSchema,
@@ -88,6 +90,16 @@ export class IamEmailProcessor extends WorkerHost {
 				case "send-account-restored": {
 					const payload = AccountRestoredEmailSchema.parse(job.data);
 					await this.emailService.sendAccountRestoredEmail(payload.email);
+					break;
+				}
+				case "send-mfa-enabled-alert": {
+					const payload = MfaEnabledAlertSchema.parse(job.data);
+					await this.emailService.sendMfaEnabledAlertEmail(payload.email);
+					break;
+				}
+				case "send-mfa-disabled-alert": {
+					const payload = MfaDisabledAlertSchema.parse(job.data);
+					await this.emailService.sendMfaDisabledAlertEmail(payload.email);
 					break;
 				}
 				default:

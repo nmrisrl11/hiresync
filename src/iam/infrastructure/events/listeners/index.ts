@@ -8,3 +8,5 @@ export * from "./user-registered.listener";
 export * from "./verification-email-resent.listener";
 export * from "./user-account-deletion-scheduled.listener";
 export * from "./user-account-restored.listener";
+export * from "./user-mfa-enabled.listener";
+export * from "./user-mfa-disabled.listener";
