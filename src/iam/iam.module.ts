@@ -26,6 +26,8 @@ import {
 	EnqueueChangeEmailRequestUseCasePort,
 	EnqueueEmailChangedAlertUseCasePort,
 	EnqueueFarewellEmailUseCasePort,
+	EnqueueMfaDisabledAlertEmailUseCasePort,
+	EnqueueMfaEnabledAlertEmailUseCasePort,
 	EnqueuePasswordChangedAlertUseCasePort,
 } from "./application/ports/inbound/account/notifications";
 import {
@@ -90,6 +92,8 @@ import {
 	EnqueueChangeEmailRequestUseCase,
 	EnqueueEmailChangedAlertUseCase,
 	EnqueueFarewellEmailUseCase,
+	EnqueueMfaDisabledAlertEmailUseCase,
+	EnqueueMfaEnabledAlertEmailUseCase,
 	EnqueuePasswordChangedAlertUseCase,
 } from "./application/use-cases/account/notifications";
 import {
@@ -134,6 +138,8 @@ import {
 	UserAccountRestoredListener,
 	UserEmailChangedListener,
 	UserEmailVerifiedListener,
+	UserMfaDisabledListener,
+	UserMfaEnabledListener,
 	UserPasswordChangedListener,
 	UserRegisteredListener,
 	VerificationEmailResentListener,
@@ -213,6 +219,8 @@ import { UserController } from "./presentation/controllers/user.controller";
 		UserRegisteredListener,
 		UserAccountDeletionScheduledListener,
 		UserAccountRestoredListener,
+		UserMfaEnabledListener,
+		UserMfaDisabledListener,
 		{ provide: EnqueueVerificationEmailUseCasePort, useClass: EnqueueVerificationEmailUseCase },
 		{ provide: EnqueuePasswordResetEmailUseCasePort, useClass: EnqueuePasswordResetEmailUseCase },
 		{ provide: EnqueueChangeEmailRequestUseCasePort, useClass: EnqueueChangeEmailRequestUseCase },
@@ -230,6 +238,14 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{
 			provide: EnqueueAccountRestoredEmailUseCasePort,
 			useClass: EnqueueAccountRestoredEmailUseCase,
+		},
+		{
+			provide: EnqueueMfaEnabledAlertEmailUseCasePort,
+			useClass: EnqueueMfaEnabledAlertEmailUseCase,
+		},
+		{
+			provide: EnqueueMfaDisabledAlertEmailUseCasePort,
+			useClass: EnqueueMfaDisabledAlertEmailUseCase,
 		},
 
 		//! Tasks

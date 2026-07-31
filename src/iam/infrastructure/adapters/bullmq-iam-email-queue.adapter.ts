@@ -93,4 +93,20 @@ export class BullMqIamEmailQueueAdapter implements IamEmailQueuePort {
 			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
 		);
 	}
+
+	public async enqueueMfaEnabledAlertEmail(email: string): Promise<void> {
+		await this.emailQueue.add(
+			"send-mfa-enabled-alert",
+			{ email },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
+
+	public async enqueueMfaDisabledAlertEmail(email: string): Promise<void> {
+		await this.emailQueue.add(
+			"send-mfa-disabled-alert",
+			{ email },
+			{ attempts: 3, backoff: { type: "exponential", delay: 2000 } },
+		);
+	}
 }
