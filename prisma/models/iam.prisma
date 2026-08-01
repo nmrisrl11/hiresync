@@ -14,6 +14,7 @@ model User {
     role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict)
 
     account          Account? // 1:1 relationship with Account
+    oauthAccounts    OAuthAccount[] // 1:N relationship for linked social logins
     sessions         Session[] // 1:N relationship with Session
     employerProfile  EmployerProfile? // 1:1 relationship with EmployerProfile
     applicantProfile ApplicantProfile? // 1:1 relationship with ApplicantProfile
@@ -33,24 +34,24 @@ model Account {
     // Cascade delete: If a User is deleted, their Auth Account is destroyed automatically
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    passwordHash               String
+    passwordHash               String?
     verificationToken          String?   @unique
     verificationTokenExpiresAt DateTime?
     resetToken                 String?   @unique
     resetTokenExpiresAt        DateTime?
 
     // MFA / 2FA Configuration
-    isMfaEnabled               Boolean   @default(false)
-    mfaSecret                  String?   // Base32 TOTP secret (live)
-    mfaPendingSecret           String?   // Temporary secret during enrollment/setup
-    mfaBackupCodes             String[]  // Hashed backup/recovery codes
+    isMfaEnabled     Boolean  @default(false)
+    mfaSecret        String? // Base32 TOTP secret (live)
+    mfaPendingSecret String? // Temporary secret during enrollment/setup
+    mfaBackupCodes   String[] // Hashed backup/recovery codes
 
     // Scheduled Deletion
     scheduledForDeletionAt DateTime?
 
     // Login Attempts and Lockout
-    failedLoginAttempts    Int       @default(0)
-    lockedUntil            DateTime?
+    failedLoginAttempts Int       @default(0)
+    lockedUntil         DateTime?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -90,4 +91,20 @@ model Role {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+// ------------------------------------------------------
+// OAUTH_ACCOUNT TABLE: Linked Social Providers
+// ------------------------------------------------------
+model OAuthAccount {
+    id     String @id @default(uuid())
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    provider          String // e.g., "GOOGLE", "GITHUB", "MICROSOFT"
+    providerAccountId String // The unique ID returned by the social provider (e.g., Google Sub ID)
+
+    // Ensure a social account ID from a specific provider can only be linked to ONE user
+    @@unique([provider, providerAccountId])
+    @@index([userId])
 }
