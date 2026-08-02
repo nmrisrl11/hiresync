@@ -1,5 +1,6 @@
 import { User } from "@/iam/domain/entities";
 import { UserRepository } from "@/iam/domain/repositories";
+import { OAuthProviderType } from "@/iam/domain/types";
 import { Email, UserId } from "@/iam/domain/value-objects";
 import { PrismaService } from "@/shared/database/prisma.service";
 import { Injectable } from "@nestjs/common";
@@ -14,7 +15,7 @@ export class PrismaUserRepository implements UserRepository {
 			take: limit,
 			skip: offset,
 			orderBy: { createdAt: "desc" },
-			include: { role: true, account: true, sessions: true },
+			include: { role: true, account: true, sessions: true, oauthAccounts: true },
 		});
 
 		return users.map((user) => IamMapper.toDomain(user));
@@ -27,7 +28,7 @@ export class PrismaUserRepository implements UserRepository {
 	async findById(id: UserId): Promise<User | null> {
 		const user = await this.prisma.user.findUnique({
 			where: { id: id.getValue() },
-			include: { role: true, account: true, sessions: true },
+			include: { role: true, account: true, sessions: true, oauthAccounts: true },
 		});
 
 		if (!user) return null;
@@ -37,7 +38,7 @@ export class PrismaUserRepository implements UserRepository {
 	async findByEmail(email: Email): Promise<User | null> {
 		const user = await this.prisma.user.findUnique({
 			where: { email: email.getValue() },
-			include: { role: true, account: true, sessions: true },
+			include: { role: true, account: true, sessions: true, oauthAccounts: true },
 		});
 
 		if (!user) return null;
@@ -47,7 +48,7 @@ export class PrismaUserRepository implements UserRepository {
 	async findByVerificationToken(verificationToken: string): Promise<User | null> {
 		const user = await this.prisma.user.findFirst({
 			where: { account: { verificationToken } },
-			include: { role: true, account: true, sessions: true },
+			include: { role: true, account: true, sessions: true, oauthAccounts: true },
 		});
 
 		if (!user) return null;
@@ -57,7 +58,7 @@ export class PrismaUserRepository implements UserRepository {
 	async findByResetToken(resetToken: string): Promise<User | null> {
 		const user = await this.prisma.user.findFirst({
 			where: { account: { resetToken } },
-			include: { role: true, account: true, sessions: true },
+			include: { role: true, account: true, sessions: true, oauthAccounts: true },
 		});
 
 		if (!user) return null;
@@ -71,10 +72,27 @@ export class PrismaUserRepository implements UserRepository {
 					scheduledForDeletionAt: { lte: date },
 				},
 			},
-			include: { role: true, account: true, sessions: true },
+			include: { role: true, account: true, sessions: true, oauthAccounts: true },
 		});
 
 		return users.map((user) => IamMapper.toDomain(user));
+	}
+
+	async findByOAuth(provider: OAuthProviderType, providerAccountId: string): Promise<User | null> {
+		const user = await this.prisma.user.findFirst({
+			where: {
+				oauthAccounts: {
+					some: {
+						provider,
+						providerAccountId,
+					},
+				},
+			},
+			include: { role: true, account: true, sessions: true, oauthAccounts: true },
+		});
+
+		if (!user) return null;
+		return IamMapper.toDomain(user);
 	}
 
 	async deleteExpiredSessions(date: Date): Promise<number> {
@@ -102,6 +120,7 @@ export class PrismaUserRepository implements UserRepository {
 
 		const mfaConfiguration = user.account.getMfaConfiguration();
 
+		//! Prepare Session Upserts
 		const sessionUpserts = user.getSessions().map((session) => ({
 			where: { id: session.id.getValue() },
 			update: {
@@ -120,6 +139,20 @@ export class PrismaUserRepository implements UserRepository {
 				isRevoked: session.getIsRevoked(),
 				lastActiveAt: session.getLastActiveAt(),
 				expiresAt: session.expiresAt,
+			},
+		}));
+
+		//! Prepare OAuth Account Upserts
+		const oauthAccountUpserts = user.getOAuthAccounts().map((oa) => ({
+			where: { id: oa.id.getValue() },
+			update: {
+				provider: oa.getProviderValue(),
+				providerAccountId: oa.getProviderAccountId(),
+			},
+			create: {
+				id: oa.id.getValue(),
+				provider: oa.getProviderValue(),
+				providerAccountId: oa.getProviderAccountId(),
 			},
 		}));
 
@@ -148,9 +181,8 @@ export class PrismaUserRepository implements UserRepository {
 						mfaBackupCodes: mfaConfiguration.getBackupCodes(),
 					},
 				},
-				sessions: {
-					upsert: sessionUpserts,
-				},
+				sessions: { upsert: sessionUpserts },
+				oauthAccounts: { upsert: oauthAccountUpserts },
 			},
 			create: {
 				id: user.id.getValue(),
@@ -182,6 +214,13 @@ export class PrismaUserRepository implements UserRepository {
 						isRevoked: session.getIsRevoked(),
 						lastActiveAt: session.getLastActiveAt(),
 						expiresAt: session.expiresAt,
+					})),
+				},
+				oauthAccounts: {
+					create: user.getOAuthAccounts().map((oa) => ({
+						id: oa.id.getValue(),
+						provider: oa.getProviderValue(),
+						providerAccountId: oa.getProviderAccountId(),
 					})),
 				},
 			},

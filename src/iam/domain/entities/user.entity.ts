@@ -14,8 +14,10 @@ import {
 	VerificationEmailResentDomainEvent,
 } from "../events";
 import { NoAccountFoundException, NoPendingEmailChangeException } from "../exceptions";
+import { OAuthProviderType } from "../types";
 import { AccountId, Email, SessionId, UserId } from "../value-objects";
 import { Account } from "./account.entity";
+import { OAuthAccount } from "./oauth-account.entity";
 import { Role } from "./role.entity";
 import { Session } from "./session.entity";
 
@@ -31,6 +33,7 @@ export class User extends AggregateRoot {
 		public readonly createdAt: Date,
 		public pendingEmail: string | null,
 		private sessions: Session[] = [],
+		private oauthAccounts: OAuthAccount[] = [],
 	) {
 		super();
 	}
@@ -232,5 +235,74 @@ export class User extends AggregateRoot {
 	public consumeMfaBackupCode(matchedHashedCode: string): void {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.consumeMfaBackupCode(matchedHashedCode);
+	}
+
+	//! OAuth Methods
+
+	//! Factory method for OAuth-first user registration (auto-verified, no password)
+	public static createForOAuthRegistration(
+		id: string,
+		accountId: string,
+		emailString: string,
+		name: string,
+		image: string | null,
+		role: Role,
+		oauthAccount: OAuthAccount,
+	): User {
+		const idVo = new UserId(id);
+		const accountIdVo = new AccountId(accountId);
+		const emailVo = new Email(emailString);
+
+		//! Create an empty Account with null password and tokens since OAuth verifies email automatically
+		const account = new Account(accountIdVo, null, null, null);
+
+		const createdAt = new Date();
+
+		const user = new User(
+			idVo,
+			emailVo,
+			name,
+			true, // Social provider emails are pre-verified
+			role,
+			account,
+			image,
+			createdAt,
+			null,
+			[],
+			[oauthAccount],
+		);
+
+		return user;
+	}
+
+	public getOAuthAccounts(): OAuthAccount[] {
+		return [...this.oauthAccounts];
+	}
+
+	public hasOAuthProvider(providerType: OAuthProviderType): boolean {
+		return this.oauthAccounts.some((oauth) => oauth.getProviderValue() === providerType);
+	}
+
+	public linkOAuthAccount(oauthAccount: OAuthAccount): void {
+		const alreadyLinked = this.oauthAccounts.some((existing) =>
+			existing.matches(oauthAccount.getProvider(), oauthAccount.getProviderAccountId()),
+		);
+
+		if (!alreadyLinked) {
+			this.oauthAccounts.push(oauthAccount);
+		}
+	}
+
+	public unlinkOAuthProvider(providerType: OAuthProviderType): void {
+		const hasPassword = this.account !== null && this.account.hasPassword();
+		const remainingProviders = this.oauthAccounts.filter(
+			(oauth) => oauth.getProviderValue() !== providerType,
+		);
+
+		if (!hasPassword && remainingProviders.length === 0) {
+			throw new Error("Cannot unlink the only authentication method on this account.");
+		}
+
+		this.oauthAccounts = remainingProviders;
 	}
 }

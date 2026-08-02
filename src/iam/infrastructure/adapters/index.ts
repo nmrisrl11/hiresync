@@ -6,3 +6,4 @@ export * from "./ms-time-formatter.adapter";
 export * from "./nestjs-jwt.adapter";
 export * from "./node-crypto.adapter";
 export * from "./speakeasy-mfa.adapter";
+export * from "./manual-oauth.adapter";

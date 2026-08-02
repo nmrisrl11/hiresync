@@ -1,15 +1,19 @@
 import {
 	Account as PrismaAccount,
+	OAuthAccount as PrismaOAuthAccount,
 	Role as PrismaRole,
 	Session as PrismaSession,
 	User as PrismaUser,
 } from "@/generated/prisma/client";
-import { Account, Role, Session, User } from "@/iam/domain/entities";
+import { Account, OAuthAccount, Role, Session, User } from "@/iam/domain/entities";
+import { OAuthProviderType } from "@/iam/domain/types";
 import {
 	AccountId,
 	Email,
 	FailedLoginState,
 	MfaConfiguration,
+	OAuthAccountId,
+	OAuthProvider,
 	RoleCode,
 	RoleId,
 	SessionId,
@@ -20,6 +24,7 @@ type PrismaUserWithRelations = PrismaUser & {
 	role: PrismaRole;
 	account: PrismaAccount | null;
 	sessions: PrismaSession[];
+	oauthAccounts: PrismaOAuthAccount[];
 };
 
 export class IamMapper {
@@ -70,6 +75,18 @@ export class IamMapper {
 				)
 			: [];
 
+		const oauthAccounts = Array.isArray(raw.oauthAccounts)
+			? raw.oauthAccounts.map(
+					(oa) =>
+						new OAuthAccount(
+							new OAuthAccountId(oa.id),
+							new UserId(oa.userId),
+							new OAuthProvider(oa.provider as OAuthProviderType),
+							oa.providerAccountId,
+						),
+				)
+			: [];
+
 		return new User(
 			new UserId(raw.id),
 			new Email(raw.email),
@@ -81,6 +98,7 @@ export class IamMapper {
 			raw.createdAt,
 			raw.pendingEmail,
 			sessions,
+			oauthAccounts,
 		);
 	}
 }

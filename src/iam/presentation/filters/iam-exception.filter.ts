@@ -1,10 +1,12 @@
 import {
 	AccountLockedException,
 	AccountPendingDeletionException,
+	DefaultRoleMissingException,
 	InvalidLoginException,
 	InvalidMfaChallengeException,
 	InvalidPasswordException,
 	InvalidTokenException,
+	OAuthEmailNotProvidedException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
@@ -17,6 +19,7 @@ import {
 	InvalidMfaConfigurationException,
 	InvalidMfaRecoveryCodeException,
 	InvalidMfaTokenException,
+	InvalidOAuthProviderException,
 	InvalidResetTokenException,
 	InvalidVerificationTokenException,
 	MfaNotEnabledException,
@@ -60,6 +63,7 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 			case InvalidResetTokenException:
 			case ExpiredResetTokenException:
 			case NoPendingEmailChangeException:
+			case InvalidOAuthProviderException:
 				return HttpStatus.BAD_REQUEST;
 			case NoAccountFoundException:
 				return HttpStatus.NOT_FOUND;
@@ -84,6 +88,7 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 			case InvalidTokenException:
 			case RoleNotFoundException:
 			case InvalidPasswordException:
+			case OAuthEmailNotProvidedException:
 				return HttpStatus.BAD_REQUEST;
 			case UnauthorizedRoleException:
 			case AccountPendingDeletionException:
@@ -92,6 +97,7 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 				return HttpStatus.CONFLICT;
 			case UserNotFoundException:
 				return HttpStatus.NOT_FOUND;
+			case DefaultRoleMissingException:
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;
 		}

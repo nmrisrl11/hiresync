@@ -7,3 +7,6 @@ export * from "./verify-email.use-case";
 export * from "./reset-password.use-case";
 export * from "./refresh-token.use-case";
 export * from "./mfa-login.use-case";
+
+export * from "./get-oauth-auth-url.use-case";
+export * from "./oauth-callback-login.use-case";

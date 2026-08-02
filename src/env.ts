@@ -53,6 +53,10 @@ export const env = createEnv({
 		CLOUDINARY_CLOUD_NAME: z.string(),
 		CLOUDINARY_API_KEY: z.string(),
 		CLOUDINARY_API_SECRET: z.string(),
+
+		GOOGLE_CLIENT_ID: z.string(),
+		GOOGLE_CLIENT_SECRET: z.string(),
+		GOOGLE_REDIRECT_URI: z.string(),
 	},
 
 	runtimeEnv: process.env,
