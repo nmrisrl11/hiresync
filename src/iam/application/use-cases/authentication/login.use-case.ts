@@ -40,9 +40,13 @@ export class LoginUseCase implements LoginUseCasePort {
 			throw new AccountLockedException(lockedUntil);
 		}
 
+		//! Check against OAuth-only accounts attempting password login
+		if (!user.account.hasPassword())
+			throw new InvalidLoginException("Please sign in using your linked social account.");
+
 		const passwordMatch = await this.hashService.compare(
 			command.password,
-			user.account?.getPasswordHash(),
+			user.account.getPasswordHash()!,
 		);
 
 		if (!passwordMatch) {

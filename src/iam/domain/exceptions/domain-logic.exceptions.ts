@@ -65,3 +65,9 @@ export class MfaNotEnabledException extends DomainBaseException {
 		super(message);
 	}
 }
+
+export class InvalidOAuthProviderException extends DomainBaseException {
+	constructor(message: string = "The provided OAuth provider is unsupported or invalid.") {
+		super(message);
+	}
+}

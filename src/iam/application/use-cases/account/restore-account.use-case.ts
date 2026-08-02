@@ -33,9 +33,15 @@ export class RestoreAccountUseCase implements RestoreAccountUseCasePort {
 
 		if (!user || !user.account) throw new InvalidLoginException();
 
+		//! Guard against OAuth-only accounts attempting credentials-based restore
+		if (!user.account.hasPassword())
+			throw new InvalidLoginException(
+				"Please sign in using your linked social account to restore your account.",
+			);
+
 		const isPasswordValid = await this.hashService.compare(
 			command.password,
-			user.account.getPasswordHash(),
+			user.account.getPasswordHash()!,
 		);
 		if (!isPasswordValid) throw new InvalidLoginException();
 

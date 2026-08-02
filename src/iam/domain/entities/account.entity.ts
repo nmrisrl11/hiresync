@@ -10,7 +10,7 @@ import { AccountId, FailedLoginState, MfaConfiguration } from "../value-objects"
 export class Account {
 	constructor(
 		public readonly id: AccountId,
-		private passwordHash: string,
+		private passwordHash: string | null,
 		private verificationToken: string | null,
 		private verificationTokenExpiresAt: Date | null,
 		private resetToken: string | null = null,
@@ -20,8 +20,12 @@ export class Account {
 		private mfaConfiguration: MfaConfiguration = MfaConfiguration.empty(),
 	) {}
 
-	public getPasswordHash(): string {
+	public getPasswordHash(): string | null {
 		return this.passwordHash;
+	}
+
+	public hasPassword(): boolean {
+		return this.passwordHash !== null;
 	}
 
 	public getVerificationToken(): string | null {

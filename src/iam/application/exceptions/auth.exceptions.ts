@@ -49,3 +49,15 @@ export class InvalidMfaChallengeException extends ApplicationBaseException {
 		super(message);
 	}
 }
+
+export class OAuthEmailNotProvidedException extends ApplicationBaseException {
+	constructor(message: string = "OAuth provider did not return an email address.") {
+		super(message);
+	}
+}
+
+export class DefaultRoleMissingException extends ApplicationBaseException {
+	constructor(message: string = "Default role configuration is missing.") {
+		super(message);
+	}
+}

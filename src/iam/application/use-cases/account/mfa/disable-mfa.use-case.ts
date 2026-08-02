@@ -23,10 +23,16 @@ export class DisableMfaUseCase implements DisableMfaUseCasePort {
 
 		if (!user || !user.account) throw new UserNotFoundException();
 
+		//! Guard against OAuth-only accounts
+		if (!user.account.hasPassword())
+			throw new InvalidPasswordException(
+				"Your account is linked to a social provider and does not have a password.",
+			);
+
 		//! Verify current password for security
 		const isPasswordValid = await this.hashService.compare(
 			command.currentPassword,
-			user.account.getPasswordHash(),
+			user.account.getPasswordHash()!,
 		);
 
 		if (!isPasswordValid) throw new InvalidPasswordException();

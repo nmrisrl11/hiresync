@@ -7,3 +7,6 @@ export * from "./env-config.port";
 export * from "./image-storage.port";
 export * from "./mfa.service.port";
 export * from "./backup-codes-generator.port";
+
+export * from "./state-generator.port";
+export * from "./oauth-provider.port";

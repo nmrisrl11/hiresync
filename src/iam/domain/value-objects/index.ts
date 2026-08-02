@@ -6,3 +6,6 @@ export * from "./account-id.value-object";
 export * from "./failed-login-state.value-object";
 export * from "./session-id.value-object";
 export * from "./mfa-configuration.value-object";
+
+export * from "./oauth-account-id.vo";
+export * from "./oauth-provider.vo";

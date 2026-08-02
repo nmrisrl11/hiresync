@@ -36,9 +36,11 @@ import {
 } from "./application/ports/inbound/account/tasks";
 import {
 	ForgotPasswordUseCasePort,
+	GetOAuthAuthUrlUseCasePort,
 	LoginUseCasePort,
 	LogoutUseCasePort,
 	MfaLoginUseCasePort,
+	OAuthCallbackLoginUseCasePort,
 	RefreshTokenUseCasePort,
 	RegisterUserUseCasePort,
 	ResendVerificationUseCasePort,
@@ -63,6 +65,8 @@ import {
 	ImageStoragePort,
 	JwtServicePort,
 	MfaServicePort,
+	OAuthProviderPort,
+	StateGeneratorPort,
 	TimeFormatterPort,
 	VerificationTokenGeneratorPort,
 } from "./application/ports/outbound";
@@ -102,9 +106,11 @@ import {
 } from "./application/use-cases/account/tasks";
 import {
 	ForgotPasswordUseCase,
+	GetOAuthAuthUrlUseCase,
 	LoginUseCase,
 	LogoutUseCase,
 	MfaLoginUseCase,
+	OAuthCallbackLoginUseCase,
 	RefreshTokenUseCase,
 	RegisterUserUseCase,
 	ResendVerificationUsecase,
@@ -124,6 +130,7 @@ import {
 	BullMqIamEmailQueueAdapter,
 	CloudinaryImageStorageAdapter,
 	EnvConfigAdapter,
+	ManualOAuthAdapter,
 	MsTimeFormatterAdapter,
 	NestjsJwtAdapter,
 	NodeCryptoAdapter,
@@ -149,12 +156,20 @@ import { CleanExpiredSessionsTask, ExecutePendingDeletionsTask } from "./infrast
 import { AccountController } from "./presentation/controllers/account.controller";
 import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
+import { OAuthController } from "./presentation/controllers/oauth.controller";
 import { RoleController } from "./presentation/controllers/role.controller";
 import { UserController } from "./presentation/controllers/user.controller";
 
 @Module({
 	imports: [DatabaseModule, IamNotificationsModule],
-	controllers: [AuthController, AccountController, AdminController, UserController, RoleController],
+	controllers: [
+		AuthController,
+		OAuthController,
+		AccountController,
+		AdminController,
+		UserController,
+		RoleController,
+	],
 	providers: [
 		//! Repositories and Persistence
 		{ provide: UserRepository, useClass: PrismaUserRepository },
@@ -172,6 +187,8 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: ResendVerificationUseCasePort, useClass: ResendVerificationUsecase },
 		{ provide: RestoreAccountUseCasePort, useClass: RestoreAccountUseCase },
 		{ provide: MfaLoginUseCasePort, useClass: MfaLoginUseCase },
+		{ provide: GetOAuthAuthUrlUseCasePort, useClass: GetOAuthAuthUrlUseCase },
+		{ provide: OAuthCallbackLoginUseCasePort, useClass: OAuthCallbackLoginUseCase },
 
 		/** Account **/
 		{ provide: GetUserByIdUseCasePort, useClass: GetUserByIdUseCase },
@@ -202,11 +219,13 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: JwtServicePort, useClass: NestjsJwtAdapter },
 		{ provide: VerificationTokenGeneratorPort, useClass: NodeCryptoAdapter },
 		{ provide: BackupCodesGeneratorPort, useClass: NodeCryptoAdapter },
+		{ provide: StateGeneratorPort, useClass: NodeCryptoAdapter },
 		{ provide: IamEmailQueuePort, useClass: BullMqIamEmailQueueAdapter },
 		{ provide: TimeFormatterPort, useClass: MsTimeFormatterAdapter },
 		{ provide: EnvConfigPort, useClass: EnvConfigAdapter },
 		{ provide: ImageStoragePort, useClass: CloudinaryImageStorageAdapter },
 		{ provide: MfaServicePort, useClass: SpeakeasyMfaAdapter },
+		{ provide: OAuthProviderPort, useClass: ManualOAuthAdapter },
 
 		//! Domain Event and Event Listeners
 		EmailChangeRequestedListener,

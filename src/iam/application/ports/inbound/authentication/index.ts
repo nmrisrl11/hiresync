@@ -7,3 +7,6 @@ export * from "./verify-email.in-port";
 export * from "./reset-password.in-port";
 export * from "./refresh-token.in-port.ts";
 export * from "./mfa-login.in-port";
+
+export * from "./get-oauth-auth-url.in-port";
+export * from "./oauth-callback-login.in-port";
