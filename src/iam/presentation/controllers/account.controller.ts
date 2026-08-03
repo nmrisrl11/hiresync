@@ -32,6 +32,16 @@ import {
 	InitiateMfaSetupCommand,
 	InitiateMfaSetupUseCasePort,
 } from "@/iam/application/ports/inbound/account/mfa";
+import {
+	GetConnectedOAuthProvidersUseCasePort,
+	UnlinkOAuthProviderCommand,
+	UnlinkOAuthProviderUseCasePort,
+} from "@/iam/application/ports/inbound/account/oauth";
+import {
+	GetOAuthAuthUrlCommand,
+	GetOAuthAuthUrlUseCasePort,
+} from "@/iam/application/ports/inbound/authentication";
+import { OAuthProviderType } from "@/iam/domain/types";
 import { CurrentUser, Public } from "@/shared/http/decorators";
 import { type JwtPayload } from "@/shared/types";
 import {
@@ -47,6 +57,7 @@ import {
 	ParseFilePipe,
 	Patch,
 	Post,
+	Res,
 	UploadedFile,
 	UseFilters,
 	UseInterceptors,
@@ -54,6 +65,7 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
+import type { Response } from "express";
 import "multer";
 import {
 	ChangePasswordDto,
@@ -86,6 +98,9 @@ export class AccountController {
 		private readonly enableMfaUseCase: EnableMfaUseCasePort,
 		private readonly disableMfaUseCase: DisableMfaUseCasePort,
 		private readonly setInitialPasswordUseCase: SetInitialPasswordUseCasePort,
+		private readonly getConnectedOAuthProvidersUseCase: GetConnectedOAuthProvidersUseCasePort,
+		private readonly unlinkOAuthProviderUseCase: UnlinkOAuthProviderUseCasePort,
+		private readonly getOAuthAuthUrlUseCase: GetOAuthAuthUrlUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -281,5 +296,60 @@ export class AccountController {
 		const command = new DisableMfaCommand(userPayload.sub, dto.currentPassword);
 
 		await this.disableMfaUseCase.execute(command);
+	}
+
+	@Get("oauth")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Get a list of connected OAuth providers." })
+	public async getConnectedProviders(@CurrentUser() userPayload: JwtPayload) {
+		const providers = await this.getConnectedOAuthProvidersUseCase.execute(userPayload.sub);
+
+		return {
+			message: "Connected providers retrieved successfully.",
+			data: providers,
+		};
+	}
+
+	@Get("oauth/:provider/link-url")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Generate URL to link an OAuth provider to the current account." })
+	public async getLinkProviderUrl(
+		@Param("provider") providerParam: string,
+		@CurrentUser() userPayload: JwtPayload,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		const provider = providerParam.toUpperCase() as OAuthProviderType;
+		const command = new GetOAuthAuthUrlCommand(provider);
+		const result = await this.getOAuthAuthUrlUseCase.execute(command);
+
+		res.cookie("oauth_link_intent", userPayload.sub, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "lax",
+			maxAge: 5 * 60 * 1000,
+			path: "/api/auth/oauth",
+		});
+
+		return {
+			message: `Authorization URL for linking ${provider} generated successfully.`,
+			data: result,
+		};
+	}
+
+	@Delete("oauth/:provider")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Unlink an OAuth provider from the account." })
+	public async unlinkProvider(
+		@Param("provider") providerParam: string,
+		@CurrentUser() userPayload: JwtPayload,
+	) {
+		const provider = providerParam.toUpperCase() as OAuthProviderType;
+		const command = new UnlinkOAuthProviderCommand(userPayload.sub, provider);
+
+		await this.unlinkOAuthProviderUseCase.execute(command);
+
+		return {
+			message: `Successfully unlinked ${provider} from your account.`,
+		};
 	}
 }

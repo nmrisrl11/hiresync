@@ -69,3 +69,9 @@ export class DefaultRoleMissingException extends ApplicationBaseException {
 		super(message);
 	}
 }
+
+export class ProviderAccountAlreadyLinkedException extends ApplicationBaseException {
+	constructor(message: string = "This provider account is already linked to another user.") {
+		super(message);
+	}
+}
