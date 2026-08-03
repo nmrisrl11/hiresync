@@ -15,6 +15,7 @@ export type MfaLoginResult = {
 		email: string;
 		name: string;
 		role: string;
+		hasPassword: boolean;
 	};
 };
 
