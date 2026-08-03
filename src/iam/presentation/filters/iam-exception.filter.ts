@@ -8,6 +8,7 @@ import {
 	InvalidTokenException,
 	OAuthEmailNotProvidedException,
 	PasswordAlreadySetException,
+	ProviderAccountAlreadyLinkedException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
@@ -96,6 +97,7 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 			case AccountPendingDeletionException:
 				return HttpStatus.FORBIDDEN;
 			case UserAlreadyExistsException:
+			case ProviderAccountAlreadyLinkedException:
 				return HttpStatus.CONFLICT;
 			case UserNotFoundException:
 				return HttpStatus.NOT_FOUND;

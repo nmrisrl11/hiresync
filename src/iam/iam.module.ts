@@ -32,6 +32,11 @@ import {
 	EnqueuePasswordChangedAlertUseCasePort,
 } from "./application/ports/inbound/account/notifications";
 import {
+	GetConnectedOAuthProvidersUseCasePort,
+	LinkOAuthProviderUseCasePort,
+	UnlinkOAuthProviderUseCasePort,
+} from "./application/ports/inbound/account/oauth";
+import {
 	CleanExpiredSessionsUseCasePort,
 	ExecuteHardDeletionUseCasePort,
 } from "./application/ports/inbound/account/tasks";
@@ -102,6 +107,11 @@ import {
 	EnqueueMfaEnabledAlertEmailUseCase,
 	EnqueuePasswordChangedAlertUseCase,
 } from "./application/use-cases/account/notifications";
+import {
+	GetConnectedOAuthProvidersUseCase,
+	LinkOAuthProviderUseCase,
+	UnlinkOAuthProviderUseCase,
+} from "./application/use-cases/account/oauth";
 import {
 	CleanExpiredSessionsUseCase,
 	ExecuteHardDeletionUseCase,
@@ -209,6 +219,9 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: EnableMfaUseCasePort, useClass: EnableMfaUseCase },
 		{ provide: DisableMfaUseCasePort, useClass: DisableMfaUseCase },
 		{ provide: SetInitialPasswordUseCasePort, useClass: SetInitialPasswordUseCase },
+		{ provide: GetConnectedOAuthProvidersUseCasePort, useClass: GetConnectedOAuthProvidersUseCase },
+		{ provide: LinkOAuthProviderUseCasePort, useClass: LinkOAuthProviderUseCase },
+		{ provide: UnlinkOAuthProviderUseCasePort, useClass: UnlinkOAuthProviderUseCase },
 
 		/** Users **/
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },

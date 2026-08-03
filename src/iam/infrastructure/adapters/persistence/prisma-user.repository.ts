@@ -120,6 +120,10 @@ export class PrismaUserRepository implements UserRepository {
 
 		const mfaConfiguration = user.account.getMfaConfiguration();
 
+		//! Extract current IDs to tell Prisma what to keep vs. what to delete
+		const currentSessionIds = user.getSessions().map((s) => s.id.getValue());
+		const currentOAuthAccountIds = user.getOAuthAccounts().map((oa) => oa.id.getValue());
+
 		//! Prepare Session Upserts
 		const sessionUpserts = user.getSessions().map((session) => ({
 			where: { id: session.id.getValue() },
@@ -181,8 +185,11 @@ export class PrismaUserRepository implements UserRepository {
 						mfaBackupCodes: mfaConfiguration.getBackupCodes(),
 					},
 				},
-				sessions: { upsert: sessionUpserts },
-				oauthAccounts: { upsert: oauthAccountUpserts },
+				sessions: { deleteMany: { id: { notIn: currentSessionIds } }, upsert: sessionUpserts },
+				oauthAccounts: {
+					deleteMany: { id: { notIn: currentOAuthAccountIds } },
+					upsert: oauthAccountUpserts,
+				},
 			},
 			create: {
 				id: user.id.getValue(),

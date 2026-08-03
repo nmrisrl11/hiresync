@@ -24,6 +24,10 @@ import type { Request, Response } from "express";
 import type { StringValue } from "ms";
 import ms from "ms";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
+import {
+	LinkOAuthProviderCommand,
+	LinkOAuthProviderUseCasePort,
+} from "@/iam/application/ports/inbound/account/oauth";
 
 @UseFilters(IamExceptionFilter)
 @ApiTags("Authentication - OAuth")
@@ -32,6 +36,7 @@ export class OAuthController {
 	constructor(
 		private readonly getOAuthAuthUrlUseCase: GetOAuthAuthUrlUseCasePort,
 		private readonly oauthCallbackLoginUseCase: OAuthCallbackLoginUseCasePort,
+		private readonly linkOAuthProviderUseCase: LinkOAuthProviderUseCasePort,
 	) {}
 
 	private readonly refreshCookieMaxAge = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
@@ -66,7 +71,9 @@ export class OAuthController {
 	@Get(":provider/callback")
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 10 } })
-	@ApiOperation({ summary: "Handle provider callback, exchange code, and log the user in." })
+	@ApiOperation({
+		summary: "Handle provider callback, exchange code, and log the user in or link account.",
+	})
 	public async handleCallback(
 		@Param("provider") providerParam: string,
 		@Query("code") code: string,
@@ -75,6 +82,19 @@ export class OAuthController {
 		@Res({ passthrough: true }) res: Response,
 	) {
 		const provider = providerParam.toUpperCase() as OAuthProviderType;
+
+		const cookies = req.cookies as Record<string, string>;
+		const linkIntentUserId = cookies?.oauth_link_intent;
+
+		if (linkIntentUserId) {
+			res.clearCookie("oauth_link_intent", { path: "/api/auth/oauth" });
+
+			const linkCommand = new LinkOAuthProviderCommand(linkIntentUserId, provider, code);
+			await this.linkOAuthProviderUseCase.execute(linkCommand);
+
+			return { message: `Successfully linked ${provider} to your account.` };
+		}
+
 		const userAgent = req.headers["user-agent"] || "Unknown Device";
 		const ipAddress = req.ip;
 
@@ -91,9 +111,6 @@ export class OAuthController {
 
 		this.setRefreshTokenCookie(res, result.refreshToken!);
 
-		return {
-			accessToken: result.accessToken,
-			user: result.user,
-		};
+		return { accessToken: result.accessToken, user: result.user };
 	}
 }

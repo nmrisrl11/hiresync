@@ -184,9 +184,9 @@ Manual OAuth Integration
 - [ ] Add GitHub OAuth support
 - [ ] Add Microsoft OAuth support  
 - [x] Set initial password for OAuth users
-- [ ] Display OAuth provider links on the user profile
-- [ ] Link to OAuth Provider 
-- [ ] Unlink OAuth Provider
+- [x] Display OAuth provider links on the user profile
+- [x] Link to OAuth Provider 
+- [x] Unlink OAuth Provider
 
 ### Employers
 - [ ] Company profile Allowing multiple User accounts (with a "Recruiter" role) to attach to a single Employer entity.
