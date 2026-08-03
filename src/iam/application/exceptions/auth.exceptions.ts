@@ -12,6 +12,14 @@ export class UserAlreadyExistsException extends ApplicationBaseException {
 	}
 }
 
+export class PasswordAlreadySetException extends ApplicationBaseException {
+	constructor(
+		message: string = "This account already has a password set. Please use the change password feature instead.",
+	) {
+		super(message);
+	}
+}
+
 export class UserNotFoundException extends ApplicationBaseException {
 	constructor(message: string = "User not found.") {
 		super(message);

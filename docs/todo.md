@@ -178,11 +178,15 @@
     - [x] Send email when MFA is disabled
 
 Manual OAuth Integration
-- [ ] Generate the secure redirect URL for the requested OAuth provider
-- [ ] Handle the OAuth callback from the requested OAuth provider
+- [x] Generate the secure redirect URL for the requested OAuth provider
+- [x] Handle the OAuth callback from the requested OAuth provider
 - [x] Add Google OAuth support
 - [ ] Add GitHub OAuth support
 - [ ] Add Microsoft OAuth support  
+- [x] Set initial password for OAuth users
+- [ ] Display OAuth provider links on the user profile
+- [ ] Link to OAuth Provider 
+- [ ] Unlink OAuth Provider
 
 ### Employers
 - [ ] Company profile Allowing multiple User accounts (with a "Recruiter" role) to attach to a single Employer entity.

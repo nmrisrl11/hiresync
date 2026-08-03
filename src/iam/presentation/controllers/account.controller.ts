@@ -17,6 +17,8 @@ import {
 	RevokeSessionUseCasePort,
 	ScheduleAccountDeletionCommand,
 	ScheduleAccountDeletionUseCasePort,
+	SetInitialPasswordCommand,
+	SetInitialPasswordUseCasePort,
 	UpdateAccountCommand,
 	UpdateAccountUseCasePort,
 	UploadAvatarCommand,
@@ -53,10 +55,15 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
 import "multer";
-import { ChangePasswordDto, RequestEmailChangeDto, UpdateAccountDto } from "../dtos/account";
+import {
+	ChangePasswordDto,
+	RequestEmailChangeDto,
+	SetInitialPasswordDto,
+	UpdateAccountDto,
+} from "../dtos/account";
+import { DisableMfaDto, EnableMfaDto } from "../dtos/authentication";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import { ResponseMapper } from "../mappers/response.mapper";
-import { DisableMfaDto, EnableMfaDto } from "../dtos/authentication";
 
 @UseFilters(IamExceptionFilter)
 @ApiBearerAuth()
@@ -78,6 +85,7 @@ export class AccountController {
 		private readonly initiateMfaSetupUseCase: InitiateMfaSetupUseCasePort,
 		private readonly enableMfaUseCase: EnableMfaUseCasePort,
 		private readonly disableMfaUseCase: DisableMfaUseCasePort,
+		private readonly setInitialPasswordUseCase: SetInitialPasswordUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -185,6 +193,21 @@ export class AccountController {
 	public async confirmEmailChange(@Param("token") token: string): Promise<void> {
 		const command = new ConfirmEmailChangeCommand(token);
 		await this.confirmEmailChangeUseCase.execute(command);
+	}
+
+	@Post("password/initial")
+	@HttpCode(HttpStatus.OK)
+	@ApiBearerAuth()
+	@ApiOperation({ summary: "Set an initial password for an OAuth-only account." })
+	public async setInitialPassword(
+		@CurrentUser() userPayload: JwtPayload,
+		@Body() dto: SetInitialPasswordDto,
+	) {
+		const command = new SetInitialPasswordCommand(userPayload.sub, dto.newPassword);
+
+		await this.setInitialPasswordUseCase.execute(command);
+
+		return { message: "Initial password successfully set. You can now log in using credentials." };
 	}
 
 	@Delete()
