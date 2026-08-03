@@ -178,7 +178,11 @@
     - [x] Send email when MFA is disabled
 
 Manual OAuth Integration
-  - Build custom authorization flows for Google, GitHub, Microsoft, etc., without relying on third-party UI libraries.
+- [ ] Generate the secure redirect URL for the requested OAuth provider
+- [ ] Handle the OAuth callback from the requested OAuth provider
+- [x] Add Google OAuth support
+- [ ] Add GitHub OAuth support
+- [ ] Add Microsoft OAuth support  
 
 ### Employers
 - [ ] Company profile Allowing multiple User accounts (with a "Recruiter" role) to attach to a single Employer entity.
