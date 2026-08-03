@@ -44,6 +44,7 @@ export class UploadAvatarUseCase implements UploadAvatarUseCasePort {
 			image: user.image,
 			role: user.role.code.getValue(),
 			isVerified: user.isVerified,
+			hasPassword: user.account?.hasPassword() ?? false,
 			createdAt: user.createdAt,
 		};
 	}

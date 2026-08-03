@@ -29,6 +29,7 @@ export class UpdateAccountUseCase implements UpdateAccountUseCasePort {
 			image: user.image,
 			role: user.role.code.getValue(),
 			isVerified: user.isVerified,
+			hasPassword: user.account?.hasPassword() ?? false,
 			createdAt: user.createdAt,
 		};
 	}
