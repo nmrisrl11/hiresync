@@ -1,9 +1,11 @@
+import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import cookieParser from "cookie-parser";
 import { AppModule } from "./app.module";
 import { env } from "./env";
-import cookieParser from "cookie-parser";
-import { ValidationPipe } from "@nestjs/common";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { HttpExceptionFilter } from "./shared/http/filters";
+import { ResponseTransformInterceptor } from "./shared/http/interceptors";
 
 const isSwaggerEnabled = env.NODE_ENV === "development" || env.NODE_ENV === "test";
 const PORT = env.PORT;
@@ -16,6 +18,8 @@ async function bootstrap() {
 	app.setGlobalPrefix("api");
 
 	//! Runs before the Controller Methods.
+	app.useGlobalInterceptors(new ResponseTransformInterceptor());
+	app.useGlobalFilters(new HttpExceptionFilter());
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true, //! Removes properties that are not defined in the DTO.

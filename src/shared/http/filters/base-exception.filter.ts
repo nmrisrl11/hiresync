@@ -1,4 +1,5 @@
 import { ApplicationBaseException, DomainBaseException } from "@/shared/core";
+import { ErrorResponse } from "@/shared/types";
 import { ArgumentsHost, ExceptionFilter, HttpStatus } from "@nestjs/common";
 import { Response } from "express";
 
@@ -13,15 +14,20 @@ export abstract class BaseExceptionFilter implements ExceptionFilter<
 		exception: ApplicationBaseException | DomainBaseException,
 		host: ArgumentsHost,
 	): void {
-		const response = host.switchToHttp().getResponse<Response>();
+		const ctx = host.switchToHttp();
+		const response = ctx.getResponse<Response>();
+		const request = ctx.getRequest<Request>();
 
 		const status = this.getStatus(exception);
 
-		response.status(status).json({
+		const errorResponse: ErrorResponse = {
 			statusCode: status,
 			message: exception.message,
 			error: exception.name,
+			path: request.url,
 			timestamp: new Date().toISOString(),
-		});
+		};
+
+		response.status(status).json(errorResponse);
 	}
 }
