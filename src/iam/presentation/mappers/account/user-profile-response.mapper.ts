@@ -1,5 +1,5 @@
 import { UserResult } from "@/iam/application/ports/inbound/users";
-import { UserProfileResponseDto } from "../../dtos/responses/account";
+import { UserProfileResponseDto } from "../../dtos/account/responses";
 
 export class UserProfileResponseMapper {
 	public static toDto(user: UserResult): UserProfileResponseDto {

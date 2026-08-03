@@ -42,7 +42,7 @@ export const ApiMessageResponse = (
 				properties: {
 					statusCode: { type: "number", example: statusCode },
 					message: { type: "string", example: description },
-					data: { type: "null", example: null },
+					data: { enum: ["null"], example: null },
 					timestamp: { type: "string", format: "date-time", example: "2026-08-03T05:05:24.000Z" },
 				},
 			},
