@@ -12,6 +12,7 @@ import {
 	RevokeAllOtherSessionsUseCasePort,
 	RevokeSessionUseCasePort,
 	ScheduleAccountDeletionUseCasePort,
+	SetInitialPasswordUseCasePort,
 	UpdateAccountUseCasePort,
 	UploadAvatarUseCasePort,
 } from "./application/ports/inbound/account";
@@ -82,6 +83,7 @@ import {
 	RevokeAllOtherSessionsUseCase,
 	RevokeSessionUseCase,
 	ScheduleAccountDeletionUseCase,
+	SetInitialPasswordUseCase,
 	UpdateAccountUseCase,
 	UploadAvatarUseCase,
 } from "./application/use-cases/account";
@@ -206,6 +208,7 @@ import { UserController } from "./presentation/controllers/user.controller";
 		{ provide: InitiateMfaSetupUseCasePort, useClass: InitiateMfaSetupUseCase },
 		{ provide: EnableMfaUseCasePort, useClass: EnableMfaUseCase },
 		{ provide: DisableMfaUseCasePort, useClass: DisableMfaUseCase },
+		{ provide: SetInitialPasswordUseCasePort, useClass: SetInitialPasswordUseCase },
 
 		/** Users **/
 		{ provide: GetUsersUseCasePort, useClass: GetUsersUseCase },

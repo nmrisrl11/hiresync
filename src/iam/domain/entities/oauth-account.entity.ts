@@ -9,6 +9,10 @@ export class OAuthAccount {
 		private readonly providerAccountId: string,
 	) {}
 
+	public getUserId(): UserId {
+		return this.userId;
+	}
+
 	public getProvider(): OAuthProvider {
 		return this.provider;
 	}
@@ -23,9 +27,5 @@ export class OAuthAccount {
 
 	public getProviderValue(): OAuthProviderType {
 		return this.provider.getValue();
-	}
-
-	public getUserId(): UserId {
-		return this.userId;
 	}
 }

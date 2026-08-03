@@ -7,6 +7,7 @@ import {
 	InvalidPasswordException,
 	InvalidTokenException,
 	OAuthEmailNotProvidedException,
+	PasswordAlreadySetException,
 	RoleNotFoundException,
 	UnauthorizedRoleException,
 	UserAlreadyExistsException,
@@ -89,6 +90,7 @@ export class IamExceptionFilter extends BaseExceptionFilter {
 			case RoleNotFoundException:
 			case InvalidPasswordException:
 			case OAuthEmailNotProvidedException:
+			case PasswordAlreadySetException:
 				return HttpStatus.BAD_REQUEST;
 			case UnauthorizedRoleException:
 			case AccountPendingDeletionException:
