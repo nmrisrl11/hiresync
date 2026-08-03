@@ -17,6 +17,7 @@ export type LoginResult = {
 		email: string;
 		name: string;
 		role: string;
+		hasPassword: boolean;
 	};
 };
 

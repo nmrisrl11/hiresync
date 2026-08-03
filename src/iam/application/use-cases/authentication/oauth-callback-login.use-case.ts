@@ -195,6 +195,7 @@ export class OAuthCallbackLoginUseCase implements OAuthCallbackLoginUseCasePort 
 				email: user.email.getValue(),
 				name: user.name,
 				role: user.role.code.getValue(),
+				hasPassword: user.account?.hasPassword() ?? false,
 			},
 		};
 	}

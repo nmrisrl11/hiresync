@@ -22,6 +22,7 @@ export class GetUserByIdUseCase implements GetUserByIdUseCasePort {
 			image: user.image,
 			role: user.role.code.getValue(),
 			isVerified: user.isVerified,
+			hasPassword: user.account?.hasPassword() ?? false,
 			createdAt: user.createdAt,
 		};
 	}

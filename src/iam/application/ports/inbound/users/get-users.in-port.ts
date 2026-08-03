@@ -12,6 +12,7 @@ export type UserResult = {
 	image: string | null;
 	role: string;
 	isVerified: boolean;
+	hasPassword: boolean;
 	createdAt: Date;
 };
 
