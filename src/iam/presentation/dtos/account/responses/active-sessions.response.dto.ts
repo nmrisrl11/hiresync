@@ -4,10 +4,10 @@ export class ActiveSessionDto {
 	@ApiProperty()
 	public readonly id!: string;
 
-	@ApiProperty()
+	@ApiProperty({ nullable: true })
 	public readonly userAgent!: string | null;
 
-	@ApiProperty()
+	@ApiProperty({ nullable: true })
 	public readonly ipAddress!: string | null;
 
 	@ApiProperty()

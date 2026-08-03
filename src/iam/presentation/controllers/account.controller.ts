@@ -86,7 +86,7 @@ import {
 	MfaSetupResponseDto,
 	OAuthLinkUrlResponseDto,
 	UserProfileResponseDto,
-} from "../dtos/responses/account";
+} from "../dtos/account/responses";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import {
 	ActiveSessionsResponseMapper,
@@ -232,7 +232,7 @@ export class AccountController {
 
 	@Public()
 	@Patch("change-email/confirm/:token")
-	@HttpCode(HttpStatus.NO_CONTENT)
+	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Confirm an email change using the verification token." })
 	@ApiMessageResponse(HttpStatus.OK, "Email successfully changed.")

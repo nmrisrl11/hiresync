@@ -1,7 +1,7 @@
 import { ApplicationBaseException, DomainBaseException } from "@/shared/core";
 import { ErrorResponse } from "@/shared/types";
 import { ArgumentsHost, ExceptionFilter, HttpStatus } from "@nestjs/common";
-import { Response } from "express";
+import type { Request, Response } from "express";
 
 export abstract class BaseExceptionFilter implements ExceptionFilter<
 	ApplicationBaseException | DomainBaseException
@@ -24,7 +24,7 @@ export abstract class BaseExceptionFilter implements ExceptionFilter<
 			statusCode: status,
 			message: exception.message,
 			error: exception.name,
-			path: request.url,
+			path: request.path,
 			timestamp: new Date().toISOString(),
 		};
 
