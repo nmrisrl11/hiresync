@@ -1,12 +1,16 @@
 import { env } from "@/env";
 import {
+	LinkOAuthProviderCommand,
+	LinkOAuthProviderUseCasePort,
+} from "@/iam/application/ports/inbound/account/oauth";
+import {
 	GetOAuthAuthUrlCommand,
 	GetOAuthAuthUrlUseCasePort,
 	OAuthCallbackLoginCommand,
 	OAuthCallbackLoginUseCasePort,
 } from "@/iam/application/ports/inbound/authentication";
 import { OAuthProviderType } from "@/iam/domain/types";
-import { Public } from "@/shared/http/decorators";
+import { ApiSuccessResponse, Public } from "@/shared/http/decorators";
 import {
 	Controller,
 	Get,
@@ -23,11 +27,12 @@ import { Throttle } from "@nestjs/throttler";
 import type { Request, Response } from "express";
 import type { StringValue } from "ms";
 import ms from "ms";
+import { LoginResponseDto, OAuthAuthorizationUrlResponseDto } from "../dtos/authentication";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import {
-	LinkOAuthProviderCommand,
-	LinkOAuthProviderUseCasePort,
-} from "@/iam/application/ports/inbound/account/oauth";
+	LoginResponseMapper,
+	OAuthAuthorizationUrlResponseMapper,
+} from "../mappers/authentication";
 
 @UseFilters(IamExceptionFilter)
 @ApiTags("Authentication - OAuth")
@@ -42,12 +47,13 @@ export class OAuthController {
 	private readonly refreshCookieMaxAge = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
 	private readonly isProduction = env.NODE_ENV === "production";
 
-	private setRefreshTokenCookie(res: Response, token: string): void {
+	private setRefreshTokenCookie(res: Response, token: string, path: string = "/api/auth"): void {
 		res.cookie("refresh_token", token, {
 			httpOnly: true,
 			secure: this.isProduction,
 			sameSite: "lax",
 			maxAge: this.refreshCookieMaxAge,
+			path,
 		});
 	}
 
@@ -56,15 +62,19 @@ export class OAuthController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Generate the secure redirect URL for the requested OAuth provider." })
-	public async getAuthorizationUrl(@Param("provider") providerParam: string) {
+	@ApiSuccessResponse(
+		OAuthAuthorizationUrlResponseDto,
+		HttpStatus.OK,
+		"OAuth authorization URL generated successfully.",
+	)
+	public async getAuthorizationUrl(
+		@Param("provider") providerParam: string,
+	): Promise<OAuthAuthorizationUrlResponseDto> {
 		const provider = providerParam.toUpperCase() as OAuthProviderType;
 		const command = new GetOAuthAuthUrlCommand(provider);
 		const result = await this.getOAuthAuthUrlUseCase.execute(command);
 
-		return {
-			message: "OAuth authorization URL generated successfully.",
-			data: result,
-		};
+		return OAuthAuthorizationUrlResponseMapper.toDto(result);
 	}
 
 	@Public()
@@ -74,13 +84,14 @@ export class OAuthController {
 	@ApiOperation({
 		summary: "Handle provider callback, exchange code, and log the user in or link account.",
 	})
+	@ApiSuccessResponse(LoginResponseDto, HttpStatus.OK, "OAuth callback processed successfully.")
 	public async handleCallback(
 		@Param("provider") providerParam: string,
 		@Query("code") code: string,
 		@Query("state") state: string,
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response,
-	) {
+	): Promise<LoginResponseDto | { message: string }> {
 		const provider = providerParam.toUpperCase() as OAuthProviderType;
 
 		const cookies = req.cookies as Record<string, string>;
@@ -95,22 +106,17 @@ export class OAuthController {
 			return { message: `Successfully linked ${provider} to your account.` };
 		}
 
+		const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP Address";
 		const userAgent = req.headers["user-agent"] || "Unknown Device";
-		const ipAddress = req.ip;
 
 		const command = new OAuthCallbackLoginCommand(provider, code, state, userAgent, ipAddress);
-
 		const result = await this.oauthCallbackLoginUseCase.execute(command);
 
-		if (result.mfaRequired) {
-			return {
-				mfaRequired: true,
-				mfaChallengeToken: result.mfaChallengeToken,
-			};
+		//! If MFA is enabled, do NOT set the refresh cookie. Return the challenge token via mapper.
+		if (!result.mfaRequired && result.refreshToken) {
+			this.setRefreshTokenCookie(res, result.refreshToken);
 		}
 
-		this.setRefreshTokenCookie(res, result.refreshToken!);
-
-		return { accessToken: result.accessToken, user: result.user };
+		return LoginResponseMapper.toDto(result);
 	}
 }

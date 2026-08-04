@@ -2,9 +2,22 @@ import {
 	GetPublicUserProfileQuery,
 	GetPublicUserProfileUseCasePort,
 } from "@/iam/application/ports/inbound/users";
-import { Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe } from "@nestjs/common";
+import { ApiSuccessResponse } from "@/shared/http/decorators";
+import {
+	Controller,
+	Get,
+	HttpCode,
+	HttpStatus,
+	Param,
+	ParseUUIDPipe,
+	UseFilters,
+} from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { PublicUserProfileResponseDto } from "../dtos/users";
+import { IamExceptionFilter } from "../filters/iam-exception.filter";
+import { PublicUserProfileResponseMapper } from "../mappers/users";
 
+@UseFilters(IamExceptionFilter)
 @ApiBearerAuth()
 @ApiTags("Users")
 @Controller("users")
@@ -14,9 +27,16 @@ export class UserController {
 	@Get(":id")
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Get a specific user's public profile" })
-	public async getUserProfileById(@Param("id", ParseUUIDPipe) id: string) {
+	@ApiSuccessResponse(
+		PublicUserProfileResponseDto,
+		HttpStatus.OK,
+		"User public profile retrieved successfully.",
+	)
+	public async getUserProfileById(
+		@Param("id", ParseUUIDPipe) id: string,
+	): Promise<PublicUserProfileResponseDto> {
 		const query = new GetPublicUserProfileQuery(id);
-
-		return await this.getPublicUserProfileUseCase.execute(query);
+		const result = await this.getPublicUserProfileUseCase.execute(query);
+		return PublicUserProfileResponseMapper.toDto(result);
 	}
 }
