@@ -9,7 +9,6 @@ export * from "./remove-avatar.use-case";
 export * from "./set-initial-password.use-case";
 
 export * from "./schedule-account-deletion.use-case";
-export * from "./restore-account.use-case";
 
 export * from "./get-active-sessions.use-case";
 export * from "./revoke-session.use-case";

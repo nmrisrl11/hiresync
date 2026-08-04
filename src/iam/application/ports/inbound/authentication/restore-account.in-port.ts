@@ -7,8 +7,11 @@ export class RestoreAccountCommand {
 	) {}
 }
 
+export type RestoreAccountResult = {
+	accessToken: string;
+	refreshToken: string;
+};
+
 export abstract class RestoreAccountUseCasePort {
-	abstract execute(
-		command: RestoreAccountCommand,
-	): Promise<{ accessToken: string; refreshToken: string }>;
+	abstract execute(command: RestoreAccountCommand): Promise<RestoreAccountResult>;
 }

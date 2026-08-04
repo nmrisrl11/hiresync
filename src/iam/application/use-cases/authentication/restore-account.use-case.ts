@@ -5,7 +5,11 @@ import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 import { InvalidLoginException } from "../../exceptions";
-import { RestoreAccountCommand, RestoreAccountUseCasePort } from "../../ports/inbound/account";
+import {
+	RestoreAccountCommand,
+	RestoreAccountResult,
+	RestoreAccountUseCasePort,
+} from "../../ports/inbound/authentication";
 import {
 	EnvConfigPort,
 	HashServicePort,
@@ -25,9 +29,7 @@ export class RestoreAccountUseCase implements RestoreAccountUseCasePort {
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
-	public async execute(
-		command: RestoreAccountCommand,
-	): Promise<{ accessToken: string; refreshToken: string }> {
+	public async execute(command: RestoreAccountCommand): Promise<RestoreAccountResult> {
 		const emailVo = new Email(command.email);
 		const user = await this.userRepository.findByEmail(emailVo);
 

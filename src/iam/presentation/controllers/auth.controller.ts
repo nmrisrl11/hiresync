@@ -1,9 +1,5 @@
 import { env } from "@/env";
 import {
-	RestoreAccountCommand,
-	RestoreAccountUseCasePort,
-} from "@/iam/application/ports/inbound/account";
-import {
 	ForgotPasswordCommand,
 	ForgotPasswordUseCasePort,
 	LoginCommand,
@@ -20,6 +16,8 @@ import {
 	ResendVerificationUseCasePort,
 	ResetPasswordCommand,
 	ResetPasswordUseCasePort,
+	RestoreAccountCommand,
+	RestoreAccountUseCasePort,
 	VerifyEmailCommand,
 	VerifyEmailUseCasePort,
 } from "@/iam/application/ports/inbound/authentication";
@@ -56,6 +54,7 @@ import {
 	ResendVerificationRequestDto,
 	ResetPasswordRequestDto,
 	RestoreAccountRequestDto,
+	RestoreAccountResponseDto,
 	VerifyEmailRequestDto,
 	VerifyEmailResponseDto,
 } from "../dtos/authentication";
@@ -64,6 +63,7 @@ import {
 	LoginResponseMapper,
 	MfaLoginResponseMapper,
 	RefreshResponseMapper,
+	RestoreAccountResponseMapper,
 	VerifyEmailResponseMapper,
 } from "../mappers/authentication";
 
@@ -201,7 +201,7 @@ export class AuthController {
 
 		await this.logoutUseCase.execute(command);
 
-		res.clearCookie("refresh_token");
+		res.clearCookie("refresh_token", { path: "/api/auth" });
 
 		return { message: "Logged out successfully." };
 	}
@@ -273,12 +273,12 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 5 } })
 	@ApiOperation({ summary: "Cancel a scheduled deletion and restore the account." })
-	@ApiSuccessResponse(RefreshResponseDto, HttpStatus.OK, "Account successfully restored.")
+	@ApiSuccessResponse(RestoreAccountResponseDto, HttpStatus.OK, "Account successfully restored.")
 	public async restoreAccount(
 		@Body() dto: RestoreAccountRequestDto,
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response,
-	) {
+	): Promise<RestoreAccountResponseDto> {
 		const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP Address";
 		const userAgent = req.headers["user-agent"] || "Unknown Device";
 
@@ -287,6 +287,6 @@ export class AuthController {
 
 		this.setRefreshTokenCookie(res, result.refreshToken);
 
-		return { message: "Account successfully restored.", accessToken: result.accessToken };
+		return RestoreAccountResponseMapper.toDto(result);
 	}
 }

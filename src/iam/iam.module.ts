@@ -8,7 +8,6 @@ import {
 	GetUserByIdUseCasePort,
 	RemoveAvatarUseCasePort,
 	RequestEmailChangeUseCasePort,
-	RestoreAccountUseCasePort,
 	RevokeAllOtherSessionsUseCasePort,
 	RevokeSessionUseCasePort,
 	ScheduleAccountDeletionUseCasePort,
@@ -51,6 +50,7 @@ import {
 	RegisterUserUseCasePort,
 	ResendVerificationUseCasePort,
 	ResetPasswordUseCasePort,
+	RestoreAccountUseCasePort,
 	VerifyEmailUseCasePort,
 } from "./application/ports/inbound/authentication";
 import {
@@ -84,7 +84,6 @@ import {
 	GetUserByIdUseCase,
 	RemoveAvatarUseCase,
 	RequestEmailChangeUseCase,
-	RestoreAccountUseCase,
 	RevokeAllOtherSessionsUseCase,
 	RevokeSessionUseCase,
 	ScheduleAccountDeletionUseCase,
@@ -127,6 +126,7 @@ import {
 	RegisterUserUseCase,
 	ResendVerificationUsecase,
 	ResetPasswordUseCase,
+	RestoreAccountUseCase,
 	VerifyEmailUseCase,
 } from "./application/use-cases/authentication";
 import {

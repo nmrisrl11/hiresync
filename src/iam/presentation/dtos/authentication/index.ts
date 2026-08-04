@@ -9,4 +9,5 @@ export * from "./requests/verify-email.request.dto";
 
 export * from "./responses/login.response.dto";
 export * from "./responses/refresh.response.dto";
+export * from "./responses/restore-account.response.dto";
 export * from "./responses/verify-email.response.dto";
