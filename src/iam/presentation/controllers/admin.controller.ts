@@ -5,7 +5,8 @@ import {
 	GetUserByIdUseCasePort,
 } from "@/iam/application/ports/inbound/account";
 import { GetUsersQuery, GetUsersUseCasePort } from "@/iam/application/ports/inbound/users";
-import { Roles } from "@/shared/http/decorators";
+import { ApiMessageResponse, ApiSuccessResponse, Roles } from "@/shared/http/decorators";
+import { PaginationDto } from "@/shared/http/dtos";
 import { ROLES } from "@/shared/types";
 import {
 	Controller,
@@ -17,7 +18,9 @@ import {
 	ParseUUIDPipe,
 	Query,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { AdminUserResponseDto, PaginatedUsersResponseDto } from "../dtos/admin";
+import { AdminUserResponseMapper, PaginatedUsersResponseMapper } from "../mappers/admin";
 
 @ApiBearerAuth()
 @ApiTags("Admin")
@@ -33,42 +36,30 @@ export class AdminController {
 	@Get("users")
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Get a paginated list of all users (admin only)" })
-	@ApiQuery({ name: "limit", required: false, type: Number, description: "Default is 50" })
-	@ApiQuery({ name: "offset", required: false, type: Number, description: "Default is 0" })
-	public async getUsers(@Query("limit") limit?: string, @Query("offset") offset?: string) {
-		//! Parse incoming strings to strict integers with safe fallbacks
-		const parsedLimit = limit ? parseInt(limit, 10) : 50;
-		const parsedOffset = offset ? parseInt(offset, 10) : 0;
-
-		const query = new GetUsersQuery(parsedLimit, parsedOffset);
+	@ApiSuccessResponse(PaginatedUsersResponseDto, HttpStatus.OK, "Users retrieved successfully.")
+	public async getUsers(@Query() queryDto: PaginationDto): Promise<PaginatedUsersResponseDto> {
+		const query = new GetUsersQuery(queryDto.limit, queryDto.offset);
 		const result = await this.getUsersUseCase.execute(query);
-
-		return {
-			data: result.items,
-			meta: {
-				limit: parsedLimit,
-				offset: parsedOffset,
-				count: result.items.length,
-				totalRecords: result.total,
-			},
-		};
+		return PaginatedUsersResponseMapper.toDto(result, queryDto.limit, queryDto.offset);
 	}
 
 	@Get("users/:id")
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Get a specific user by ID (admin only)" })
-	public async getUserById(@Param("id", ParseUUIDPipe) id: string) {
+	@ApiSuccessResponse(AdminUserResponseDto, HttpStatus.OK, "User retrieved successfully.")
+	public async getUserById(@Param("id", ParseUUIDPipe) id: string): Promise<AdminUserResponseDto> {
 		const query = new GetUserByIdQuery(id);
-
-		return await this.getUserByIdUseCase.execute(query);
+		const result = await this.getUserByIdUseCase.execute(query);
+		return AdminUserResponseMapper.toDto(result);
 	}
 
 	@Delete("users/:id")
-	@HttpCode(HttpStatus.NO_CONTENT)
+	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: "Delete a user account instantly and permanently (admin only)" })
+	@ApiMessageResponse(HttpStatus.OK, "User account permanently deleted.")
 	public async forceDeleteUser(@Param("id", ParseUUIDPipe) id: string) {
 		const command = new DeleteAccountCommand(id);
-
 		await this.deleteAccountUseCase.execute(command);
+		return { message: "User account permanently deleted." };
 	}
 }
