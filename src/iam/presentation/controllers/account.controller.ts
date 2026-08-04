@@ -73,20 +73,18 @@ import { Throttle } from "@nestjs/throttler";
 import type { Response } from "express";
 import "multer";
 import {
-	ChangePasswordDto,
-	RequestEmailChangeDto,
-	SetInitialPasswordDto,
-	UpdateAccountDto,
-} from "../dtos/account";
-import { DisableMfaDto, EnableMfaDto } from "../dtos/authentication";
-import {
 	ActiveSessionsResponseDto,
+	ChangePasswordRequestDto,
 	ConnectedProvidersResponseDto,
 	MfaEnableResponseDto,
 	MfaSetupResponseDto,
 	OAuthLinkUrlResponseDto,
+	RequestEmailChangeRequestDto,
+	SetInitialPasswordRequestDto,
+	UpdateAccountRequestDto,
 	UserProfileResponseDto,
-} from "../dtos/account/responses";
+} from "../dtos/account";
+import { DisableMfaDto, EnableMfaDto } from "../dtos/authentication";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import {
 	ActiveSessionsResponseMapper,
@@ -139,7 +137,7 @@ export class AccountController {
 	@ApiSuccessResponse(UserProfileResponseDto, HttpStatus.OK, "Profile updated successfully.")
 	public async updateProfile(
 		@CurrentUser() userPayload: JwtPayload,
-		@Body() dto: UpdateAccountDto,
+		@Body() dto: UpdateAccountRequestDto,
 	): Promise<UserProfileResponseDto> {
 		const command = new UpdateAccountCommand(userPayload.sub, dto.name, dto.image);
 		const userResult = await this.updateAccountUseCase.execute(command);
@@ -198,7 +196,7 @@ export class AccountController {
 	@ApiMessageResponse(HttpStatus.OK, "Password changed successfully.")
 	public async changePassword(
 		@CurrentUser() userPayload: JwtPayload,
-		@Body() dto: ChangePasswordDto,
+		@Body() dto: ChangePasswordRequestDto,
 	) {
 		const command = new ChangePasswordCommand(
 			userPayload.sub,
@@ -220,7 +218,7 @@ export class AccountController {
 	)
 	public async requestEmailChange(
 		@CurrentUser() userPayload: JwtPayload,
-		@Body() dto: RequestEmailChangeDto,
+		@Body() dto: RequestEmailChangeRequestDto,
 	) {
 		const command = new RequestEmailChangeCommand(userPayload.sub, dto.newEmail);
 		await this.requestEmailChangeUseCase.execute(command);
@@ -252,7 +250,7 @@ export class AccountController {
 	)
 	public async setInitialPassword(
 		@CurrentUser() userPayload: JwtPayload,
-		@Body() dto: SetInitialPasswordDto,
+		@Body() dto: SetInitialPasswordRequestDto,
 	) {
 		const command = new SetInitialPasswordCommand(userPayload.sub, dto.newPassword);
 		await this.setInitialPasswordUseCase.execute(command);
