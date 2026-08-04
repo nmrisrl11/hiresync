@@ -1,5 +1,5 @@
 import { ActiveSessionResult } from "@/iam/application/ports/inbound/account";
-import { ActiveSessionsResponseDto } from "../../dtos/account/responses";
+import { ActiveSessionsResponseDto } from "../../dtos/account";
 
 export class ActiveSessionsResponseMapper {
 	public static toDto(sessions: ActiveSessionResult[]): ActiveSessionsResponseDto {

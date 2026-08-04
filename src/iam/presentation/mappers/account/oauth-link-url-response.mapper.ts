@@ -1,5 +1,5 @@
 import { GetOAuthAuthUrlResult } from "@/iam/application/ports/inbound/authentication";
-import { OAuthLinkUrlResponseDto } from "../../dtos/account/responses";
+import { OAuthLinkUrlResponseDto } from "../../dtos/account";
 
 export class OAuthLinkUrlResponseMapper {
 	public static toDto(result: GetOAuthAuthUrlResult): OAuthLinkUrlResponseDto {

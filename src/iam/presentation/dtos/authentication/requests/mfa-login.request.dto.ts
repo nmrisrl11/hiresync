@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class MfaLoginDto {
+export class MfaLoginRequestDto {
 	@ApiProperty({
 		example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
 		description: "The short-lived MFA challenge token returned from the initial login attempt.",

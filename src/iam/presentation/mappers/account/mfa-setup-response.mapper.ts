@@ -1,4 +1,4 @@
-import { MfaSetupResponseDto } from "../../dtos/account/responses";
+import { MfaSetupResponseDto } from "../../dtos/account";
 
 export class MfaSetupResponseMapper {
 	public static toDto(result: { secret: string; qrCodeUrl: string }): MfaSetupResponseDto {

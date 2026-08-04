@@ -1,4 +1,6 @@
 export * from "./requests/change-password.request.dto";
+export * from "./requests/disable-mfa.request.dto";
+export * from "./requests/enable-mfa.request.dto";
 export * from "./requests/request-email-change.request.dto";
 export * from "./requests/set-initial-password.request.dto";
 export * from "./requests/update-account.request.dto";
