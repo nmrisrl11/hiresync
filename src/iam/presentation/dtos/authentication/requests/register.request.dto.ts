@@ -3,7 +3,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export const ALLOWED_REGISTRATION_ROLES = ["EMPLOYER", "APPLICANT"];
 
-export class RegisterDto {
+export class RegisterRequestDto {
 	@ApiProperty({ example: "Name" })
 	@IsString()
 	@IsNotEmpty()

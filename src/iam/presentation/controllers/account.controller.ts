@@ -76,6 +76,8 @@ import {
 	ActiveSessionsResponseDto,
 	ChangePasswordRequestDto,
 	ConnectedProvidersResponseDto,
+	DisableMfaRequestDto,
+	EnableMfaRequestDto,
 	MfaEnableResponseDto,
 	MfaSetupResponseDto,
 	OAuthLinkUrlResponseDto,
@@ -84,7 +86,6 @@ import {
 	UpdateAccountRequestDto,
 	UserProfileResponseDto,
 } from "../dtos/account";
-import { DisableMfaDto, EnableMfaDto } from "../dtos/authentication";
 import { IamExceptionFilter } from "../filters/iam-exception.filter";
 import {
 	ActiveSessionsResponseMapper,
@@ -329,7 +330,7 @@ export class AccountController {
 	@ApiSuccessResponse(MfaEnableResponseDto, HttpStatus.OK, "MFA successfully enabled.")
 	public async enableMfa(
 		@CurrentUser() userPayload: JwtPayload,
-		@Body() dto: EnableMfaDto,
+		@Body() dto: EnableMfaRequestDto,
 	): Promise<MfaEnableResponseDto> {
 		const command = new EnableMfaCommand(userPayload.sub, dto.code);
 		const result = await this.enableMfaUseCase.execute(command);
@@ -342,7 +343,10 @@ export class AccountController {
 		summary: "Disable multi-factor authentication after verifying current password.",
 	})
 	@ApiMessageResponse(HttpStatus.OK, "MFA disabled successfully.")
-	public async disableMfa(@CurrentUser() userPayload: JwtPayload, @Body() dto: DisableMfaDto) {
+	public async disableMfa(
+		@CurrentUser() userPayload: JwtPayload,
+		@Body() dto: DisableMfaRequestDto,
+	) {
 		const command = new DisableMfaCommand(userPayload.sub, dto.currentPassword);
 		await this.disableMfaUseCase.execute(command);
 		return { message: "MFA disabled successfully." };
