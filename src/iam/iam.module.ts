@@ -169,7 +169,6 @@ import { AccountController } from "./presentation/controllers/account.controller
 import { AdminController } from "./presentation/controllers/admin.controller";
 import { AuthController } from "./presentation/controllers/auth.controller";
 import { OAuthController } from "./presentation/controllers/oauth.controller";
-import { RoleController } from "./presentation/controllers/role.controller";
 import { UserController } from "./presentation/controllers/user.controller";
 
 @Module({
@@ -180,7 +179,6 @@ import { UserController } from "./presentation/controllers/user.controller";
 		AccountController,
 		AdminController,
 		UserController,
-		RoleController,
 	],
 	providers: [
 		//! Repositories and Persistence

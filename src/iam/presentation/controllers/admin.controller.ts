@@ -4,6 +4,7 @@ import {
 	GetUserByIdQuery,
 	GetUserByIdUseCasePort,
 } from "@/iam/application/ports/inbound/account";
+import { GetRolesUseCasePort } from "@/iam/application/ports/inbound/roles";
 import { GetUsersQuery, GetUsersUseCasePort } from "@/iam/application/ports/inbound/users";
 import { ApiMessageResponse, ApiSuccessResponse, Roles } from "@/shared/http/decorators";
 import { PaginationDto } from "@/shared/http/dtos";
@@ -19,8 +20,16 @@ import {
 	Query,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { AdminUserResponseDto, PaginatedUsersResponseDto } from "../dtos/admin";
-import { AdminUserResponseMapper, PaginatedUsersResponseMapper } from "../mappers/admin";
+import {
+	AdminRolesListResponseDto,
+	AdminUserResponseDto,
+	PaginatedUsersResponseDto,
+} from "../dtos/admin";
+import {
+	AdminRolesResponseMapper,
+	AdminUserResponseMapper,
+	PaginatedUsersResponseMapper,
+} from "../mappers/admin";
 
 @ApiBearerAuth()
 @ApiTags("Admin")
@@ -31,6 +40,7 @@ export class AdminController {
 		private readonly getUsersUseCase: GetUsersUseCasePort,
 		private readonly getUserByIdUseCase: GetUserByIdUseCasePort,
 		private readonly deleteAccountUseCase: DeleteAccountUseCasePort,
+		private readonly getRolesUseCase: GetRolesUseCasePort,
 	) {}
 
 	@Get("users")
@@ -61,5 +71,14 @@ export class AdminController {
 		const command = new DeleteAccountCommand(id);
 		await this.deleteAccountUseCase.execute(command);
 		return { message: "User account permanently deleted." };
+	}
+
+	@Get("roles")
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: "Get a list of all system roles (admin only)" })
+	@ApiSuccessResponse(AdminRolesListResponseDto, HttpStatus.OK, "Roles retrieved successfully.")
+	public async getAllRoles(): Promise<AdminRolesListResponseDto> {
+		const roles = await this.getRolesUseCase.execute();
+		return AdminRolesResponseMapper.toDto(roles);
 	}
 }
