@@ -32,7 +32,12 @@ import {
 	GetEmployerJobsQuery,
 	GetEmployerJobsUseCasePort,
 } from "@/recruitment/application/ports/inbound/jobs";
-import { CurrentUser, Roles } from "@/shared/http/decorators";
+import {
+	ApiMessageResponse,
+	ApiSuccessResponse,
+	CurrentUser,
+	Roles,
+} from "@/shared/http/decorators";
 import { ROLES, type JwtPayload } from "@/shared/types";
 import {
 	Body,
@@ -59,18 +64,34 @@ import { Throttle } from "@nestjs/throttler";
 import {
 	BulkUpdateApplicationStatusRequestDto,
 	GetApplicationsRequestDto,
+	PaginatedEmployerApplicationsResponseDto,
 	UpdateApplicationStatusRequestDto,
 	UpdateInternalNoteRequestDto,
 } from "../dtos/applications";
-import { CreateEmployerProfileRequestDto, EditEmployerProfileRequestDto } from "../dtos/employers";
+import {
+	CreateEmployerProfileRequestDto,
+	EditEmployerProfileRequestDto,
+	EmployerApplicantProfileResponseDto,
+	EmployerProfileResponseDto,
+} from "../dtos/employers";
 import {
 	CloseJobListingRequestDto,
 	CreateJobListingRequestDto,
+	CreateJobListingResponseDto,
 	EditJobListingRequestDto,
 	GetEmployerJobsRequestDto,
+	PaginatedEmployerJobListingsResponseDto,
 } from "../dtos/jobs";
 import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.filter";
-import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mapper";
+import { PaginatedEmployerApplicationsResponseMapper } from "../mappers/applications";
+import {
+	EmployerApplicantProfileResponseMapper,
+	EmployerProfileResponseMapper,
+} from "../mappers/employers";
+import {
+	CreateJobListingResponseMapper,
+	PaginatedEmployerJobListingsResponseMapper,
+} from "../mappers/jobs";
 
 @UseFilters(RecruitmentExceptionFilter)
 @ApiTags("Employers")
@@ -99,18 +120,22 @@ export class EmployerController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 30 } })
 	@ApiOperation({ summary: "Get the employer's company profile." })
-	public async getProfile(@CurrentUser() user: JwtPayload) {
+	@ApiSuccessResponse(
+		EmployerProfileResponseDto,
+		HttpStatus.OK,
+		"Employer profile retrieved successfully.",
+	)
+	public async getProfile(@CurrentUser() user: JwtPayload): Promise<EmployerProfileResponseDto> {
 		const query = new GetEmployerProfileQuery(user.sub);
-
 		const profile = await this.getEmployerProfileUseCase.execute(query);
-
-		return { data: profile };
+		return EmployerProfileResponseMapper.toDto(profile);
 	}
 
 	@Post("profile")
 	@HttpCode(HttpStatus.CREATED)
 	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Create an employer's company profile." })
+	@ApiMessageResponse(HttpStatus.CREATED, "Employer profile created successfully.")
 	public async createProfile(
 		@CurrentUser() user: JwtPayload,
 		@Body() dto: CreateEmployerProfileRequestDto,
@@ -132,6 +157,7 @@ export class EmployerController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 15 } })
 	@ApiOperation({ summary: "Edit the employer's company profile." })
+	@ApiMessageResponse(HttpStatus.OK, "Employer profile updated successfully.")
 	public async editProfile(
 		@CurrentUser() user: JwtPayload,
 		@Body() dto: EditEmployerProfileRequestDto,
@@ -166,6 +192,7 @@ export class EmployerController {
 		},
 	})
 	@UseInterceptors(FileInterceptor("file"))
+	@ApiMessageResponse(HttpStatus.OK, "Company logo uploaded successfully.")
 	public async uploadLogo(
 		@CurrentUser() user: JwtPayload,
 		@UploadedFile(
@@ -189,6 +216,7 @@ export class EmployerController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Remove the company profile logo." })
+	@ApiMessageResponse(HttpStatus.OK, "Company logo removed successfully.")
 	public async removeLogo(@CurrentUser() user: JwtPayload) {
 		const command = new RemoveCompanyLogoCommand(user.sub);
 
@@ -201,7 +229,15 @@ export class EmployerController {
 	@HttpCode(HttpStatus.CREATED)
 	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Create a new job listing." })
-	public async createJob(@CurrentUser() user: JwtPayload, @Body() dto: CreateJobListingRequestDto) {
+	@ApiSuccessResponse(
+		CreateJobListingResponseDto,
+		HttpStatus.CREATED,
+		"Job listing created successfully.",
+	)
+	public async createJob(
+		@CurrentUser() user: JwtPayload,
+		@Body() dto: CreateJobListingRequestDto,
+	): Promise<CreateJobListingResponseDto> {
 		const command = new CreateJobListingCommand(
 			user.sub,
 			dto.title,
@@ -218,13 +254,14 @@ export class EmployerController {
 
 		const jobId = await this.createJobListingUseCase.execute(command);
 
-		return { message: "Job listing created successfully.", jobId };
+		return CreateJobListingResponseMapper.toDto(jobId);
 	}
 
 	@Put("jobs/:id")
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 15 } })
 	@ApiOperation({ summary: "Edit an existing job listing." })
+	@ApiMessageResponse(HttpStatus.OK, "Job listing updated successfully.")
 	public async editJob(
 		@CurrentUser() user: JwtPayload,
 		@Param("id") jobId: string,
@@ -253,6 +290,7 @@ export class EmployerController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Close a job listing." })
+	@ApiMessageResponse(HttpStatus.OK, "Job listing closed successfully.")
 	public async closeJob(
 		@CurrentUser() user: JwtPayload,
 		@Param("id") jobId: string,
@@ -269,10 +307,15 @@ export class EmployerController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 30 } })
 	@ApiOperation({ summary: "Get a paginated list of jobs posted by the employer." })
+	@ApiSuccessResponse(
+		PaginatedEmployerJobListingsResponseDto,
+		HttpStatus.OK,
+		"Employer jobs retrieved successfully.",
+	)
 	public async getJobs(
 		@CurrentUser() user: JwtPayload,
 		@Query() queryDto: GetEmployerJobsRequestDto,
-	) {
+	): Promise<PaginatedEmployerJobListingsResponseDto> {
 		const query = new GetEmployerJobsQuery(
 			user.sub,
 			queryDto.limit,
@@ -280,26 +323,28 @@ export class EmployerController {
 			queryDto.status,
 		);
 
-		const { items, total } = await this.getEmployerJobsUseCase.execute(query);
+		const result = await this.getEmployerJobsUseCase.execute(query);
 
-		return {
-			data: items.map((job) => RecruitmentResponseMapper.toJobListingResponse(job)),
-			meta: {
-				total,
-				limit: queryDto.limit,
-				offset: queryDto.offset,
-			},
-		};
+		return PaginatedEmployerJobListingsResponseMapper.toDto(
+			result,
+			queryDto.limit,
+			queryDto.offset,
+		);
 	}
 
 	@Get("applications")
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 30 } })
 	@ApiOperation({ summary: "Get a paginated list of applications received for your jobs." })
+	@ApiSuccessResponse(
+		PaginatedEmployerApplicationsResponseDto,
+		HttpStatus.OK,
+		"Applications retrieved successfully.",
+	)
 	public async getApplications(
 		@CurrentUser() user: JwtPayload,
 		@Query() queryDto: GetApplicationsRequestDto,
-	) {
+	): Promise<PaginatedEmployerApplicationsResponseDto> {
 		const query = new GetEmployerApplicationsQuery(
 			user.sub,
 			queryDto.limit,
@@ -308,27 +353,27 @@ export class EmployerController {
 			queryDto.status,
 		);
 
-		const { items, total } = await this.getEmployerApplicationsUseCase.execute(query);
+		const result = await this.getEmployerApplicationsUseCase.execute(query);
 
-		return {
-			data: items,
-			meta: { total, limit: queryDto.limit, offset: queryDto.offset },
-		};
+		return PaginatedEmployerApplicationsResponseMapper.toDto(
+			result,
+			queryDto.limit,
+			queryDto.offset,
+		);
 	}
 
 	@Patch("applications/:id/status")
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 15 } })
 	@ApiOperation({ summary: "Update the status of a specific job application." })
+	@ApiMessageResponse(HttpStatus.OK, "Application status updated successfully.")
 	public async updateApplicationStatus(
 		@CurrentUser() user: JwtPayload,
 		@Param("id") applicationId: string,
 		@Body() dto: UpdateApplicationStatusRequestDto,
 	) {
 		const command = new UpdateApplicationStatusCommand(user.sub, applicationId, dto.newStatus);
-
 		await this.updateApplicationStatusUseCase.execute(command);
-
 		return { message: "Application status updated successfully." };
 	}
 
@@ -336,6 +381,7 @@ export class EmployerController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Bulk update the status of multiple applications." })
+	@ApiMessageResponse(HttpStatus.OK, "Applications successfully updated.")
 	public async bulkUpdateApplicationStatus(
 		@CurrentUser() user: JwtPayload,
 		@Body() dto: BulkUpdateApplicationStatusRequestDto,
@@ -355,6 +401,7 @@ export class EmployerController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 15 } })
 	@ApiOperation({ summary: "Update the internal note for an application." })
+	@ApiMessageResponse(HttpStatus.OK, "Internal note successfully updated.")
 	public async updateApplicationNote(
 		@CurrentUser() user: JwtPayload,
 		@Param("id") applicationId: string,
@@ -373,13 +420,17 @@ export class EmployerController {
 	@ApiOperation({
 		summary: "Get an applicant's profile (restricted to applicants who applied to your jobs).",
 	})
+	@ApiSuccessResponse(
+		EmployerApplicantProfileResponseDto,
+		HttpStatus.OK,
+		"Applicant profile retrieved successfully.",
+	)
 	public async getApplicantProfile(
 		@CurrentUser() user: JwtPayload,
 		@Param("id") applicantId: string,
-	) {
+	): Promise<EmployerApplicantProfileResponseDto> {
 		const query = new GetApplicantProfileForEmployerQuery(user.sub, applicantId);
 		const profile = await this.getApplicantProfileForEmployerUseCase.execute(query);
-
-		return { data: profile };
+		return EmployerApplicantProfileResponseMapper.toDto(profile);
 	}
 }

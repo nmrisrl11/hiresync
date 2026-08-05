@@ -1,4 +1,3 @@
-import { JobListing } from "@/recruitment/domain/entities";
 import {
 	EmployerProfileRepository,
 	FindJobsFilter,
@@ -6,7 +5,11 @@ import {
 } from "@/recruitment/domain/repositories";
 import { Injectable } from "@nestjs/common";
 import { EmployerProfileNotFoundException } from "../../exceptions";
-import { GetEmployerJobsQuery, GetEmployerJobsUseCasePort } from "../../ports/inbound/jobs";
+import {
+	EmployerJobListingResult,
+	GetEmployerJobsQuery,
+	GetEmployerJobsUseCasePort,
+} from "../../ports/inbound/jobs";
 
 @Injectable()
 export class GetEmployerJobsUseCase implements GetEmployerJobsUseCasePort {
@@ -16,7 +19,7 @@ export class GetEmployerJobsUseCase implements GetEmployerJobsUseCasePort {
 	) {}
 	public async execute(
 		query: GetEmployerJobsQuery,
-	): Promise<{ items: JobListing[]; total: number }> {
+	): Promise<{ items: EmployerJobListingResult[]; total: number }> {
 		const employerProfile = await this.employerProfileRepository.findByUserId(query.userId);
 		if (!employerProfile) throw new EmployerProfileNotFoundException();
 
@@ -27,10 +30,27 @@ export class GetEmployerJobsUseCase implements GetEmployerJobsUseCasePort {
 			offset: query.offset,
 		};
 
-		const [items, total] = await Promise.all([
+		const [jobs, total] = await Promise.all([
 			this.jobListingRepository.findMany(filter),
 			this.jobListingRepository.count(filter),
 		]);
+
+		const items: EmployerJobListingResult[] = jobs.map((job) => ({
+			id: job.id.getValue(),
+			employerId: job.employerId.getValue(),
+			title: job.title,
+			description: job.description,
+			requirements: job.requirements,
+			employmentType: job.employmentType,
+			locationType: job.location.type,
+			locationAddress: job.location.address,
+			salaryMin: job.salaryRange?.min ?? null,
+			salaryMax: job.salaryRange?.max ?? null,
+			salaryCurrency: job.salaryRange?.currency ?? "USD",
+			status: job.status,
+			createdAt: job.createdAt,
+			expiresAt: job.expiresAt,
+		}));
 
 		return { items, total };
 	}
