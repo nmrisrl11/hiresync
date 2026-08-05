@@ -2,7 +2,7 @@ import { APPLICATION_STATUS, type ApplicationStatus } from "@/recruitment/domain
 import { ApiProperty } from "@nestjs/swagger";
 import { ArrayNotEmpty, IsArray, IsEnum, IsUUID } from "class-validator";
 
-export class BulkUpdateApplicationStatusDto {
+export class BulkUpdateApplicationStatusRequestDto {
 	@ApiProperty({
 		description: "Array of application IDs to update",
 		type: [String],

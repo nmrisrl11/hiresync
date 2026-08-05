@@ -106,7 +106,7 @@ export class OAuthController {
 			return { message: `Successfully linked ${provider} to your account.` };
 		}
 
-		const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP Address";
+		const ipAddress = req.ip || req.socket.remoteAddress;
 		const userAgent = req.headers["user-agent"] || "Unknown Device";
 
 		const command = new OAuthCallbackLoginCommand(provider, code, state, userAgent, ipAddress);

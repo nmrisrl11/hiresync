@@ -3,7 +3,7 @@ import { PaginationDto } from "@/shared/http/dtos";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsOptional, IsString, IsUUID } from "class-validator";
 
-export class GetApplicationsDto extends PaginationDto {
+export class GetApplicationsRequestDto extends PaginationDto {
 	@ApiPropertyOptional({ enum: APPLICATION_STATUS })
 	@IsOptional()
 	@IsEnum(APPLICATION_STATUS)
