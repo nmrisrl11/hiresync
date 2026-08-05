@@ -62,12 +62,12 @@ import {
 	UpdateApplicationStatusRequestDto,
 	UpdateInternalNoteRequestDto,
 } from "../dtos/applications";
-import { CreateEmployerProfileDto, EditEmployerProfileDto } from "../dtos/employers";
+import { CreateEmployerProfileRequestDto, EditEmployerProfileRequestDto } from "../dtos/employers";
 import {
-	CloseJobListingDto,
-	CreateJobListingDto,
-	EditJobListingDto,
-	GetEmployerJobsDto,
+	CloseJobListingRequestDto,
+	CreateJobListingRequestDto,
+	EditJobListingRequestDto,
+	GetEmployerJobsRequestDto,
 } from "../dtos/jobs";
 import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.filter";
 import { RecruitmentResponseMapper } from "../mappers/recruitment-response.mapper";
@@ -113,7 +113,7 @@ export class EmployerController {
 	@ApiOperation({ summary: "Create an employer's company profile." })
 	public async createProfile(
 		@CurrentUser() user: JwtPayload,
-		@Body() dto: CreateEmployerProfileDto,
+		@Body() dto: CreateEmployerProfileRequestDto,
 	) {
 		const command = new CreateEmployerProfileCommand(
 			user.sub,
@@ -132,7 +132,10 @@ export class EmployerController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 15 } })
 	@ApiOperation({ summary: "Edit the employer's company profile." })
-	public async editProfile(@CurrentUser() user: JwtPayload, @Body() dto: EditEmployerProfileDto) {
+	public async editProfile(
+		@CurrentUser() user: JwtPayload,
+		@Body() dto: EditEmployerProfileRequestDto,
+	) {
 		const command = new EditEmployerProfileCommand(
 			user.sub,
 			dto.companyName,
@@ -198,7 +201,7 @@ export class EmployerController {
 	@HttpCode(HttpStatus.CREATED)
 	@Throttle({ default: { ttl: 60000, limit: 10 } })
 	@ApiOperation({ summary: "Create a new job listing." })
-	public async createJob(@CurrentUser() user: JwtPayload, @Body() dto: CreateJobListingDto) {
+	public async createJob(@CurrentUser() user: JwtPayload, @Body() dto: CreateJobListingRequestDto) {
 		const command = new CreateJobListingCommand(
 			user.sub,
 			dto.title,
@@ -225,7 +228,7 @@ export class EmployerController {
 	public async editJob(
 		@CurrentUser() user: JwtPayload,
 		@Param("id") jobId: string,
-		@Body() dto: EditJobListingDto,
+		@Body() dto: EditJobListingRequestDto,
 	) {
 		const command = new EditJobListingCommand(
 			user.sub,
@@ -253,7 +256,7 @@ export class EmployerController {
 	public async closeJob(
 		@CurrentUser() user: JwtPayload,
 		@Param("id") jobId: string,
-		@Body() dto: CloseJobListingDto,
+		@Body() dto: CloseJobListingRequestDto,
 	) {
 		const command = new CloseJobListingCommand(user.sub, jobId, dto.reason);
 
@@ -266,7 +269,10 @@ export class EmployerController {
 	@HttpCode(HttpStatus.OK)
 	@Throttle({ default: { ttl: 60000, limit: 30 } })
 	@ApiOperation({ summary: "Get a paginated list of jobs posted by the employer." })
-	public async getJobs(@CurrentUser() user: JwtPayload, @Query() queryDto: GetEmployerJobsDto) {
+	public async getJobs(
+		@CurrentUser() user: JwtPayload,
+		@Query() queryDto: GetEmployerJobsRequestDto,
+	) {
 		const query = new GetEmployerJobsQuery(
 			user.sub,
 			queryDto.limit,

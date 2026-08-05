@@ -8,7 +8,7 @@ import { PaginationDto } from "@/shared/http/dtos";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsOptional, IsString } from "class-validator";
 
-export class SearchJobListingDto extends PaginationDto {
+export class SearchJobListingRequestDto extends PaginationDto {
 	@ApiPropertyOptional({ description: "Search by job title or description" })
 	@IsOptional()
 	@IsString()

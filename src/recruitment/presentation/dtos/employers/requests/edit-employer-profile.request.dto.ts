@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsOptional, IsString, IsUrl, MaxLength, MinLength } from "class-validator";
 
-export class EditEmployerProfileDto {
+export class EditEmployerProfileRequestDto {
 	@ApiProperty({ example: "Tech Corp Inc." })
 	@IsString()
 	@MinLength(2)

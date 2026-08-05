@@ -1,3 +1,5 @@
+import { EmploymentType, JobStatus, LocationType } from "@/recruitment/domain/types";
+
 export class GetJobListingByIdQuery {
 	constructor(public readonly jobId: string) {}
 }
@@ -10,13 +12,13 @@ export type PublicJobListingResult = {
 	title: string;
 	description: string;
 	requirements: string[];
-	employmentType: string;
-	locationType: string;
+	employmentType: EmploymentType;
+	locationType: LocationType;
 	locationAddress: string | null;
 	salaryMin: number | null;
 	salaryMax: number | null;
 	salaryCurrency: string;
-	status: string;
+	status: JobStatus;
 	postedAt: Date;
 };
 

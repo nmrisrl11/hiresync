@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
 
-export class CreateEmployerProfileDto {
+export class CreateEmployerProfileRequestDto {
 	@ApiProperty({ example: "TechNova Solutions" })
 	@IsString()
 	@IsNotEmpty()
