@@ -2,7 +2,7 @@ import { APPLICATION_STATUS, type ApplicationStatus } from "@/recruitment/domain
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum } from "class-validator";
 
-export class UpdateApplicationStatusDto {
+export class UpdateApplicationStatusRequestDto {
 	@ApiProperty({ enum: APPLICATION_STATUS, description: "The new status of the application" })
 	@IsEnum(APPLICATION_STATUS)
 	newStatus!: ApplicationStatus;

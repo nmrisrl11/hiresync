@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsOptional, IsString, MaxLength } from "class-validator";
 
-export class CreateApplicantProfileDto {
+export class EditApplicantProfileRequestDto {
 	@ApiProperty({ description: "Applicant's first name" })
 	@IsString()
 	firstName!: string;
@@ -10,7 +10,7 @@ export class CreateApplicantProfileDto {
 	@IsString()
 	lastName!: string;
 
-	@ApiPropertyOptional({ description: "Professional headline (e.g., Senior Frontend Developer)" })
+	@ApiPropertyOptional({ description: "Professional headline" })
 	@IsOptional()
 	@IsString()
 	@MaxLength(100)

@@ -57,10 +57,10 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
 import {
-	BulkUpdateApplicationStatusDto,
-	GetApplicationsDto,
-	UpdateApplicationStatusDto,
-	UpdateInternalNoteDto,
+	BulkUpdateApplicationStatusRequestDto,
+	GetApplicationsRequestDto,
+	UpdateApplicationStatusRequestDto,
+	UpdateInternalNoteRequestDto,
 } from "../dtos/applications";
 import { CreateEmployerProfileDto, EditEmployerProfileDto } from "../dtos/employers";
 import {
@@ -292,7 +292,7 @@ export class EmployerController {
 	@ApiOperation({ summary: "Get a paginated list of applications received for your jobs." })
 	public async getApplications(
 		@CurrentUser() user: JwtPayload,
-		@Query() queryDto: GetApplicationsDto,
+		@Query() queryDto: GetApplicationsRequestDto,
 	) {
 		const query = new GetEmployerApplicationsQuery(
 			user.sub,
@@ -317,7 +317,7 @@ export class EmployerController {
 	public async updateApplicationStatus(
 		@CurrentUser() user: JwtPayload,
 		@Param("id") applicationId: string,
-		@Body() dto: UpdateApplicationStatusDto,
+		@Body() dto: UpdateApplicationStatusRequestDto,
 	) {
 		const command = new UpdateApplicationStatusCommand(user.sub, applicationId, dto.newStatus);
 
@@ -332,7 +332,7 @@ export class EmployerController {
 	@ApiOperation({ summary: "Bulk update the status of multiple applications." })
 	public async bulkUpdateApplicationStatus(
 		@CurrentUser() user: JwtPayload,
-		@Body() dto: BulkUpdateApplicationStatusDto,
+		@Body() dto: BulkUpdateApplicationStatusRequestDto,
 	) {
 		const command = new BulkUpdateApplicationStatusCommand(
 			user.sub,
@@ -352,7 +352,7 @@ export class EmployerController {
 	public async updateApplicationNote(
 		@CurrentUser() user: JwtPayload,
 		@Param("id") applicationId: string,
-		@Body() dto: UpdateInternalNoteDto,
+		@Body() dto: UpdateInternalNoteRequestDto,
 	) {
 		const command = new UpdateInternalNoteCommand(user.sub, applicationId, dto.note ?? null);
 

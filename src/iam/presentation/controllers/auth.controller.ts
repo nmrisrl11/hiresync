@@ -126,7 +126,7 @@ export class AuthController {
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<VerifyEmailResponseDto> {
-		const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP Address";
+		const ipAddress = req.ip || req.socket.remoteAddress;
 		const userAgent = req.headers["user-agent"] || "Unknown Device";
 
 		const command = new VerifyEmailCommand(dto.token, userAgent, ipAddress);
@@ -150,7 +150,7 @@ export class AuthController {
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<LoginResponseDto> {
-		const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP Address";
+		const ipAddress = req.ip || req.socket.remoteAddress;
 		const userAgent = req.headers["user-agent"] || "Unknown Device";
 
 		const command = new LoginCommand(dto.email, dto.password, userAgent, ipAddress);
@@ -177,7 +177,7 @@ export class AuthController {
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<LoginResponseDto> {
-		const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP Address";
+		const ipAddress = req.ip || req.socket.remoteAddress;
 		const userAgent = req.headers["user-agent"] || "Unknown Device";
 
 		const command = new MfaLoginCommand(dto.mfaChallengeToken, dto.code, userAgent, ipAddress);
@@ -279,7 +279,7 @@ export class AuthController {
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<RestoreAccountResponseDto> {
-		const ipAddress = req.ip || req.socket.remoteAddress || "Unknown IP Address";
+		const ipAddress = req.ip || req.socket.remoteAddress;
 		const userAgent = req.headers["user-agent"] || "Unknown Device";
 
 		const command = new RestoreAccountCommand(dto.email, dto.password, userAgent, ipAddress);
