@@ -1,3 +1,5 @@
+import { EmploymentType, JobStatus, LocationType } from "@/recruitment/domain/types";
+
 export class GetSavedJobsQuery {
 	constructor(
 		public readonly userId: string,
@@ -10,13 +12,13 @@ export type SavedJobResult = {
 	id: string;
 	employerId: string;
 	title: string;
-	locationType: string;
+	locationType: LocationType;
 	locationAddress: string | null;
-	employmentType: string;
+	employmentType: EmploymentType;
 	salaryMin: number | null;
 	salaryMax: number | null;
 	salaryCurrency: string;
-	status: string;
+	status: JobStatus;
 	createdAt: Date;
 };
 

@@ -17,7 +17,7 @@ import {
 	Min,
 } from "class-validator";
 
-export class CreateJobListingDto {
+export class CreateJobListingRequestDto {
 	@ApiProperty({ example: "Senior Frontend Developer" })
 	@IsString()
 	@IsNotEmpty()
