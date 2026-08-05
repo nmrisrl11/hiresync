@@ -1,5 +1,4 @@
-import { JobListing } from "@/recruitment/domain/entities";
-import { JobStatus } from "@/recruitment/domain/types";
+import { EmploymentType, JobStatus, LocationType } from "@/recruitment/domain/types";
 
 export class GetEmployerJobsQuery {
 	constructor(
@@ -10,6 +9,25 @@ export class GetEmployerJobsQuery {
 	) {}
 }
 
+export type EmployerJobListingResult = {
+	id: string;
+	employerId: string;
+	title: string;
+	description: string;
+	requirements: string[];
+	employmentType: EmploymentType;
+	locationType: LocationType;
+	locationAddress: string | null;
+	salaryMin: number | null;
+	salaryMax: number | null;
+	salaryCurrency: string;
+	status: JobStatus;
+	createdAt: Date;
+	expiresAt: Date | null;
+};
+
 export abstract class GetEmployerJobsUseCasePort {
-	abstract execute(query: GetEmployerJobsQuery): Promise<{ items: JobListing[]; total: number }>;
+	abstract execute(
+		query: GetEmployerJobsQuery,
+	): Promise<{ items: EmployerJobListingResult[]; total: number }>;
 }
