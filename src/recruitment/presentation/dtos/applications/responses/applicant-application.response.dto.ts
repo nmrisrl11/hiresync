@@ -1,3 +1,4 @@
+import { APPLICATION_STATUS, type ApplicationStatus } from "@/recruitment/domain/types";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class ApplicantApplicationResponseDto {
@@ -10,8 +11,8 @@ export class ApplicantApplicationResponseDto {
 	@ApiProperty()
 	public readonly employerId!: string;
 
-	@ApiProperty()
-	public readonly status!: string;
+	@ApiProperty({ enum: APPLICATION_STATUS })
+	public readonly status!: ApplicationStatus;
 
 	@ApiProperty()
 	public readonly resumeUrl!: string;
