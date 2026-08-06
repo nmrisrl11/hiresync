@@ -71,10 +71,30 @@ model ApplicantProfile {
     bio       String? @db.Text
 
     applications JobApplication[]
+    documents    ApplicantDocument[]
 
     createdAt DateTime   @default(now())
     updatedAt DateTime   @updatedAt
     savedJobs SavedJob[]
+}
+
+// ------------------------------------------------------------------
+// APPLICANT DOCUMENT TABLE: Stores uploaded documents for applicants
+// ------------------------------------------------------------------
+model ApplicantDocument {
+    id               String           @id @default(uuid())
+    applicantId      String
+    applicant        ApplicantProfile @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+
+    type             DocumentType
+    originalFilename String
+    fileKey          String
+    isPrimary        Boolean          @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([applicantId])
 }
 
 // ------------------------------------------------------
