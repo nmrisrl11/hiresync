@@ -40,3 +40,8 @@ enum ApplicationStatus {
 	HIRED
 	WITHDRAWN
 }
+
+enum DocumentType {
+	RESUME
+	COVER_LETTER
+}
