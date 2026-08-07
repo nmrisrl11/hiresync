@@ -1,9 +1,21 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsUUID } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 
 export class ApplyForJobRequestDto {
-	@ApiProperty({ description: "The ID of the job listing being applied for" })
-	@IsString()
+	@ApiProperty({ description: "The ID of the job listing being applied for." })
 	@IsUUID()
-	jobListingId!: string;
+	@IsNotEmpty()
+	public readonly jobListingId!: string;
+
+	@ApiProperty({ description: "The ID of the stored resume document to use." })
+	@IsUUID()
+	@IsNotEmpty()
+	public readonly resumeDocumentId!: string;
+
+	@ApiPropertyOptional({
+		description: "The ID of the stored cover letter document to use (optional).",
+	})
+	@IsUUID()
+	@IsOptional()
+	public readonly coverLetterDocumentId?: string;
 }

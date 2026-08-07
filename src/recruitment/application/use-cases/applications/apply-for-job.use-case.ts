@@ -1,11 +1,16 @@
 import { JobApplication } from "@/recruitment/domain/entities";
+import { DocumentNotFoundException } from "@/recruitment/domain/exceptions";
 import {
 	ApplicantProfileRepository,
 	JobApplicationRepository,
 	JobListingRepository,
 } from "@/recruitment/domain/repositories";
-import { JOB_STATUS } from "@/recruitment/domain/types";
-import { JobApplicationId, JobListingId } from "@/recruitment/domain/value-objects";
+import { DOCUMENT_TYPE, JOB_STATUS } from "@/recruitment/domain/types";
+import {
+	ApplicantDocumentId,
+	JobApplicationId,
+	JobListingId,
+} from "@/recruitment/domain/value-objects";
 import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
@@ -16,7 +21,6 @@ import {
 	JobNotAcceptingApplicationsException,
 } from "../../exceptions";
 import { ApplyForJobCommand, ApplyForJobUseCasePort } from "../../ports/inbound/applications";
-import { DocumentStoragePort } from "../../ports/outbound";
 
 @Injectable()
 export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
@@ -25,7 +29,6 @@ export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
 		private readonly jobListingRepository: JobListingRepository,
 		private readonly applicantProfileRepository: ApplicantProfileRepository,
 		private readonly idGenerator: IdGeneratorPort,
-		private readonly documentStorage: DocumentStoragePort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -33,7 +36,7 @@ export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
 		const jobListingIdVo = new JobListingId(command.jobListingId);
 
 		//! Check if the applicant exists
-		const applicant = await this.applicantProfileRepository.findByUserId(command.applicantId);
+		const applicant = await this.applicantProfileRepository.findByUserId(command.applicantUserId);
 		if (!applicant) throw new ApplicantProfileNotFoundException();
 		const applicantId = applicant.id;
 
@@ -50,30 +53,34 @@ export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
 		);
 		if (existingApplication) throw new DuplicateJobApplicationException();
 
-		const applicationId = new JobApplicationId(this.idGenerator.generateId());
+		const resumeIdVo = new ApplicantDocumentId(command.resumeDocumentId);
+		const selectedResume = applicant.getDocuments().find((d) => d.id.equals(resumeIdVo));
 
-		//! Upload resume (PDF)
-		const resumeUrl = await this.documentStorage.uploadResume(
-			command.resumeBuffer,
-			`resume_${applicantId.getValue()}_${jobListingIdVo.getValue()}`,
-		);
+		if (!selectedResume || selectedResume.type !== DOCUMENT_TYPE.RESUME)
+			throw new DocumentNotFoundException("Invalid or missing resume document selected.");
 
-		//! Upload Cover Letter (TXT) if provided
-		let coverLetterUrl: string | null = null;
-		if (command.coverLetterBuffer) {
-			coverLetterUrl = await this.documentStorage.uploadCoverLetter(
-				command.coverLetterBuffer,
-				`cover_letter_${applicantId.getValue()}_${jobListingIdVo.getValue()}.txt`,
-			);
+		let coverLetterKey: string | null = null;
+		if (command.coverLetterDocumentId) {
+			const coverLetterIdVo = new ApplicantDocumentId(command.coverLetterDocumentId);
+			const selectedCoverLetter = applicant
+				.getDocuments()
+				.find((d) => d.id.equals(coverLetterIdVo));
+
+			if (!selectedCoverLetter || selectedCoverLetter.type !== DOCUMENT_TYPE.COVER_LETTER) {
+				throw new DocumentNotFoundException("Invalid cover letter document selected.");
+			}
+			coverLetterKey = selectedCoverLetter.fileKey;
 		}
+
+		const applicationId = new JobApplicationId(this.idGenerator.generateId());
 
 		const application = JobApplication.submit(
 			applicationId,
 			applicantId,
 			jobListingIdVo,
 			jobListing.employerId,
-			resumeUrl,
-			coverLetterUrl,
+			selectedResume.fileKey,
+			coverLetterKey,
 		);
 
 		await this.jobApplicationRepository.save(application);

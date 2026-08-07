@@ -1,16 +1,19 @@
 import {
+	ApplicantDocument as PrismaApplicantDocument,
 	ApplicantProfile as PrismaApplicantProfile,
 	EmployerProfile as PrismaEmployerProfile,
 	JobApplication as PrismaJobApplication,
 	JobListing as PrismaJobListing,
 } from "@/generated/prisma/client";
 import {
+	ApplicantDocument,
 	ApplicantProfile,
 	EmployerProfile,
 	JobApplication,
 	JobListing,
 } from "@/recruitment/domain/entities";
 import {
+	ApplicantDocumentId,
 	ApplicantId,
 	CompanyWebsite,
 	EmployerId,
@@ -61,7 +64,13 @@ export class RecruitmentMapper {
 		);
 	}
 
-	public static toApplicantProfileDomain(raw: PrismaApplicantProfile): ApplicantProfile {
+	public static toApplicantProfileDomain(
+		raw: PrismaApplicantProfile & { documents?: PrismaApplicantDocument[] },
+	): ApplicantProfile {
+		const documents = raw.documents
+			? raw.documents.map((doc) => this.toApplicantDocumentDomain(doc))
+			: [];
+
 		return new ApplicantProfile(
 			new ApplicantId(raw.id),
 			raw.userId,
@@ -69,6 +78,20 @@ export class RecruitmentMapper {
 			raw.lastName,
 			raw.headline,
 			raw.bio,
+			documents,
+			raw.createdAt,
+			raw.updatedAt,
+		);
+	}
+
+	public static toApplicantDocumentDomain(raw: PrismaApplicantDocument): ApplicantDocument {
+		return new ApplicantDocument(
+			new ApplicantDocumentId(raw.id),
+			new ApplicantId(raw.applicantId),
+			raw.type,
+			raw.originalFilename,
+			raw.fileKey,
+			raw.isPrimary,
 			raw.createdAt,
 			raw.updatedAt,
 		);
