@@ -200,7 +200,7 @@ Multiple Resumes and Cover Letters
 - [x] Setting of default resume and cover letter
 - [x] Allow user to set which resume and cover letter to use during the "Apply" flow
 
-Applicantion History Timeline
+Application History Timeline
 - A visual timeline on the applicant's side showing exactly when they applied, when the status changed, and when the employer left a note (if you choose to make certain notes public).
 
 ### System & Compliance

@@ -2,6 +2,7 @@ import { ApplicantDocument } from "@/recruitment/domain/entities";
 import { ApplicantProfileRepository } from "@/recruitment/domain/repositories";
 import { DOCUMENT_TYPE } from "@/recruitment/domain/types";
 import { ApplicantDocumentId } from "@/recruitment/domain/value-objects";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 import { ApplicantProfileNotFoundException } from "../../exceptions";
@@ -18,6 +19,7 @@ export class UploadApplicantDocumentUseCase implements UploadApplicantDocumentUs
 		private readonly applicantProfileRepository: ApplicantProfileRepository,
 		private readonly documentStorage: DocumentStoragePort,
 		private readonly idGenerator: IdGeneratorPort,
+		private readonly logger: LoggerPort,
 	) {}
 
 	public async execute(
@@ -38,20 +40,31 @@ export class UploadApplicantDocumentUseCase implements UploadApplicantDocumentUs
 			fileKey = await this.documentStorage.uploadCoverLetter(command.fileBuffer, fileName);
 		}
 
-		const document = new ApplicantDocument(
-			documentIdVo,
-			profile.id,
-			command.type,
-			command.originalFilename,
-			fileKey,
-			false, //! Aggregate root will handle primary assignment logic
-			new Date(),
-			new Date(),
-		);
+		try {
+			const document = new ApplicantDocument(
+				documentIdVo,
+				profile.id,
+				command.type,
+				command.originalFilename,
+				fileKey,
+				false, //! Aggregate root will handle primary assignment logic
+				new Date(),
+				new Date(),
+			);
 
-		profile.addDocument(document);
-
-		await this.applicantProfileRepository.save(profile);
+			profile.addDocument(document);
+			await this.applicantProfileRepository.save(profile);
+		} catch (error) {
+			//! Compensate for failed profile update by deleting the orphaned file
+			await this.documentStorage.deleteDocument(fileKey).catch((cleanupError) => {
+				//! Record cleanup failure for async retry
+				this.logger.error(
+					`Failed to cleanup orphaned document ${fileKey}:`,
+					cleanupError instanceof Error ? cleanupError.stack : "Unknown error",
+				);
+			});
+			throw error; //! Rethrow original database/validation error
+		}
 
 		return { id: documentIdStr, fileKey: fileKey };
 	}

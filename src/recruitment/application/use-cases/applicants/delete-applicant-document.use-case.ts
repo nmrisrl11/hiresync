@@ -24,10 +24,15 @@ export class DeleteApplicantDocumentUseCase implements DeleteApplicantDocumentUs
 		//! The aggregate root enforces the domain rules and throws DocumentNotFoundException if invalid
 		const removedDocument = profile.removeDocument(documentIdVo);
 
-		//! Delete the actual file from Cloudinary using the stored fileKey
-		await this.documentStorage.deleteDocument(removedDocument.fileKey).catch(() => {
-			//! Silently fail if the document is already missing from the cloud provider
-		});
+		try {
+			//! Delete the actual file from Cloudinary using the stored fileKey
+			await this.documentStorage.deleteDocument(removedDocument.fileKey);
+		} catch (error) {
+			//! Suppress only explicit "not found" responses. Rethrow timeouts/auth errors to retain the DB record for retry.
+			if (error instanceof Error)
+				if (!error.message.toLowerCase().includes("not found")) throw error;
+				else throw error; // If the error isn't a standard Error object, rethrow it immediately to be safe
+		}
 
 		//! Persist the updated aggregate root (which will delete the document row via cascade/orphan removal)
 		await this.applicantProfileRepository.save(profile);

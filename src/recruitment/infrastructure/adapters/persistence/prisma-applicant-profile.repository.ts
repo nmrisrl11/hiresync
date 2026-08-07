@@ -32,6 +32,19 @@ export class PrismaApplicantProfileRepository implements ApplicantProfileReposit
 		const currentDocumentIds = profile.getDocuments().map((doc) => doc.id.getValue());
 
 		await this.prisma.$transaction(async (tx) => {
+			//! Optimistic Concurrency Check: Reject if the database was modified after this profile was loaded
+			const existingProfile = await tx.applicantProfile.findUnique({
+				where: { id: profile.id.getValue() },
+				select: { updatedAt: true },
+			});
+
+			if (
+				existingProfile &&
+				existingProfile.updatedAt.getTime() > profile.baseUpdatedAt.getTime()
+			) {
+				throw new Error("Concurrency conflict: The profile was updated by another request.");
+			}
+
 			//! Upsert the core profile data
 			await tx.applicantProfile.upsert({
 				where: { id: profile.id.getValue() },

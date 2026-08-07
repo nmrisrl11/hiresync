@@ -6,6 +6,8 @@ import { ApplicantDocument } from "./applicant-document.entity";
 import { DocumentNotFoundException, MaxDocumentLimitReachedException } from "../exceptions";
 
 export class ApplicantProfile extends AggregateRoot {
+	public readonly baseUpdatedAt: Date; //! Track original load time for optimistic concurrency
+
 	constructor(
 		public readonly id: ApplicantId,
 		public readonly userId: string,
@@ -18,6 +20,7 @@ export class ApplicantProfile extends AggregateRoot {
 		public updatedAt: Date,
 	) {
 		super();
+		this.baseUpdatedAt = updatedAt;
 	}
 
 	public static create(
@@ -74,6 +77,7 @@ export class ApplicantProfile extends AggregateRoot {
 		if (typeDocs.length >= 5) throw new MaxDocumentLimitReachedException(document.type);
 
 		if (typeDocs.length === 0) document.makePrimary();
+		else document.removePrimary();
 
 		this.documents.push(document);
 		this.updatedAt = new Date();
