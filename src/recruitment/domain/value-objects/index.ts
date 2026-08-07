@@ -1,3 +1,4 @@
+export * from "./applicant-document-id.vo";
 export * from "./applicant-id.vo";
 export * from "./company-website.vo";
 export * from "./employer-id.vo";

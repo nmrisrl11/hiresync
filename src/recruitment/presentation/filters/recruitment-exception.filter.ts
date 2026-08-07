@@ -13,8 +13,10 @@ import {
 } from "@/recruitment/application/exceptions";
 import {
 	ApplicationNotUpdatableException,
+	DocumentNotFoundException,
 	JobAlreadyClosedException,
 	JobNotUpdatableException,
+	MaxDocumentLimitReachedException,
 } from "@/recruitment/domain/exceptions";
 import { ApplicationBaseException, DomainBaseException } from "@/shared/core";
 import { BaseExceptionFilter } from "@/shared/http/filters/base-exception.filter";
@@ -27,6 +29,10 @@ export class RecruitmentExceptionFilter extends BaseExceptionFilter {
 			case JobNotUpdatableException:
 			case JobAlreadyClosedException:
 			case ApplicationNotUpdatableException:
+				return HttpStatus.CONFLICT;
+			case DocumentNotFoundException:
+				return HttpStatus.NOT_FOUND;
+			case MaxDocumentLimitReachedException:
 				return HttpStatus.CONFLICT;
 			default:
 				return HttpStatus.INTERNAL_SERVER_ERROR;

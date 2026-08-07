@@ -17,3 +17,15 @@ export class ApplicationNotUpdatableException extends DomainBaseException {
 		super(message);
 	}
 }
+
+export class MaxDocumentLimitReachedException extends DomainBaseException {
+	constructor(type: string, limit: number = 5) {
+		super(`Maximum limit of ${limit} ${type}s reached. Please delete an existing document first.`);
+	}
+}
+
+export class DocumentNotFoundException extends DomainBaseException {
+	constructor(message: string = "The requested document could not be found in your profile.") {
+		super(message);
+	}
+}

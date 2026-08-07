@@ -3,10 +3,14 @@ import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import {
 	CreateApplicantProfileUseCasePort,
+	DeleteApplicantDocumentUseCasePort,
 	EditApplicantProfileUseCasePort,
+	GetApplicantDocumentsUseCasePort,
 	GetApplicantProfileUseCasePort,
 	GetSavedJobsUseCasePort,
+	SetPrimaryApplicantDocumentUseCasePort,
 	ToggleSavedJobUseCasePort,
+	UploadApplicantDocumentUseCasePort,
 } from "./application/ports/inbound/applicants";
 import {
 	ApplyForJobUseCasePort,
@@ -54,10 +58,14 @@ import {
 } from "./application/ports/outbound";
 import {
 	CreateApplicantProfileUseCase,
+	DeleteApplicantDocumentUseCase,
 	EditApplicantProfileUseCase,
+	GetApplicantDocumentsUseCase,
 	GetApplicantProfileUseCase,
 	GetSavedJobsUseCase,
+	SetPrimaryApplicantDocumentUseCase,
 	ToggleSavedJobUseCase,
+	UploadApplicantDocumentUseCase,
 } from "./application/use-cases/applicants";
 import {
 	ApplyForJobUseCase,
@@ -140,7 +148,7 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 		RecruitmentNotificationsModule,
 		BullModule.registerQueue({ name: "recruitment-asset-queue" }),
 	],
-	controllers: [EmployerController, RecruitmentController, ApplicantController],
+	controllers: [EmployerController, ApplicantController, RecruitmentController],
 	providers: [
 		//! Repositories and Persistence
 		{ provide: EmployerProfileRepository, useClass: PrismaEmployerProfileRepository },
@@ -177,6 +185,13 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 		{ provide: GetApplicantProfileUseCasePort, useClass: GetApplicantProfileUseCase },
 		{ provide: ToggleSavedJobUseCasePort, useClass: ToggleSavedJobUseCase },
 		{ provide: GetSavedJobsUseCasePort, useClass: GetSavedJobsUseCase },
+		{ provide: UploadApplicantDocumentUseCasePort, useClass: UploadApplicantDocumentUseCase },
+		{ provide: GetApplicantDocumentsUseCasePort, useClass: GetApplicantDocumentsUseCase },
+		{ provide: DeleteApplicantDocumentUseCasePort, useClass: DeleteApplicantDocumentUseCase },
+		{
+			provide: SetPrimaryApplicantDocumentUseCasePort,
+			useClass: SetPrimaryApplicantDocumentUseCase,
+		},
 
 		/** Applications **/
 		{ provide: ApplyForJobUseCasePort, useClass: ApplyForJobUseCase },

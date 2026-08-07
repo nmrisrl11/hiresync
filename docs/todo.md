@@ -192,8 +192,16 @@ Manual OAuth Integration
 - [ ] Company profile Allowing multiple User accounts (with a "Recruiter" role) to attach to a single Employer entity.
 
 ### Applicants
-- [ ] Multiple Resumes - Allowing them to store up to 3–5 resumes and select which one to attach during the "Apply" flow significantly improves their experience.
-- [ ] Application History Timeline - A visual timeline on the applicant's side showing exactly when they applied, when the status changed, and when the employer left a note (if you choose to make certain notes public).
+Multiple Resumes and Cover Letters
+- [x] Get all documents of an applicant (resume and cover letter)
+- [x] Upload resume up to 5 times
+- [x] Upload cover letter up to 5 times
+- [x] Deleting of resumes and cover letters
+- [x] Setting of default resume and cover letter
+- [x] Allow user to set which resume and cover letter to use during the "Apply" flow
+
+Application History Timeline
+- A visual timeline on the applicant's side showing exactly when they applied, when the status changed, and when the employer left a note (if you choose to make certain notes public).
 
 ### System & Compliance
 - [ ] Audit Logging (Activity History): Track "who did what and when" (e.g., "User A updated Job Listing B on Date C"). This is critical for resolving disputes or tracking recruiter activity.
