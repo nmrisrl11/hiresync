@@ -1,5 +1,5 @@
 import { Prisma } from "@/generated/prisma/client";
-import { JobApplication } from "@/recruitment/domain/entities";
+import { JobApplication, JobApplicationHistory } from "@/recruitment/domain/entities";
 import {
 	FindApplicationsFilter,
 	JobApplicationRepository,
@@ -29,7 +29,6 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 	async findById(id: JobApplicationId): Promise<JobApplication | null> {
 		const application = await this.prisma.jobApplication.findUnique({
 			where: { id: id.getValue() },
-			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		if (!application) return null;
@@ -39,7 +38,6 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 	async findByIds(ids: JobApplicationId[]): Promise<JobApplication[]> {
 		const applications = await this.prisma.jobApplication.findMany({
 			where: { id: { in: ids.map((id) => id.getValue()) } },
-			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		return applications.map((app) => RecruitmentMapper.toJobApplicationDomain(app));
@@ -56,7 +54,6 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 					jobListingId: jobListingId.getValue(),
 				},
 			},
-			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		if (!application) return null;
@@ -66,7 +63,6 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 	async findAllByApplicantId(applicantId: ApplicantId): Promise<JobApplication[]> {
 		const applications = await this.prisma.jobApplication.findMany({
 			where: { applicantId: applicantId.getValue() },
-			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		return applications.map((app) => RecruitmentMapper.toJobApplicationDomain(app));
@@ -78,7 +74,6 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 			take: filter.limit,
 			skip: filter.offset,
 			orderBy: { appliedAt: "desc" }, //! Order by newest applications first
-			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		return applications.map((app) => RecruitmentMapper.toJobApplicationDomain(app));
@@ -88,6 +83,15 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 		return await this.prisma.jobApplication.count({
 			where: this.buildWhereClause(filter),
 		});
+	}
+
+	async getHistory(applicationId: JobApplicationId): Promise<JobApplicationHistory[]> {
+		const records = await this.prisma.jobApplicationHistory.findMany({
+			where: { jobApplicationId: applicationId.getValue() },
+			orderBy: { createdAt: "asc" },
+		});
+
+		return records.map((record) => RecruitmentMapper.toJobApplicationHistoryDomain(record));
 	}
 
 	async save(application: JobApplication): Promise<void> {
@@ -112,12 +116,11 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 				},
 			});
 
-			//! History is append-only. Upsert them safely.
-			for (const record of application.getHistory()) {
-				await tx.jobApplicationHistory.upsert({
-					where: { id: record.id.getValue() },
-					update: {}, //! Immutable timeline
-					create: {
+			//! Retrieve only the newly appended history elements since the entity was loaded
+			const newHistoryRecords = application.getHistory();
+			if (newHistoryRecords.length > 0) {
+				await tx.jobApplicationHistory.createMany({
+					data: newHistoryRecords.map((record) => ({
 						id: record.id.getValue(),
 						jobApplicationId: record.jobApplicationId.getValue(),
 						eventType: record.eventType,
@@ -127,7 +130,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 							: Prisma.JsonNull,
 						isPublic: record.isPublic,
 						createdAt: record.createdAt,
-					},
+					})),
 				});
 			}
 		});
@@ -157,11 +160,11 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 					},
 				});
 
-				for (const record of app.getHistory()) {
-					await tx.jobApplicationHistory.upsert({
-						where: { id: record.id.getValue() },
-						update: {},
-						create: {
+				const newHistoryRecords = app.getHistory();
+
+				if (newHistoryRecords.length > 0) {
+					await tx.jobApplicationHistory.createMany({
+						data: newHistoryRecords.map((record) => ({
 							id: record.id.getValue(),
 							jobApplicationId: record.jobApplicationId.getValue(),
 							eventType: record.eventType,
@@ -171,7 +174,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 								: Prisma.JsonNull,
 							isPublic: record.isPublic,
 							createdAt: record.createdAt,
-						},
+						})),
 					});
 				}
 			}

@@ -4,10 +4,10 @@ When creating new features, follow these guidelines:
 
 ## Rules:
 - Inward to Outward (Domain -> Application -> Infrastructure -> Presentation)
-- No direct usage of third party library or dependencies on Core Layer (Domain and Application)
+- Core layers (Domain and Application) must not depend directly on third-party libraries or Infrastructure implementations.
 - No type of "any"
 - Define exceptions either Domain or Application Exceptions
-- When implementation need to use a third party library or dependency, it should be done on the Infrastructure Layer through an outbound port and adapter (Dependency Inversion)
+- When an implementation needs a third-party library or external dependency, access it through an outbound port implemented by an Infrastructure adapter.
 - Always follow SRP (Single Responsibility Principle)
 - Always follow the Hexagonal Architecture principles
 - When logging needed use the shared Logger
@@ -37,7 +37,7 @@ When creating new features, follow these guidelines:
 
 - Adapters (Persistence, External Services)
 - Events (Listeners)
-- Mappers (Mapping Domain Entities to DTOs and vice versa)
+- Mappers (Translates persistence or external records to domain entities)
 - Notifications (e.g., email, SMS)
 - Queues (e.g., BullMQ)
 - Tasks (cron jobs with NestJS Schedule)
@@ -47,9 +47,9 @@ When creating new features, follow these guidelines:
 - Controllers
 - DTOS (Request/Response)
 - Filters (Mapping of Domain and Application Exceptions, Exception -> Proper HTTP Status)
-- Mappers (Mapping of Use Cases Results to DTOs Response)
+- Mappers (Translates use-case results to response DTOs)
 
-### Prisma
+### Prisma - (Outside the main `src` directory)
 - Migrations
 - Models
 - schema.prisma
