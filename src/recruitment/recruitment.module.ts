@@ -16,6 +16,7 @@ import {
 	ApplyForJobUseCasePort,
 	BulkUpdateApplicationStatusUseCasePort,
 	GetApplicantApplicationsUseCasePort,
+	GetApplicationHistoryUseCasePort,
 	GetEmployerApplicationsUseCasePort,
 	UpdateApplicationStatusUseCasePort,
 	UpdateInternalNoteUseCasePort,
@@ -71,6 +72,7 @@ import {
 	ApplyForJobUseCase,
 	BulkUpdateApplicationStatusUseCase,
 	GetApplicantApplicationsUseCase,
+	GetApplicationHistoryUseCase,
 	GetEmployerApplicationsUseCase,
 	UpdateApplicationStatusUseCase,
 	UpdateInternalNoteUseCase,
@@ -197,6 +199,7 @@ import { RecruitmentController } from "./presentation/controllers/recruitment.co
 		{ provide: ApplyForJobUseCasePort, useClass: ApplyForJobUseCase },
 		{ provide: GetApplicantApplicationsUseCasePort, useClass: GetApplicantApplicationsUseCase },
 		{ provide: GetEmployerApplicationsUseCasePort, useClass: GetEmployerApplicationsUseCase },
+		{ provide: GetApplicationHistoryUseCasePort, useClass: GetApplicationHistoryUseCase },
 		{ provide: UpdateApplicationStatusUseCasePort, useClass: UpdateApplicationStatusUseCase },
 		{ provide: WithdrawApplicationUseCasePort, useClass: WithdrawApplicationUseCase },
 		{

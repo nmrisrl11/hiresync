@@ -201,8 +201,33 @@ Multiple Resumes and Cover Letters
 - [x] Allow user to set which resume and cover letter to use during the "Apply" flow
 
 Application History Timeline
-- A visual timeline on the applicant's side showing exactly when they applied, when the status changed, and when the employer left a note (if you choose to make certain notes public).
+- [x] Get history of specific application for an applicant
+- [x] Get history of specific application for employer
+- Record a history when:
+    - [x] Application is submitted
+    - [x] Application status is updated
+    - [x] Application is withdrawn
+    - [x] Note is added
+Notes: 
+- Include the internal note on getting of applications using employer
+- Add who added or updated the note when the company profile will have a multiple recruiter
 
 ### System & Compliance
 - [ ] Audit Logging (Activity History): Track "who did what and when" (e.g., "User A updated Job Listing B on Date C"). This is critical for resolving disputes or tracking recruiter activity.
 - [ ] Data Export (GDPR/CCPA): Since you already planned Account Deletion, adding a way for users to download their data payload as a JSON file completes the privacy compliance loop.
+
+# Phase 3
+
+### Payment Integration
+- [ ] Integrate with Stripe
+Decide what features should be included when subscribing
+Examples:
+- Maximum allowed resumes and cover letters
+- Maximum allowed applications
+- Maximum allowed sessions
+
+### AI Integration (Features)
+- [ ] Find a free AI service to integrate with, for learning (use Outbound Port and Adapter for flexibility)
+Examples:
+- Generate cover letters based on the applicant's resume and job description
+- Generate better headline and bio based on the applicant's position

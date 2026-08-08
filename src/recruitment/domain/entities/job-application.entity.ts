@@ -7,6 +7,7 @@ import {
 import { ApplicationNotUpdatableException } from "../exceptions";
 import { APPLICATION_STATUS, ApplicationStatus } from "../types";
 import { ApplicantId, EmployerId, JobApplicationId, JobListingId } from "../value-objects";
+import { JobApplicationHistory } from "./job-application-history.entity";
 
 export class JobApplication extends AggregateRoot {
 	constructor(
@@ -18,6 +19,7 @@ export class JobApplication extends AggregateRoot {
 		public coverLetterUrl: string | null,
 		public status: ApplicationStatus,
 		public internalNote: string | null,
+		private history: JobApplicationHistory[] = [],
 		public readonly appliedAt: Date,
 		public updatedAt: Date,
 	) {
@@ -43,6 +45,7 @@ export class JobApplication extends AggregateRoot {
 			coverLetterUrl,
 			APPLICATION_STATUS.PENDING,
 			null,
+			[],
 			now,
 			now,
 		);
@@ -97,6 +100,16 @@ export class JobApplication extends AggregateRoot {
 
 	public updateInternalNote(note: string | null): void {
 		this.internalNote = note;
+		this.updatedAt = new Date();
+	}
+
+	//! Job Application History
+	public getHistory(): ReadonlyArray<JobApplicationHistory> {
+		return Object.freeze([...this.history]);
+	}
+
+	public addHistory(historyRecord: JobApplicationHistory): void {
+		this.history.push(historyRecord);
 		this.updatedAt = new Date();
 	}
 }

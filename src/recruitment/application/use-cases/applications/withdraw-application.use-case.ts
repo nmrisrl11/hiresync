@@ -2,7 +2,7 @@ import {
 	ApplicantProfileRepository,
 	JobApplicationRepository,
 } from "@/recruitment/domain/repositories";
-import { JobApplicationId } from "@/recruitment/domain/value-objects";
+import { JobApplicationHistoryId, JobApplicationId } from "@/recruitment/domain/value-objects";
 import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
 import {
@@ -14,12 +14,16 @@ import {
 	WithdrawApplicationCommand,
 	WithdrawApplicationUseCasePort,
 } from "../../ports/inbound/applications";
+import { IdGeneratorPort } from "@/shared/utils/ports";
+import { JobApplicationHistory } from "@/recruitment/domain/entities";
+import { APPLICATION_EVENT_TYPE } from "@/recruitment/domain/types";
 
 @Injectable()
 export class WithdrawApplicationUseCase implements WithdrawApplicationUseCasePort {
 	constructor(
 		private readonly jobApplicationRepository: JobApplicationRepository,
 		private readonly applicantProfileRepository: ApplicantProfileRepository,
+		private readonly idGenerator: IdGeneratorPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -38,6 +42,18 @@ export class WithdrawApplicationUseCase implements WithdrawApplicationUseCasePor
 			);
 
 		application.withdraw();
+
+		//! Create and push history event
+		const historyRecord = new JobApplicationHistory(
+			new JobApplicationHistoryId(this.idGenerator.generateId()),
+			application.id,
+			APPLICATION_EVENT_TYPE.WITHDRAWN,
+			"The applicant has withdrawn this application.",
+			null,
+			true, //! Publicly visible to both Employer and Applicant
+			new Date(),
+		);
+		application.addHistory(historyRecord);
 
 		await this.jobApplicationRepository.save(application);
 

@@ -1,0 +1,9 @@
+export const APPLICATION_EVENT_TYPE = {
+	SUBMITTED: "SUBMITTED",
+	STATUS_UPDATED: "STATUS_UPDATED",
+	NOTE_ADDED: "NOTE_ADDED",
+	WITHDRAWN: "WITHDRAWN",
+} as const;
+
+export type ApplicationEventType =
+	(typeof APPLICATION_EVENT_TYPE)[keyof typeof APPLICATION_EVENT_TYPE];
