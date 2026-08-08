@@ -26,10 +26,9 @@ export class GetApplicationHistoryUseCase implements GetApplicationHistoryUseCas
 	) {}
 
 	public async execute(query: GetApplicationHistoryQuery): Promise<ApplicationHistoryResult[]> {
-		const application = await this.jobApplicationRepository.findById(
-			new JobApplicationId(query.applicationId),
-		);
+		const applicationIdVo = new JobApplicationId(query.applicationId);
 
+		const application = await this.jobApplicationRepository.findById(applicationIdVo);
 		if (!application) throw new JobApplicationNotFoundException();
 
 		if (query.isEmployer) {
@@ -48,7 +47,8 @@ export class GetApplicationHistoryUseCase implements GetApplicationHistoryUseCas
 			}
 		}
 
-		let history = application.getHistory();
+		//! Fetch the application history from the repository
+		let history = await this.jobApplicationRepository.getHistory(applicationIdVo);
 
 		//! Filter out private events if the requester is an applicant
 		if (!query.isEmployer) {

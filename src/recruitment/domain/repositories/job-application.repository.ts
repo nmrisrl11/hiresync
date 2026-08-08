@@ -1,4 +1,4 @@
-import { JobApplication } from "../entities";
+import { JobApplication, JobApplicationHistory } from "../entities";
 import { ApplicationStatus } from "../types";
 import { ApplicantId, JobApplicationId, JobListingId } from "../value-objects";
 
@@ -14,7 +14,6 @@ export interface FindApplicationsFilter {
 export abstract class JobApplicationRepository {
 	abstract findById(id: JobApplicationId): Promise<JobApplication | null>;
 	abstract findByIds(ids: JobApplicationId[]): Promise<JobApplication[]>;
-
 	//! Enforcing the "one application per job" rule
 	abstract findByApplicantAndJob(
 		applicantId: ApplicantId,
@@ -22,10 +21,9 @@ export abstract class JobApplicationRepository {
 	): Promise<JobApplication | null>;
 
 	abstract findAllByApplicantId(applicantId: ApplicantId): Promise<JobApplication[]>;
-
 	abstract findMany(filter: FindApplicationsFilter): Promise<JobApplication[]>;
 	abstract count(filter: FindApplicationsFilter): Promise<number>;
-
+	abstract getHistory(applicationId: JobApplicationId): Promise<JobApplicationHistory[]>;
 	abstract save(application: JobApplication): Promise<void>;
 	abstract saveMany(applications: JobApplication[]): Promise<void>;
 }
