@@ -1,5 +1,7 @@
-import { applyDecorators, Type } from "@nestjs/common";
+import { applyDecorators, SetMetadata, Type } from "@nestjs/common";
 import { ApiExtraModels, ApiResponse, getSchemaPath } from "@nestjs/swagger";
+
+export const RESPONSE_MESSAGE_METADATA = "response_message";
 
 //! Wraps a DTO inside the standardized SuccessResponse envelope
 export const ApiSuccessResponse = <TModel extends Type<unknown>>(
@@ -8,6 +10,7 @@ export const ApiSuccessResponse = <TModel extends Type<unknown>>(
 	description: string = "Request successful",
 ) => {
 	return applyDecorators(
+		SetMetadata(RESPONSE_MESSAGE_METADATA, description),
 		ApiExtraModels(model),
 		ApiResponse({
 			status: statusCode,
@@ -34,6 +37,7 @@ export const ApiMessageResponse = (
 	description: string = "Action completed successfully",
 ) => {
 	return applyDecorators(
+		SetMetadata(RESPONSE_MESSAGE_METADATA, description),
 		ApiResponse({
 			status: statusCode,
 			description,

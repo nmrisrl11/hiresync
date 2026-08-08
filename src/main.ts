@@ -1,5 +1,5 @@
 import { ValidationPipe } from "@nestjs/common";
-import { NestFactory } from "@nestjs/core";
+import { NestFactory, Reflector } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import cookieParser from "cookie-parser";
 import { AppModule } from "./app.module";
@@ -17,8 +17,10 @@ async function bootstrap() {
 
 	app.setGlobalPrefix("api");
 
+	const reflector = app.get(Reflector); //! Retrieve the Reflector instance and pass it to the interceptor
+
 	//! Runs before the Controller Methods.
-	app.useGlobalInterceptors(new ResponseTransformInterceptor());
+	app.useGlobalInterceptors(new ResponseTransformInterceptor(reflector));
 	app.useGlobalFilters(new HttpExceptionFilter());
 	app.useGlobalPipes(
 		new ValidationPipe({
