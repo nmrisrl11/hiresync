@@ -215,7 +215,11 @@ export class ApplicantController {
 			new ParseFilePipe({
 				validators: [
 					new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
-					new FileTypeValidator({ fileType: ".(pdf|txt)" }),
+					new FileTypeValidator({
+						fileType: /^(application\/pdf|text\/plain)$/,
+						errorMessage: "Only PDF and TXT files are allowed.",
+						skipMagicNumbersValidation: true, //! Skipping it to allows the validator to properly fall back to mimetype checking.
+					}),
 				],
 			}),
 		)
