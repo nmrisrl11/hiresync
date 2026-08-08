@@ -120,6 +120,8 @@ model JobApplication {
     status         ApplicationStatus @default(PENDING)
     internalNote String?  @db.Text
 
+    history JobApplicationHistory[]
+
     appliedAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -129,6 +131,25 @@ model JobApplication {
     @@index([employerId])
     @@index([jobListingId])
     @@index([applicantId])
+}
+
+// ----------------------------------------------------------------------
+// JOB APPLICATION HISTORY: Tracks changes to job applications over time
+// ----------------------------------------------------------------------
+model JobApplicationHistory {
+	id               String               @id @default(uuid())
+
+	jobApplicationId String
+	jobApplication   JobApplication       @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+
+	eventType        ApplicationEventType
+	message          String
+	metadata         Json?
+	isPublic         Boolean              @default(true) // If false, only the employer can see this event in the timeline
+
+	createdAt        DateTime             @default(now())
+
+	@@index([jobApplicationId])
 }
 
 // -----------------------------------------------------------------------

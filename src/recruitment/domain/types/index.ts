@@ -1,3 +1,4 @@
+export * from "./application-event-type.type";
 export * from "./application-status.type";
 export * from "./document-type.type";
 export * from "./employment-type.type";

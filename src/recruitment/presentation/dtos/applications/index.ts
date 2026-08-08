@@ -5,6 +5,7 @@ export * from "./requests/update-application-status.request.dto";
 export * from "./requests/update-internal-note.request.dto";
 
 export * from "./responses/applicant-application.response.dto";
+export * from "./responses/application-history.response.dto";
 export * from "./responses/apply-for-job.response.dto";
 export * from "./responses/employer-application.response.dto";
 export * from "./responses/paginated-applicant-applications.response.dto";

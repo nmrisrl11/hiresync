@@ -1,13 +1,14 @@
-import { JobApplication } from "@/recruitment/domain/entities";
+import { JobApplication, JobApplicationHistory } from "@/recruitment/domain/entities";
 import { DocumentNotFoundException } from "@/recruitment/domain/exceptions";
 import {
 	ApplicantProfileRepository,
 	JobApplicationRepository,
 	JobListingRepository,
 } from "@/recruitment/domain/repositories";
-import { DOCUMENT_TYPE, JOB_STATUS } from "@/recruitment/domain/types";
+import { APPLICATION_EVENT_TYPE, DOCUMENT_TYPE, JOB_STATUS } from "@/recruitment/domain/types";
 import {
 	ApplicantDocumentId,
+	JobApplicationHistoryId,
 	JobApplicationId,
 	JobListingId,
 } from "@/recruitment/domain/value-objects";
@@ -82,6 +83,18 @@ export class ApplyForJobUseCase implements ApplyForJobUseCasePort {
 			selectedResume.fileKey,
 			coverLetterKey,
 		);
+
+		//! Append the initial SUBMITTED history record
+		const historyRecord = new JobApplicationHistory(
+			new JobApplicationHistoryId(this.idGenerator.generateId()),
+			applicationId,
+			APPLICATION_EVENT_TYPE.SUBMITTED,
+			"Application submitted successfully.",
+			null,
+			true, //! Publicly visible to both Applicant and Employer
+			new Date(),
+		);
+		application.addHistory(historyRecord);
 
 		await this.jobApplicationRepository.save(application);
 

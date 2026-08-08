@@ -29,6 +29,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 	async findById(id: JobApplicationId): Promise<JobApplication | null> {
 		const application = await this.prisma.jobApplication.findUnique({
 			where: { id: id.getValue() },
+			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		if (!application) return null;
@@ -38,6 +39,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 	async findByIds(ids: JobApplicationId[]): Promise<JobApplication[]> {
 		const applications = await this.prisma.jobApplication.findMany({
 			where: { id: { in: ids.map((id) => id.getValue()) } },
+			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		return applications.map((app) => RecruitmentMapper.toJobApplicationDomain(app));
@@ -54,6 +56,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 					jobListingId: jobListingId.getValue(),
 				},
 			},
+			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		if (!application) return null;
@@ -63,6 +66,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 	async findAllByApplicantId(applicantId: ApplicantId): Promise<JobApplication[]> {
 		const applications = await this.prisma.jobApplication.findMany({
 			where: { applicantId: applicantId.getValue() },
+			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		return applications.map((app) => RecruitmentMapper.toJobApplicationDomain(app));
@@ -74,6 +78,7 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 			take: filter.limit,
 			skip: filter.offset,
 			orderBy: { appliedAt: "desc" }, //! Order by newest applications first
+			include: { history: { orderBy: { createdAt: "asc" } } },
 		});
 
 		return applications.map((app) => RecruitmentMapper.toJobApplicationDomain(app));
@@ -86,32 +91,52 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 	}
 
 	async save(application: JobApplication): Promise<void> {
-		await this.prisma.jobApplication.upsert({
-			where: { id: application.id.getValue() },
-			update: {
-				status: application.status,
-				internalNote: application.internalNote,
-				updatedAt: application.updatedAt,
-			},
-			create: {
-				id: application.id.getValue(),
-				applicantId: application.applicantId.getValue(),
-				jobListingId: application.jobListingId.getValue(),
-				employerId: application.employerId.getValue(),
-				resumeUrl: application.resumeUrl,
-				coverLetterUrl: application.coverLetterUrl,
-				status: application.status,
-				appliedAt: application.appliedAt,
-				updatedAt: application.updatedAt,
-			},
+		await this.prisma.$transaction(async (tx) => {
+			await tx.jobApplication.upsert({
+				where: { id: application.id.getValue() },
+				update: {
+					status: application.status,
+					internalNote: application.internalNote,
+					updatedAt: application.updatedAt,
+				},
+				create: {
+					id: application.id.getValue(),
+					applicantId: application.applicantId.getValue(),
+					jobListingId: application.jobListingId.getValue(),
+					employerId: application.employerId.getValue(),
+					resumeUrl: application.resumeUrl,
+					coverLetterUrl: application.coverLetterUrl,
+					status: application.status,
+					appliedAt: application.appliedAt,
+					updatedAt: application.updatedAt,
+				},
+			});
+
+			//! History is append-only. Upsert them safely.
+			for (const record of application.getHistory()) {
+				await tx.jobApplicationHistory.upsert({
+					where: { id: record.id.getValue() },
+					update: {}, //! Immutable timeline
+					create: {
+						id: record.id.getValue(),
+						jobApplicationId: record.jobApplicationId.getValue(),
+						eventType: record.eventType,
+						message: record.message,
+						metadata: record.metadata
+							? (record.metadata as Prisma.InputJsonValue)
+							: Prisma.JsonNull,
+						isPublic: record.isPublic,
+						createdAt: record.createdAt,
+					},
+				});
+			}
 		});
 	}
 
 	async saveMany(applications: JobApplication[]): Promise<void> {
-		//! Use a transaction to ensure all updates succeed or fail together
-		await this.prisma.$transaction(
-			applications.map((app) =>
-				this.prisma.jobApplication.upsert({
+		await this.prisma.$transaction(async (tx) => {
+			for (const app of applications) {
+				await tx.jobApplication.upsert({
 					where: { id: app.id.getValue() },
 					update: {
 						status: app.status,
@@ -130,8 +155,26 @@ export class PrismaJobApplicationRepository implements JobApplicationRepository 
 						appliedAt: app.appliedAt,
 						updatedAt: app.updatedAt,
 					},
-				}),
-			),
-		);
+				});
+
+				for (const record of app.getHistory()) {
+					await tx.jobApplicationHistory.upsert({
+						where: { id: record.id.getValue() },
+						update: {},
+						create: {
+							id: record.id.getValue(),
+							jobApplicationId: record.jobApplicationId.getValue(),
+							eventType: record.eventType,
+							message: record.message,
+							metadata: record.metadata
+								? (record.metadata as Prisma.InputJsonValue)
+								: Prisma.JsonNull,
+							isPublic: record.isPublic,
+							createdAt: record.createdAt,
+						},
+					});
+				}
+			}
+		});
 	}
 }

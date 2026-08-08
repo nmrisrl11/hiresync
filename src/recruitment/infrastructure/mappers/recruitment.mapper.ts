@@ -3,6 +3,7 @@ import {
 	ApplicantProfile as PrismaApplicantProfile,
 	EmployerProfile as PrismaEmployerProfile,
 	JobApplication as PrismaJobApplication,
+	JobApplicationHistory as PrismaJobApplicationHistory,
 	JobListing as PrismaJobListing,
 } from "@/generated/prisma/client";
 import {
@@ -10,6 +11,7 @@ import {
 	ApplicantProfile,
 	EmployerProfile,
 	JobApplication,
+	JobApplicationHistory,
 	JobListing,
 } from "@/recruitment/domain/entities";
 import {
@@ -17,6 +19,7 @@ import {
 	ApplicantId,
 	CompanyWebsite,
 	EmployerId,
+	JobApplicationHistoryId,
 	JobApplicationId,
 	JobListingId,
 	JobLocation,
@@ -97,7 +100,27 @@ export class RecruitmentMapper {
 		);
 	}
 
-	public static toJobApplicationDomain(raw: PrismaJobApplication): JobApplication {
+	public static toJobApplicationHistoryDomain(
+		raw: PrismaJobApplicationHistory,
+	): JobApplicationHistory {
+		return new JobApplicationHistory(
+			new JobApplicationHistoryId(raw.id),
+			new JobApplicationId(raw.jobApplicationId),
+			raw.eventType,
+			raw.message,
+			raw.metadata ? (raw.metadata as Record<string, unknown>) : null,
+			raw.isPublic,
+			raw.createdAt,
+		);
+	}
+
+	public static toJobApplicationDomain(
+		raw: PrismaJobApplication & { history?: PrismaJobApplicationHistory[] },
+	): JobApplication {
+		const history = raw.history
+			? raw.history.map((record) => this.toJobApplicationHistoryDomain(record))
+			: [];
+
 		return new JobApplication(
 			new JobApplicationId(raw.id),
 			new ApplicantId(raw.applicantId),
@@ -107,6 +130,7 @@ export class RecruitmentMapper {
 			raw.coverLetterUrl,
 			raw.status,
 			raw.internalNote,
+			history,
 			raw.appliedAt,
 			raw.updatedAt,
 		);

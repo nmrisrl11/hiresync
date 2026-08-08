@@ -1,6 +1,8 @@
 import {
 	BulkUpdateApplicationStatusCommand,
 	BulkUpdateApplicationStatusUseCasePort,
+	GetApplicationHistoryQuery,
+	GetApplicationHistoryUseCasePort,
 	GetEmployerApplicationsQuery,
 	GetEmployerApplicationsUseCasePort,
 	UpdateApplicationStatusCommand,
@@ -62,6 +64,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
 import {
+	ApplicationHistoryResponseDto,
 	BulkUpdateApplicationStatusRequestDto,
 	GetApplicationsRequestDto,
 	PaginatedEmployerApplicationsResponseDto,
@@ -83,7 +86,10 @@ import {
 	PaginatedEmployerJobListingsResponseDto,
 } from "../dtos/jobs";
 import { RecruitmentExceptionFilter } from "../filters/recruitment-exception.filter";
-import { PaginatedEmployerApplicationsResponseMapper } from "../mappers/applications";
+import {
+	ApplicationHistoryResponseMapper,
+	PaginatedEmployerApplicationsResponseMapper,
+} from "../mappers/applications";
 import {
 	EmployerApplicantProfileResponseMapper,
 	EmployerProfileResponseMapper,
@@ -114,6 +120,7 @@ export class EmployerController {
 		private readonly getApplicantProfileForEmployerUseCase: GetApplicantProfileForEmployerUseCasePort,
 		private readonly bulkUpdateApplicationStatusUseCase: BulkUpdateApplicationStatusUseCasePort,
 		private readonly updateInternalNoteUseCase: UpdateInternalNoteUseCasePort,
+		private readonly getApplicationHistoryUseCase: GetApplicationHistoryUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -432,5 +439,23 @@ export class EmployerController {
 		const query = new GetApplicantProfileForEmployerQuery(user.sub, applicantId);
 		const profile = await this.getApplicantProfileForEmployerUseCase.execute(query);
 		return EmployerApplicantProfileResponseMapper.toDto(profile);
+	}
+
+	@Get("applications/:id/history")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
+	@ApiOperation({ summary: "Get the history timeline and notes of a specific application." })
+	@ApiSuccessResponse(
+		ApplicationHistoryResponseDto,
+		HttpStatus.OK,
+		"Application history retrieved successfully.",
+	)
+	public async getApplicationHistory(
+		@CurrentUser() user: JwtPayload,
+		@Param("id") applicationId: string,
+	): Promise<ApplicationHistoryResponseDto[]> {
+		const query = new GetApplicationHistoryQuery(user.sub, applicationId, true); // true = is Employer
+		const result = await this.getApplicationHistoryUseCase.execute(query);
+		return ApplicationHistoryResponseMapper.toDtoList(result);
 	}
 }

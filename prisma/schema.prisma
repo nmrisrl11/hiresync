@@ -41,6 +41,13 @@ enum ApplicationStatus {
 	WITHDRAWN
 }
 
+enum ApplicationEventType {
+	SUBMITTED
+	STATUS_UPDATED
+	NOTE_ADDED
+	WITHDRAWN
+}
+
 enum DocumentType {
 	RESUME
 	COVER_LETTER

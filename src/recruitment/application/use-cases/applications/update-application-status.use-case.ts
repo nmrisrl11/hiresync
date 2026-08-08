@@ -1,9 +1,12 @@
+import { JobApplicationHistory } from "@/recruitment/domain/entities";
 import {
 	EmployerProfileRepository,
 	JobApplicationRepository,
 } from "@/recruitment/domain/repositories";
-import { JobApplicationId } from "@/recruitment/domain/value-objects";
+import { APPLICATION_EVENT_TYPE } from "@/recruitment/domain/types";
+import { JobApplicationHistoryId, JobApplicationId } from "@/recruitment/domain/value-objects";
 import { DomainEventPublisherPort } from "@/shared/events/ports";
+import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 import {
 	EmployerProfileNotFoundException,
@@ -20,6 +23,7 @@ export class UpdateApplicationStatusUseCase implements UpdateApplicationStatusUs
 	constructor(
 		private readonly jobApplicationRepository: JobApplicationRepository,
 		private readonly employerProfileRepository: EmployerProfileRepository,
+		private readonly idGenerator: IdGeneratorPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -36,7 +40,22 @@ export class UpdateApplicationStatusUseCase implements UpdateApplicationStatusUs
 		if (!application.employerId.equals(employerProfile.id))
 			throw new UnauthorizedApplicationAccessException();
 
+		//! Capture the previous status before updating
+		const previousStatus = application.status;
+
 		application.updateStatus(command.newStatus);
+
+		//! Create and push history timeline event
+		const historyRecord = new JobApplicationHistory(
+			new JobApplicationHistoryId(this.idGenerator.generateId()),
+			application.id,
+			APPLICATION_EVENT_TYPE.STATUS_UPDATED,
+			`Application status changed from ${previousStatus} to ${command.newStatus}.`,
+			{ oldStatus: previousStatus, newStatus: command.newStatus },
+			true, //! Publicly visible to Applicant
+			new Date(),
+		);
+		application.addHistory(historyRecord);
 
 		await this.jobApplicationRepository.save(application);
 

@@ -23,9 +23,12 @@ import {
 	ApplyForJobUseCasePort,
 	GetApplicantApplicationsQuery,
 	GetApplicantApplicationsUseCasePort,
+	GetApplicationHistoryQuery,
+	GetApplicationHistoryUseCasePort,
 	WithdrawApplicationCommand,
 	WithdrawApplicationUseCasePort,
 } from "@/recruitment/application/ports/inbound/applications";
+import { DOCUMENT_TYPE, type DocumentType } from "@/recruitment/domain/types";
 import {
 	ApiMessageResponse,
 	ApiSuccessResponse,
@@ -53,6 +56,7 @@ import {
 	UseFilters,
 	UseInterceptors,
 } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
 import {
@@ -66,6 +70,7 @@ import {
 	UploadApplicantDocumentResponseDto,
 } from "../dtos/applicants";
 import {
+	ApplicationHistoryResponseDto,
 	ApplyForJobRequestDto,
 	ApplyForJobResponseDto,
 	GetApplicationsRequestDto,
@@ -80,11 +85,10 @@ import {
 	UploadApplicantDocumentResponseMapper,
 } from "../mappers/applicants";
 import {
+	ApplicationHistoryResponseMapper,
 	ApplyForJobResponseMapper,
 	PaginatedApplicantApplicationsResponseMapper,
 } from "../mappers/applications";
-import { DOCUMENT_TYPE, type DocumentType } from "@/recruitment/domain/types";
-import { FileInterceptor } from "@nestjs/platform-express";
 
 @UseFilters(RecruitmentExceptionFilter)
 @ApiTags("Applicants")
@@ -105,6 +109,7 @@ export class ApplicantController {
 		private readonly getApplicantDocumentsUseCase: GetApplicantDocumentsUseCasePort,
 		private readonly deleteApplicantDocumentUseCase: DeleteApplicantDocumentUseCasePort,
 		private readonly setPrimaryApplicantDocumentUseCase: SetPrimaryApplicantDocumentUseCasePort,
+		private readonly getApplicationHistoryUseCase: GetApplicationHistoryUseCasePort,
 	) {}
 
 	@Get("profile")
@@ -358,5 +363,23 @@ export class ApplicantController {
 		const query = new GetSavedJobsQuery(user.sub, queryDto.limit, queryDto.offset);
 		const result = await this.getSavedJobsUseCase.execute(query);
 		return PaginatedSavedJobsResponseMapper.toDto(result, queryDto.limit, queryDto.offset);
+	}
+
+	@Get("applications/:id/history")
+	@HttpCode(HttpStatus.OK)
+	@Throttle({ default: { ttl: 60000, limit: 30 } })
+	@ApiOperation({ summary: "Get the history timeline of a specific application." })
+	@ApiSuccessResponse(
+		ApplicationHistoryResponseDto,
+		HttpStatus.OK,
+		"Application history retrieved successfully.",
+	)
+	public async getApplicationHistory(
+		@CurrentUser() user: JwtPayload,
+		@Param("id") applicationId: string,
+	): Promise<ApplicationHistoryResponseDto[]> {
+		const query = new GetApplicationHistoryQuery(user.sub, applicationId, false); // false = is Applicant
+		const result = await this.getApplicationHistoryUseCase.execute(query);
+		return ApplicationHistoryResponseMapper.toDtoList(result);
 	}
 }
