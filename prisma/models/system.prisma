@@ -1,0 +1,18 @@
+// ------------------------------------------------------
+// AUDIT LOG TABLE: System & Compliance Activity History
+// ------------------------------------------------------
+model AuditLog {
+	id         String   @id @default(uuid())
+
+	eventName  String   // e.g., "JobApplicationStatusUpdatedDomainEvent"
+	actorId    String?  // Dynamically extracted (userId, employerId, applicantId) if available
+	payload    Json     // Event payload serialized
+
+	occurredOn DateTime // When the domain event was actually instantiated
+	createdAt  DateTime @default(now())
+
+	// Indexes for fast searching
+	@@index([eventName])
+	@@index([actorId])
+	@@index([occurredOn])
+}

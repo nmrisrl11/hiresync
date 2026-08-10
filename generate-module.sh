@@ -10,25 +10,43 @@ CLASS_NAME="$(tr '[:lower:]' '[:upper:]' <<< ${MODULE_NAME:0:1})${MODULE_NAME:1}
 
 TARGET_DIR="src/$MODULE_NAME"
 
-# Create the Clean Architecture + Hexagonal directories
-mkdir -p "$TARGET_DIR/application/exceptions"
-mkdir -p "$TARGET_DIR/application/ports/inbound"
-mkdir -p "$TARGET_DIR/application/ports/outbound"
-mkdir -p "$TARGET_DIR/application/use-cases"
+# Function to create dir and .gitkeep with instructions
+create_dir_with_keep() {
+	mkdir -p "$1"
+	echo "$2" > "$1/.gitkeep"
+}
 
-mkdir -p "$TARGET_DIR/domain/entities"
-mkdir -p "$TARGET_DIR/domain/events"
-mkdir -p "$TARGET_DIR/domain/exceptions"
-mkdir -p "$TARGET_DIR/domain/repositories"
-mkdir -p "$TARGET_DIR/domain/value-objects"
+# 1. Application Layer
+create_dir_with_keep "$TARGET_DIR/application/exceptions" "# Application Exceptions: Specific errors related to application flows and use cases."
+create_dir_with_keep "$TARGET_DIR/application/ports/inbound" "# Inbound Ports: Interfaces/Contracts for communication entering the application layer (e.g., Use Case interfaces)."
+create_dir_with_keep "$TARGET_DIR/application/ports/outbound" "# Outbound Ports: Interfaces/Contracts for communication leaving the application layer (e.g., Repository interfaces, External Services)."
+create_dir_with_keep "$TARGET_DIR/application/use-cases" "# Use Cases: Implementations of inbound ports containing application-specific business rules and orchestration."
 
-mkdir -p "$TARGET_DIR/infrastructure/adapters"
+# 2. Domain Layer
+create_dir_with_keep "$TARGET_DIR/domain/entities" "# Entities: Core business models responsible for domain logic and raising domain events."
+create_dir_with_keep "$TARGET_DIR/domain/events" "# Domain Events: Events raised by entities representing business changes."
+create_dir_with_keep "$TARGET_DIR/domain/exceptions" "# Domain Exceptions: Business rule violations and validation exceptions."
+create_dir_with_keep "$TARGET_DIR/domain/repositories" "# Repositories: Interfaces defining data access contracts for aggregates."
+create_dir_with_keep "$TARGET_DIR/domain/types" "# Types: Domain-specific types and enums."
+create_dir_with_keep "$TARGET_DIR/domain/value-objects" "# Value Objects: Immutable objects representing descriptive aspects of the domain with no conceptual identity."
 
-mkdir -p "$TARGET_DIR/presentation/controllers"
-mkdir -p "$TARGET_DIR/presentation/dtos"
-mkdir -p "$TARGET_DIR/presentation/event-listeners"
+# 3. Infrastructure Layer
+create_dir_with_keep "$TARGET_DIR/infrastructure/adapters/persistence" "# Persistence Adapters: Database-specific repository implementations (e.g., Prisma repositories)."
+create_dir_with_keep "$TARGET_DIR/infrastructure/events/listeners" "# Event Listeners: Handlers that react to domain or integration events."
+create_dir_with_keep "$TARGET_DIR/infrastructure/mappers" "# Mappers: Translates persistence or external records directly to Domain entities."
+create_dir_with_keep "$TARGET_DIR/infrastructure/notifications" "# Notifications: Implementations for sending emails, SMS, or other external communications."
+create_dir_with_keep "$TARGET_DIR/infrastructure/queues" "# Queues: Processors and configurations for background jobs (e.g., BullMQ)."
+create_dir_with_keep "$TARGET_DIR/infrastructure/tasks" "# Tasks: Cron jobs and scheduled tasks using NestJS Schedule."
 
-# Generate the module file
+# 4. Presentation Layer
+create_dir_with_keep "$TARGET_DIR/presentation/controllers" "# Controllers: HTTP endpoints handling incoming requests."
+create_dir_with_keep "$TARGET_DIR/presentation/dtos" "# DTOs: Data Transfer Objects for request validation and response formatting."
+create_dir_with_keep "$TARGET_DIR/presentation/filters" "# Filters: Maps Domain and Application Exceptions to proper HTTP Status codes."
+create_dir_with_keep "$TARGET_DIR/presentation/guards" "# Guards: Route protection and authorization checks."
+create_dir_with_keep "$TARGET_DIR/presentation/mappers" "# Mappers: Translates use-case results into response DTOs."
+create_dir_with_keep "$TARGET_DIR/presentation/pipes" "# Pipes: Data transformation and validation payloads for controllers."
+
+# Generate the module file (ensuring tabs, double quotes, and semicolons)
 cat <<EOF> "$TARGET_DIR/$MODULE_NAME.module.ts"
 import { Module } from "@nestjs/common";
 
@@ -41,24 +59,5 @@ export class $CLASS_NAME {}
 EOF
 
 # Print the requested output
-echo "Output:"
-echo "$MODULE_NAME"
-echo "- application"
-echo "    - exceptions"
-echo "    - ports"
-echo "        - inbound"
-echo "        - outbound"
-echo "    - use-cases"
-echo "- domain"
-echo "    - entities"
-echo "    - events"
-echo "    - exceptions"
-echo "    - repositories"
-echo "    - value-objects"
-echo "- infrastructure"
-echo "    - adapters"
-echo "- presentation"
-echo "    - controllers"
-echo "    - dtos"
-echo "    - event-listeners"
-echo "- $MODULE_NAME.module.ts"
+echo "Module generated successfully at: $TARGET_DIR/"
+echo "All directories have been seeded with documented .gitkeep files."
