@@ -1,6 +1,15 @@
 #!/bin/bash
 
+# Fail immediately if any command returns a non-zero status
+set -e
+
 read -p "Enter module name: " MODULE_NAME
+
+# Validate MODULE_NAME to prevent path traversal and invalid directory characters
+if [[ ! "$MODULE_NAME" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+	echo "Error: Invalid module name. Please use only alphanumeric characters, dashes, and underscores."
+	exit 1
+fi
 
 # Convert the input to lowercase for the folder name
 MODULE_NAME=$(echo "$MODULE_NAME" | tr '[:upper:]' '[:lower:]')
@@ -10,10 +19,10 @@ CLASS_NAME="$(tr '[:lower:]' '[:upper:]' <<< ${MODULE_NAME:0:1})${MODULE_NAME:1}
 
 TARGET_DIR="src/$MODULE_NAME"
 
-# Function to create dir and .gitkeep with instructions
+# Function to create dir and .gitkeep with instructions, propagating write errors
 create_dir_with_keep() {
-	mkdir -p "$1"
-	echo "$2" > "$1/.gitkeep"
+	mkdir -p "$1" || return 1
+	echo "$2" > "$1/.gitkeep" || return 1
 }
 
 # 1. Application Layer
@@ -33,7 +42,7 @@ create_dir_with_keep "$TARGET_DIR/domain/value-objects" "# Value Objects: Immuta
 # 3. Infrastructure Layer
 create_dir_with_keep "$TARGET_DIR/infrastructure/adapters/persistence" "# Persistence Adapters: Database-specific repository implementations (e.g., Prisma repositories)."
 create_dir_with_keep "$TARGET_DIR/infrastructure/events/listeners" "# Event Listeners: Handlers that react to domain or integration events."
-create_dir_with_keep "$TARGET_DIR/infrastructure/mappers" "# Mappers: Translates persistence or external records directly to Domain entities."
+create_dir_with_keep "$TARGET_DIR/infrastructure/mappers" "# Mappers: Translate persistence or external records directly to Domain entities."
 create_dir_with_keep "$TARGET_DIR/infrastructure/notifications" "# Notifications: Implementations for sending emails, SMS, or other external communications."
 create_dir_with_keep "$TARGET_DIR/infrastructure/queues" "# Queues: Processors and configurations for background jobs (e.g., BullMQ)."
 create_dir_with_keep "$TARGET_DIR/infrastructure/tasks" "# Tasks: Cron jobs and scheduled tasks using NestJS Schedule."
@@ -43,11 +52,11 @@ create_dir_with_keep "$TARGET_DIR/presentation/controllers" "# Controllers: HTTP
 create_dir_with_keep "$TARGET_DIR/presentation/dtos" "# DTOs: Data Transfer Objects for request validation and response formatting."
 create_dir_with_keep "$TARGET_DIR/presentation/filters" "# Filters: Maps Domain and Application Exceptions to proper HTTP Status codes."
 create_dir_with_keep "$TARGET_DIR/presentation/guards" "# Guards: Route protection and authorization checks."
-create_dir_with_keep "$TARGET_DIR/presentation/mappers" "# Mappers: Translates use-case results into response DTOs."
+create_dir_with_keep "$TARGET_DIR/presentation/mappers" "# Mappers: Translate use-case results into response DTOs."
 create_dir_with_keep "$TARGET_DIR/presentation/pipes" "# Pipes: Data transformation and validation payloads for controllers."
 
 # Generate the module file (ensuring tabs, double quotes, and semicolons)
-cat <<EOF> "$TARGET_DIR/$MODULE_NAME.module.ts"
+cat <<EOF> "$TARGET_DIR/$MODULE_NAME.module.ts" || exit 1
 import { Module } from "@nestjs/common";
 
 @Module({
