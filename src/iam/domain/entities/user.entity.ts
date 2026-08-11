@@ -65,7 +65,7 @@ export class User extends AggregateRoot {
 		const user = new User(idVo, emailVo, name, false, role, account, null, createdAt, null);
 
 		user.addDomainEvent(
-			new UserRegisteredDomainEvent(emailString, verificationToken, verificationTokenTtlMs),
+			new UserRegisteredDomainEvent(id, emailString, verificationToken, verificationTokenTtlMs),
 		);
 
 		return user;
@@ -77,7 +77,9 @@ export class User extends AggregateRoot {
 		this.account.verify(token);
 		this.isVerified = true;
 
-		this.addDomainEvent(new UserEmailVerifiedDomainEvent(this.email.getValue()));
+		this.addDomainEvent(
+			new UserEmailVerifiedDomainEvent(this.id.getValue(), this.email.getValue()),
+		);
 	}
 
 	public refreshVerificationToken(token: string, tokenExpiresInMs: number): void {
@@ -85,7 +87,12 @@ export class User extends AggregateRoot {
 		this.account.updateVerificationToken(token, tokenExpiresInMs);
 
 		this.addDomainEvent(
-			new VerificationEmailResentDomainEvent(this.email.getValue(), token, tokenExpiresInMs),
+			new VerificationEmailResentDomainEvent(
+				this.id.getValue(),
+				this.email.getValue(),
+				token,
+				tokenExpiresInMs,
+			),
 		);
 	}
 
@@ -94,7 +101,12 @@ export class User extends AggregateRoot {
 		this.account.updateResetToken(token, tokenExpiresInMs);
 
 		this.addDomainEvent(
-			new PasswordResetRequestedDomainEvent(this.email.getValue(), token, tokenExpiresInMs),
+			new PasswordResetRequestedDomainEvent(
+				this.id.getValue(),
+				this.email.getValue(),
+				token,
+				tokenExpiresInMs,
+			),
 		);
 	}
 
@@ -102,14 +114,18 @@ export class User extends AggregateRoot {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.updatePasswordHash(token, password);
 
-		this.addDomainEvent(new UserPasswordChangedDomainEvent(this.email.getValue()));
+		this.addDomainEvent(
+			new UserPasswordChangedDomainEvent(this.id.getValue(), this.email.getValue()),
+		);
 	}
 
 	public updatePassword(newHash: string): void {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.setPasswordHash(newHash);
 
-		this.addDomainEvent(new UserPasswordChangedDomainEvent(this.email.getValue()));
+		this.addDomainEvent(
+			new UserPasswordChangedDomainEvent(this.id.getValue(), this.email.getValue()),
+		);
 	}
 
 	public updateProfile(name?: string, image?: string | null): void {
@@ -127,7 +143,9 @@ export class User extends AggregateRoot {
 		//! Generate new verification token
 		this.account.updateVerificationToken(token, tokenExpiresInMs);
 
-		this.addDomainEvent(new EmailChangeRequestedDomainEvent(newEmail, token, tokenExpiresInMs));
+		this.addDomainEvent(
+			new EmailChangeRequestedDomainEvent(this.id.getValue(), newEmail, token, tokenExpiresInMs),
+		);
 	}
 
 	public confirmEmailChange(token: string): void {
@@ -143,7 +161,9 @@ export class User extends AggregateRoot {
 		this.email = new Email(this.pendingEmail);
 		this.pendingEmail = null;
 
-		this.addDomainEvent(new UserEmailChangedDomainEvent(oldEmail, this.email.getValue()));
+		this.addDomainEvent(
+			new UserEmailChangedDomainEvent(this.id.getValue(), oldEmail, this.email.getValue()),
+		);
 	}
 
 	public delete(): void {
@@ -159,6 +179,7 @@ export class User extends AggregateRoot {
 
 		this.addDomainEvent(
 			new UserAccountDeletionScheduledDomainEvent(
+				this.id.getValue(),
 				this.email.getValue(),
 				this.account.getScheduledForDeletionAt(),
 			),
@@ -170,7 +191,9 @@ export class User extends AggregateRoot {
 
 		this.account.cancelDeletion();
 
-		this.addDomainEvent(new UserAccountRestoredDomainEvent(this.email.getValue()));
+		this.addDomainEvent(
+			new UserAccountRestoredDomainEvent(this.id.getValue(), this.email.getValue()),
+		);
 	}
 
 	//! Session Management Methods
@@ -222,14 +245,14 @@ export class User extends AggregateRoot {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.enableMfa(hashedBackupCodes);
 
-		this.addDomainEvent(new UserMfaEnabledDomainEvent(this.email.getValue()));
+		this.addDomainEvent(new UserMfaEnabledDomainEvent(this.id.getValue(), this.email.getValue()));
 	}
 
 	public disableMfa(): void {
 		if (!this.account) throw new NoAccountFoundException();
 		this.account.disableMfa();
 
-		this.addDomainEvent(new UserMfaDisabledDomainEvent(this.email.getValue()));
+		this.addDomainEvent(new UserMfaDisabledDomainEvent(this.id.getValue(), this.email.getValue()));
 	}
 
 	public consumeMfaBackupCode(matchedHashedCode: string): void {

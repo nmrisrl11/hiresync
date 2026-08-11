@@ -1,6 +1,8 @@
 import { DomainEvent } from "@/shared/events";
 
 export class JobApplicationSubmittedDomainEvent extends DomainEvent {
+	public readonly actorId: string;
+
 	constructor(
 		public readonly applicationId: string,
 		public readonly applicantId: string,
@@ -8,5 +10,6 @@ export class JobApplicationSubmittedDomainEvent extends DomainEvent {
 		public readonly employerId: string,
 	) {
 		super();
+		this.actorId = applicantId;
 	}
 }

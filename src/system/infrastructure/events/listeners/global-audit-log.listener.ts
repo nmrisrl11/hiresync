@@ -74,12 +74,24 @@ export class GlobalAuditLogListener implements OnModuleInit {
 		await this.auditLogRepository.save(auditLog);
 	}
 
-	//! Safely extracts the user/actor identity based on common property names in events
+	//! Safely extracts the user/actor identity using a predictable convention
 	private extractActorId(payload: Record<string, unknown>): string | null {
+		// Explicit override for ambiguous/multi-actor events
+		if (typeof payload.actorId === "string") return payload.actorId;
+		if (typeof payload.initiatorId === "string") return payload.initiatorId;
+
+		// Standard single-actor fallbacks
 		if (typeof payload.userId === "string") return payload.userId;
 		if (typeof payload.accountId === "string") return payload.accountId;
-		if (typeof payload.employerId === "string") return payload.employerId;
-		if (typeof payload.applicantId === "string") return payload.applicantId;
+
+		// Mutually exclusive role checks
+		const hasApplicant = typeof payload.applicantId === "string";
+		const hasEmployer = typeof payload.employerId === "string";
+
+		if (hasApplicant && !hasEmployer) return payload.applicantId as string;
+		if (hasEmployer && !hasApplicant) return payload.employerId as string;
+
+		// If both exist and no explicit actorId is provided, return null to avoid false attribution
 		return null;
 	}
 
