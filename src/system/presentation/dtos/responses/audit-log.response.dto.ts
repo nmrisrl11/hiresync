@@ -1,9 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class AuditLogResponseDto {
 	@ApiProperty() public readonly id!: string;
 	@ApiProperty() public readonly eventName!: string;
-	@ApiPropertyOptional({ nullable: true }) public readonly actorId!: string | null;
+	@ApiProperty({ nullable: true }) public readonly actorId!: string | null;
 	@ApiProperty({ type: "object", additionalProperties: true }) public readonly payload!: Record<
 		string,
 		unknown

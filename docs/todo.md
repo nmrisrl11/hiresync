@@ -213,7 +213,11 @@ Notes:
 - Add who added or updated the note when the company profile will have a multiple recruiter
 
 ### System & Compliance
-- [ ] Audit Logging (Activity History): Track "who did what and when" (e.g., "User A updated Job Listing B on Date C"). This is critical for resolving disputes or tracking recruiter activity.
+Audit Logging
+- [x] Global audit logging (Activity History)
+- [x] Catch every event and persist it to the audit log
+- [x] Redact sensitive data from audit log payloads
+Data Export
 - [ ] Data Export (GDPR/CCPA): Since you already planned Account Deletion, adding a way for users to download their data payload as a JSON file completes the privacy compliance loop.
 
 # Phase 3
