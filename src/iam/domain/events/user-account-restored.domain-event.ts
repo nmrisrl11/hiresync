@@ -1,7 +1,10 @@
 import { DomainEvent } from "@/shared/events";
 
 export class UserAccountRestoredDomainEvent extends DomainEvent {
-	constructor(public readonly email: string) {
+	constructor(
+		public readonly userId: string,
+		public readonly email: string,
+	) {
 		super();
 	}
 }

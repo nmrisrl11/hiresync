@@ -73,6 +73,7 @@ export class JobApplication extends AggregateRoot {
 				this.id.getValue(),
 				this.applicantId.getValue(),
 				this.status,
+				this.employerId.getValue(),
 			),
 		);
 	}
