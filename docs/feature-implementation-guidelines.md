@@ -1,6 +1,6 @@
 # Feature Implementation Guidelines
 
-When creating new features, follow these guidelines:
+When creating new features, ALWAYS follow these guidelines:
 
 ## Rules:
 - Inward to Outward (Domain -> Application -> Infrastructure -> Presentation)
@@ -11,6 +11,9 @@ When creating new features, follow these guidelines:
 - Always follow SRP (Single Responsibility Principle)
 - Always follow the Hexagonal Architecture principles
 - When logging needed use the shared Logger
+- When generating and id is needed, use the shared id generator from the shared utils
+- When pagination is needed, use the shared pagination dto from the shared http/dtos
+- On creating an email template with link, define the link using the shared utils app-links
 
 ## Always do these before implementation:
 - Ask me the updated repository codebase (so I will attach the updated repository link)
