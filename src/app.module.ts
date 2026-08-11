@@ -13,6 +13,7 @@ import { EmailModule } from "./shared/email/email.module";
 import { RolesGuard, UserThrottlerGuard } from "./shared/http/guards";
 import { QueueModule } from "./shared/queue/queue.module";
 import { SharedModule } from "./shared/shared.module";
+import { SystemModule } from "./system/system.module";
 
 @Module({
 	imports: [
@@ -36,6 +37,7 @@ import { SharedModule } from "./shared/shared.module";
 		SharedModule,
 		IamModule,
 		RecruitmentModule,
+		SystemModule,
 		EmailModule,
 		QueueModule,
 	],
