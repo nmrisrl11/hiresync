@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { EventEmitterModule } from "@nestjs/event-emitter";
@@ -11,6 +11,7 @@ import { RecruitmentModule } from "./recruitment/recruitment.module";
 import { DatabaseModule } from "./shared/database/database.module";
 import { EmailModule } from "./shared/email/email.module";
 import { RolesGuard, UserThrottlerGuard } from "./shared/http/guards";
+import { AuditContextMiddleware } from "./shared/http/middlewares";
 import { QueueModule } from "./shared/queue/queue.module";
 import { SharedModule } from "./shared/shared.module";
 import { SystemModule } from "./system/system.module";
@@ -47,4 +48,8 @@ import { SystemModule } from "./system/system.module";
 		{ provide: APP_GUARD, useClass: RolesGuard },
 	],
 })
-export class AppModule {}
+export class AppModule {
+	public configure(consumer: MiddlewareConsumer): void {
+		consumer.apply(AuditContextMiddleware).forRoutes("*");
+	}
+}

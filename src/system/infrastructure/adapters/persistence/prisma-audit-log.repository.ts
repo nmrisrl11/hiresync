@@ -34,7 +34,7 @@ export class PrismaAuditLogRepository implements AuditLogRepository {
 			where: this.buildWhereClause(filter),
 			take: filter.limit,
 			skip: filter.offset,
-			orderBy: { occurredOn: "desc" }, //! Newest logs first
+			orderBy: { occurredOn: "desc", id: "desc" }, //! Newest logs first
 		});
 
 		return records.map((record) => SystemMapper.toAuditLogDomain(record));

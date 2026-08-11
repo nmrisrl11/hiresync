@@ -1,4 +1,5 @@
 import { DomainEvent, IntegrationEvent } from "@/shared/events";
+import { auditContextStorage } from "@/shared/http/context";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { IdGeneratorPort } from "@/shared/utils/ports";
 import { AuditLog } from "@/system/domain/entities";
@@ -15,6 +16,21 @@ export class GlobalAuditLogListener implements OnModuleInit {
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly logger: LoggerPort,
 	) {}
+
+	//! These keys should never be persisted in plaintext audit logs
+	private readonly SENSITIVE_KEYS = new Set([
+		"password",
+		"passwordHash",
+		"token",
+		"verificationToken",
+		"resetToken",
+		"refreshToken",
+		"secret",
+		"mfaSecret",
+		"backupCodes",
+		"cvv",
+		"creditCard",
+	]);
 
 	public onModuleInit(): void {
 		//! Bind to ALL events emitted through the system using a synchronous wrapper
@@ -36,11 +52,21 @@ export class GlobalAuditLogListener implements OnModuleInit {
 		const payload = this.serializePayload(event);
 		const actorId = this.extractActorId(payload);
 
+		const httpContext = auditContextStorage.getStore();
+
+		const enhancedPayload = {
+			...payload,
+			_meta: {
+				ipAddress: httpContext?.ipAddress ?? null,
+				userAgent: httpContext?.userAgent ?? null,
+			},
+		};
+
 		const auditLog = new AuditLog(
 			new AuditLogId(this.idGenerator.generateId()),
 			eventNameStr,
 			actorId,
-			payload,
+			enhancedPayload,
 			event.occurredOn,
 			new Date(),
 		);
@@ -51,17 +77,44 @@ export class GlobalAuditLogListener implements OnModuleInit {
 	//! Safely extracts the user/actor identity based on common property names in events
 	private extractActorId(payload: Record<string, unknown>): string | null {
 		if (typeof payload.userId === "string") return payload.userId;
+		if (typeof payload.accountId === "string") return payload.accountId;
 		if (typeof payload.employerId === "string") return payload.employerId;
 		if (typeof payload.applicantId === "string") return payload.applicantId;
 		return null;
 	}
 
-	//! Converts the class instance to a plain object, handling Dates
+	//! Converts the class instance to a plain object and redacts sensitive information
 	private serializePayload(event: unknown): Record<string, unknown> {
 		try {
-			return JSON.parse(JSON.stringify(event)) as Record<string, unknown>;
+			const parsed = JSON.parse(JSON.stringify(event)) as Record<string, unknown>;
+			return this.redactSensitiveData(parsed);
 		} catch {
 			return { unparseable: true };
 		}
+	}
+
+	//! Recursively walks the object and replaces sensitive values with a placeholder
+	private redactSensitiveData(obj: Record<string, unknown>): Record<string, unknown> {
+		const redactedObj: Record<string, unknown> = {};
+
+		for (const [key, value] of Object.entries(obj)) {
+			if (this.SENSITIVE_KEYS.has(key)) {
+				redactedObj[key] = "[REDACTED]";
+			} else if (value !== null && typeof value === "object") {
+				if (Array.isArray(value)) {
+					redactedObj[key] = value.map((item: unknown) =>
+						typeof item === "object" && item !== null
+							? this.redactSensitiveData(item as Record<string, unknown>)
+							: item,
+					);
+				} else {
+					redactedObj[key] = this.redactSensitiveData(value as Record<string, unknown>);
+				}
+			} else {
+				redactedObj[key] = value;
+			}
+		}
+
+		return redactedObj;
 	}
 }
