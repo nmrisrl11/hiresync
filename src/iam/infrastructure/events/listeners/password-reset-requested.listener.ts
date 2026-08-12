@@ -2,7 +2,7 @@ import {
 	EnqueuePasswordResetEmailCommand,
 	EnqueuePasswordResetEmailUseCasePort,
 } from "@/iam/application/ports/inbound/authentication/notifications";
-import { PasswordResetRequestedDomainEvent } from "@/iam/domain/events";
+import { PasswordResetRequestedDomainEvent } from "@/iam/domain/events/authentication";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
