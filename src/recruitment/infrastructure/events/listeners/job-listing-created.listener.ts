@@ -2,7 +2,7 @@ import {
 	EnqueueJobCreatedEmailCommand,
 	EnqueueJobCreatedEmailUseCasePort,
 } from "@/recruitment/application/ports/inbound/notifications";
-import { JobListingCreatedDomainEvent } from "@/recruitment/domain/events";
+import { JobListingCreatedDomainEvent } from "@/recruitment/domain/events/jobs";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
