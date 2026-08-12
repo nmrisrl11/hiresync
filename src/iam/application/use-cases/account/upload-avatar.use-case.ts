@@ -1,6 +1,7 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { UserId } from "@/iam/domain/value-objects";
 import { DomainEventPublisherPort } from "@/shared/events/ports";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { UserNotFoundException } from "../../exceptions";
 import {
@@ -15,6 +16,7 @@ export class UploadAvatarUseCase implements UploadAvatarUseCasePort {
 	constructor(
 		private readonly userRepository: UserRepository,
 		private readonly imageStorage: ImageStoragePort,
+		private readonly logger: LoggerPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -39,8 +41,16 @@ export class UploadAvatarUseCase implements UploadAvatarUseCasePort {
 
 		await this.userRepository.save(user);
 
-		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
-		user.clearEvents();
+		try {
+			await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+		} catch (error) {
+			this.logger.error(
+				`Failed to publish domain events for User ${user.id.getValue()}`,
+				(error as Error).stack,
+			);
+		} finally {
+			user.clearEvents();
+		}
 
 		return {
 			id: user.id.getValue(),

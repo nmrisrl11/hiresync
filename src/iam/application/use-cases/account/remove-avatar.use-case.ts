@@ -34,8 +34,16 @@ export class RemoveAvatarUseCase implements RemoveAvatarUseCasePort {
 
 			await this.userRepository.save(user);
 
-			await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
-			user.clearEvents();
+			try {
+				await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+			} catch (error) {
+				this.logger.error(
+					`Failed to publish domain events for User ${user.id.getValue()}`,
+					error instanceof Error ? error.stack : "Unknown error",
+				);
+			} finally {
+				user.clearEvents();
+			}
 		}
 
 		return {

@@ -367,15 +367,20 @@ export class User extends AggregateRoot {
 
 		if (!alreadyLinked) {
 			this.oauthAccounts.push(oauthAccount);
-		}
 
-		this.addDomainEvent(
-			new OAuthProviderLinkedDomainEvent(this.id.getValue(), oauthAccount.getProviderValue()),
-		);
+			//! Emit event ONLY when a new account is successfully linked
+			this.addDomainEvent(
+				new OAuthProviderLinkedDomainEvent(this.id.getValue(), oauthAccount.getProviderValue()),
+			);
+		}
 	}
 
 	public unlinkOAuthProvider(providerType: OAuthProviderType): void {
 		const hasPassword = this.account !== null && this.account.hasPassword();
+
+		//! Capture the length before filtering
+		const initialLength = this.oauthAccounts.length;
+
 		const remainingProviders = this.oauthAccounts.filter(
 			(oauth) => oauth.getProviderValue() !== providerType,
 		);
@@ -386,6 +391,9 @@ export class User extends AggregateRoot {
 
 		this.oauthAccounts = remainingProviders;
 
-		this.addDomainEvent(new OAuthProviderUnlinkedDomainEvent(this.id.getValue(), providerType));
+		//! Emit event ONLY if the array size changed (meaning an account was actually removed)
+		if (this.oauthAccounts.length !== initialLength) {
+			this.addDomainEvent(new OAuthProviderUnlinkedDomainEvent(this.id.getValue(), providerType));
+		}
 	}
 }

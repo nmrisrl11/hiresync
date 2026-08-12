@@ -29,6 +29,7 @@ import {
 	OAuthProviderPort,
 	TimeFormatterPort,
 } from "../../ports/outbound";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 
 @Injectable()
 export class OAuthCallbackLoginUseCase implements OAuthCallbackLoginUseCasePort {
@@ -41,6 +42,7 @@ export class OAuthCallbackLoginUseCase implements OAuthCallbackLoginUseCasePort 
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly envConfig: EnvConfigPort,
 		private readonly timeFormatter: TimeFormatterPort,
+		private readonly logger: LoggerPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -125,6 +127,17 @@ export class OAuthCallbackLoginUseCase implements OAuthCallbackLoginUseCasePort 
 				 * STEP3.5: Persist the newly linked account or the newly created user.
 				 */
 				await this.userRepository.save(user);
+
+				try {
+					await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+				} catch (error) {
+					this.logger.error(
+						`Failed to publish login events for User ${user.id.getValue()}`,
+						(error as Error).stack,
+					);
+				} finally {
+					user.clearEvents();
+				}
 			}
 
 			/**
@@ -190,8 +203,16 @@ export class OAuthCallbackLoginUseCase implements OAuthCallbackLoginUseCasePort 
 			user.addSession(session);
 			await this.userRepository.save(user);
 
-			await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
-			user.clearEvents();
+			try {
+				await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+			} catch (error) {
+				this.logger.error(
+					`Failed to publish login events for User ${user.id.getValue()}`,
+					(error as Error).stack,
+				);
+			} finally {
+				user.clearEvents();
+			}
 
 			/**
 			 * STEP6.3: Return Standardized Login Result
