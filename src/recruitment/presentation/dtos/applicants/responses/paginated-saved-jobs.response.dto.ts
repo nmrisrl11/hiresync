@@ -1,5 +1,5 @@
+import { PaginationMetaResponseDto } from "@/shared/http/dtos";
 import { ApiProperty } from "@nestjs/swagger";
-import { PaginationMetaResponseDto } from "../../shared";
 import { SavedJobResponseDto } from "./saved-job.response.dto";
 
 export class PaginatedSavedJobsResponseDto {
