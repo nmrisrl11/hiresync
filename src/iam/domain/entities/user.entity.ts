@@ -13,6 +13,7 @@ import {
 	UserRegisteredDomainEvent,
 	VerificationEmailResentDomainEvent,
 } from "../events";
+import { UserLoggedInDomainEvent, UserSessionRevokedDomainEvent } from "../events/authentication";
 import { NoAccountFoundException, NoPendingEmailChangeException } from "../exceptions";
 import { OAuthProviderType } from "../types";
 import { AccountId, Email, SessionId, UserId } from "../value-objects";
@@ -207,18 +208,25 @@ export class User extends AggregateRoot {
 
 	public addSession(session: Session): void {
 		this.sessions.push(session);
+		this.addDomainEvent(new UserLoggedInDomainEvent(this.id.getValue(), session.id.getValue()));
 	}
 
 	public revokeSession(sessionId: SessionId): void {
 		const session = this.sessions.find((s) => s.id.equals(sessionId));
 		if (session) {
 			session.revoke();
+			this.addDomainEvent(
+				new UserSessionRevokedDomainEvent(this.id.getValue(), session.id.getValue()),
+			);
 		}
 	}
 
 	public revokeAllSessions(): void {
 		for (const session of this.sessions) {
 			session.revoke();
+			this.addDomainEvent(
+				new UserSessionRevokedDomainEvent(this.id.getValue(), session.id.getValue()),
+			);
 		}
 	}
 
@@ -226,6 +234,9 @@ export class User extends AggregateRoot {
 		for (const session of this.sessions) {
 			if (!session.id.equals(currentSessionId)) {
 				session.revoke();
+				this.addDomainEvent(
+					new UserSessionRevokedDomainEvent(this.id.getValue(), session.id.getValue()),
+				);
 			}
 		}
 	}

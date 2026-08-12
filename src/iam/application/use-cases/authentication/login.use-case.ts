@@ -1,6 +1,8 @@
 import { Session } from "@/iam/domain/entities";
+import { FailedLoginAttemptedDomainEvent } from "@/iam/domain/events/authentication";
 import { UserRepository } from "@/iam/domain/repositories";
 import { Email, SessionId } from "@/iam/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 import {
@@ -25,6 +27,7 @@ export class LoginUseCase implements LoginUseCasePort {
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly envConfig: EnvConfigPort,
 		private readonly timeFormatter: TimeFormatterPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: LoginCommand): Promise<LoginResult> {
@@ -32,17 +35,38 @@ export class LoginUseCase implements LoginUseCasePort {
 
 		const user = await this.userRepository.findByEmail(emailVo);
 
-		if (!user || !user.account) throw new InvalidLoginException();
+		if (!user || !user.account) {
+			await this.domainEventPublisher.publishAsync(
+				new FailedLoginAttemptedDomainEvent(
+					command.email,
+					"Invalid login credentials or user not found.",
+				),
+			);
+			throw new InvalidLoginException();
+		}
 
 		//! If the account is locked, throw an exception with the lockout duration
 		if (user.account.isLocked()) {
 			const lockedUntil = user.account.getFailedLoginState().getLockedUntil()!;
+			await this.domainEventPublisher.publishAsync(
+				new FailedLoginAttemptedDomainEvent(
+					command.email,
+					"Account locked due to multiple failed login attempts.",
+				),
+			);
 			throw new AccountLockedException(lockedUntil);
 		}
 
 		//! Check against OAuth-only accounts attempting password login
-		if (!user.account.hasPassword())
+		if (!user.account.hasPassword()) {
+			await this.domainEventPublisher.publishAsync(
+				new FailedLoginAttemptedDomainEvent(
+					command.email,
+					"Attempted to login with password on an OAuth-only account.",
+				),
+			);
 			throw new InvalidLoginException("Please sign in using your linked social account.");
+		}
 
 		const passwordMatch = await this.hashService.compare(
 			command.password,
@@ -58,6 +82,10 @@ export class LoginUseCase implements LoginUseCasePort {
 			user.account.handleFailedLogin(maxLoginAttempts, lockOutDurationInMs);
 
 			await this.userRepository.save(user);
+
+			await this.domainEventPublisher.publishAsync(
+				new FailedLoginAttemptedDomainEvent(command.email, "Invalid password."),
+			);
 			throw new InvalidLoginException();
 		}
 
@@ -69,6 +97,13 @@ export class LoginUseCase implements LoginUseCasePort {
 		if (scheduledForDeletionDate) {
 			//! Save just in case resetFailedLogins mutated the state before hitting this block
 			await this.userRepository.save(user);
+
+			await this.domainEventPublisher.publishAsync(
+				new FailedLoginAttemptedDomainEvent(
+					command.email,
+					"Attempted to login on an account scheduled for deletion.",
+				),
+			);
 			throw new AccountPendingDeletionException(scheduledForDeletionDate);
 		}
 
@@ -76,6 +111,10 @@ export class LoginUseCase implements LoginUseCasePort {
 		if (!user.isVerified) {
 			//! Save any reset states
 			await this.userRepository.save(user);
+
+			await this.domainEventPublisher.publishAsync(
+				new FailedLoginAttemptedDomainEvent(command.email, "Email is not verified."),
+			);
 			throw new InvalidLoginException("Please verify your email address before logging in.");
 		}
 
@@ -122,6 +161,9 @@ export class LoginUseCase implements LoginUseCasePort {
 
 		user.addSession(session);
 		await this.userRepository.save(user);
+
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+		user.clearEvents();
 
 		return {
 			mfaRequired: false,

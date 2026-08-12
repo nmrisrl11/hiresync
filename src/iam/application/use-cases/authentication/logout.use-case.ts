@@ -1,12 +1,16 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { SessionId, UserId } from "@/iam/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
 import { UserNotFoundException } from "../../exceptions";
 import { LogoutCommand, LogoutUseCasePort } from "../../ports/inbound/authentication";
 
 @Injectable()
 export class LogoutUseCase implements LogoutUseCasePort {
-	constructor(private readonly userRepository: UserRepository) {}
+	constructor(
+		private readonly userRepository: UserRepository,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
+	) {}
 
 	public async execute(command: LogoutCommand): Promise<void> {
 		const userIdVo = new UserId(command.userId);
@@ -19,5 +23,8 @@ export class LogoutUseCase implements LogoutUseCasePort {
 		user.revokeSession(sessionIdVo);
 
 		await this.userRepository.save(user);
+
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+		user.clearEvents();
 	}
 }
