@@ -3,7 +3,7 @@ import {
 	EnqueueFarewellEmailUseCasePort,
 } from "@/iam/application/ports/inbound/account/notifications";
 import { ImageStoragePort } from "@/iam/application/ports/outbound";
-import { UserAccountDeletedDomainEvent } from "@/iam/domain/events";
+import { UserAccountDeletedDomainEvent } from "@/iam/domain/events/account";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
