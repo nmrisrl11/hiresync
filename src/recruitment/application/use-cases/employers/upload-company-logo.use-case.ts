@@ -1,5 +1,6 @@
 import { EmployerProfileRepository } from "@/recruitment/domain/repositories";
 import { DomainEventPublisherPort } from "@/shared/events/ports";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { EmployerProfileNotFoundException } from "../../exceptions";
 import {
@@ -13,6 +14,7 @@ export class UploadCompanyLogoUseCase implements UploadCompanyLogoUseCasePort {
 	constructor(
 		private readonly employerProfileRepository: EmployerProfileRepository,
 		private readonly imageStorage: ImageStoragePort,
+		private readonly logger: LoggerPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -35,7 +37,15 @@ export class UploadCompanyLogoUseCase implements UploadCompanyLogoUseCasePort {
 
 		await this.employerProfileRepository.save(employerProfile);
 
-		await this.domainEventPublisher.publishMultipleAsync(employerProfile.domainEvents);
-		employerProfile.clearEvents();
+		try {
+			await this.domainEventPublisher.publishMultipleAsync(employerProfile.domainEvents);
+		} catch (error) {
+			this.logger.error(
+				`Failed to publish company logo event for ${employerProfile.id.getValue()}`,
+				(error as Error).stack,
+			);
+		} finally {
+			employerProfile.clearEvents();
+		}
 	}
 }

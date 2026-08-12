@@ -4,6 +4,7 @@ import {
 	JobApplicationSubmittedDomainEvent,
 	JobApplicationWithdrawnDomainEvent,
 } from "../events";
+import { InternalNoteUpdatedDomainEvent } from "../events/applications";
 import { ApplicationNotUpdatableException } from "../exceptions";
 import { APPLICATION_STATUS, ApplicationStatus } from "../types";
 import { ApplicantId, EmployerId, JobApplicationId, JobListingId } from "../value-objects";
@@ -102,6 +103,10 @@ export class JobApplication extends AggregateRoot {
 	public updateInternalNote(note: string | null): void {
 		this.internalNote = note;
 		this.updatedAt = new Date();
+
+		this.addDomainEvent(
+			new InternalNoteUpdatedDomainEvent(this.id.getValue(), this.employerId.getValue(), note),
+		);
 	}
 
 	//! Job Application History

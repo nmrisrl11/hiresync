@@ -1,5 +1,7 @@
 import { ApplicantProfileRepository } from "@/recruitment/domain/repositories";
 import { ApplicantDocumentId } from "@/recruitment/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { ApplicantProfileNotFoundException } from "../../exceptions";
 import {
@@ -13,6 +15,8 @@ export class DeleteApplicantDocumentUseCase implements DeleteApplicantDocumentUs
 	constructor(
 		private readonly applicantProfileRepository: ApplicantProfileRepository,
 		private readonly documentStorage: DocumentStoragePort,
+		private readonly logger: LoggerPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: DeleteApplicantDocumentCommand): Promise<void> {
@@ -36,5 +40,16 @@ export class DeleteApplicantDocumentUseCase implements DeleteApplicantDocumentUs
 
 		//! Persist the updated aggregate root (which will delete the document row via cascade/orphan removal)
 		await this.applicantProfileRepository.save(profile);
+
+		try {
+			await this.domainEventPublisher.publishMultipleAsync(profile.domainEvents);
+		} catch (error) {
+			this.logger.error(
+				`Failed to publish document deletion events for ${profile.id.getValue()}`,
+				(error as Error).stack,
+			);
+		} finally {
+			profile.clearEvents();
+		}
 	}
 }

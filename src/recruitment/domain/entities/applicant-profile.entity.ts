@@ -1,9 +1,14 @@
 import { AggregateRoot } from "@/shared/core";
 import { ApplicantProfileCreatedDomainEvent, ApplicantProfileUpdatedDomainEvent } from "../events";
+import {
+	ApplicantDocumentDeletedDomainEvent,
+	ApplicantDocumentUploadedDomainEvent,
+	PrimaryDocumentSetDomainEvent,
+} from "../events/applicants";
+import { DocumentNotFoundException, MaxDocumentLimitReachedException } from "../exceptions";
 import { DocumentType } from "../types";
 import { ApplicantDocumentId, ApplicantId } from "../value-objects";
 import { ApplicantDocument } from "./applicant-document.entity";
-import { DocumentNotFoundException, MaxDocumentLimitReachedException } from "../exceptions";
 
 export class ApplicantProfile extends AggregateRoot {
 	public readonly baseUpdatedAt: Date; //! Track original load time for optimistic concurrency
@@ -76,11 +81,27 @@ export class ApplicantProfile extends AggregateRoot {
 
 		if (typeDocs.length >= 5) throw new MaxDocumentLimitReachedException(document.type);
 
-		if (typeDocs.length === 0) document.makePrimary();
+		const isFirstOfType = typeDocs.length === 0;
+
+		if (isFirstOfType) document.makePrimary();
 		else document.removePrimary();
 
 		this.documents.push(document);
 		this.updatedAt = new Date();
+
+		this.addDomainEvent(
+			new ApplicantDocumentUploadedDomainEvent(
+				this.id.getValue(),
+				document.id.getValue(),
+				document.type,
+			),
+		);
+
+		if (isFirstOfType) {
+			this.addDomainEvent(
+				new PrimaryDocumentSetDomainEvent(this.id.getValue(), document.id.getValue()),
+			);
+		}
 	}
 
 	public removeDocument(documentIdVo: ApplicantDocumentId): ApplicantDocument {
@@ -91,10 +112,22 @@ export class ApplicantProfile extends AggregateRoot {
 
 		if (removedDoc.isPrimary) {
 			const remainingOfType = this.documents.filter((d) => d.type === removedDoc.type);
-			if (remainingOfType.length > 0) remainingOfType[0].makePrimary();
+			if (remainingOfType.length > 0) {
+				const newPrimary = remainingOfType[0];
+				newPrimary.makePrimary();
+
+				this.addDomainEvent(
+					new PrimaryDocumentSetDomainEvent(this.id.getValue(), newPrimary.id.getValue()),
+				);
+			}
 		}
 
 		this.updatedAt = new Date();
+
+		this.addDomainEvent(
+			new ApplicantDocumentDeletedDomainEvent(this.id.getValue(), removedDoc.id.getValue()),
+		);
+
 		return removedDoc;
 	}
 
@@ -106,5 +139,9 @@ export class ApplicantProfile extends AggregateRoot {
 		this.documents.filter((d) => d.type === type).forEach((d) => d.removePrimary());
 		targetDoc.makePrimary();
 		this.updatedAt = new Date();
+
+		this.addDomainEvent(
+			new PrimaryDocumentSetDomainEvent(this.id.getValue(), targetDoc.id.getValue()),
+		);
 	}
 }
