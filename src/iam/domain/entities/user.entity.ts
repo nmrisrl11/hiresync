@@ -1,17 +1,13 @@
 import { AggregateRoot } from "@/shared/core";
 import {
 	EmailChangeRequestedDomainEvent,
-	PasswordResetRequestedDomainEvent,
 	UserAccountDeletedDomainEvent,
 	UserAccountDeletionScheduledDomainEvent,
 	UserAccountRestoredDomainEvent,
 	UserEmailChangedDomainEvent,
-	UserEmailVerifiedDomainEvent,
 	UserMfaDisabledDomainEvent,
 	UserMfaEnabledDomainEvent,
 	UserPasswordChangedDomainEvent,
-	UserRegisteredDomainEvent,
-	VerificationEmailResentDomainEvent,
 } from "../events";
 import {
 	AvatarRemovedDomainEvent,
@@ -23,7 +19,14 @@ import {
 	OAuthProviderLinkedDomainEvent,
 	OAuthProviderUnlinkedDomainEvent,
 } from "../events/account/oauth";
-import { UserLoggedInDomainEvent, UserSessionRevokedDomainEvent } from "../events/authentication";
+import {
+	PasswordResetRequestedDomainEvent,
+	UserEmailVerifiedDomainEvent,
+	UserLoggedInDomainEvent,
+	UserRegisteredDomainEvent,
+	UserSessionRevokedDomainEvent,
+	VerificationEmailResentDomainEvent,
+} from "../events/authentication";
 import { NoAccountFoundException, NoPendingEmailChangeException } from "../exceptions";
 import { OAuthProviderType } from "../types";
 import { AccountId, Email, SessionId, UserId } from "../value-objects";

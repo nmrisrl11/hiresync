@@ -2,7 +2,7 @@ import {
 	EnqueueVerificationEmailCommand,
 	EnqueueVerificationEmailUseCasePort,
 } from "@/iam/application/ports/inbound/authentication/notifications";
-import { VerificationEmailResentDomainEvent } from "@/iam/domain/events";
+import { VerificationEmailResentDomainEvent } from "@/iam/domain/events/authentication";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
