@@ -1,8 +1,9 @@
 import { AggregateRoot } from "@/shared/core";
-import { ApplicantProfileCreatedDomainEvent, ApplicantProfileUpdatedDomainEvent } from "../events";
 import {
 	ApplicantDocumentDeletedDomainEvent,
 	ApplicantDocumentUploadedDomainEvent,
+	ApplicantProfileCreatedDomainEvent,
+	ApplicantProfileUpdatedDomainEvent,
 	PrimaryDocumentSetDomainEvent,
 } from "../events/applicants";
 import { DocumentNotFoundException, MaxDocumentLimitReachedException } from "../exceptions";
