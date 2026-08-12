@@ -2,7 +2,7 @@ import {
 	EnqueueApplicationWithdrawnCommand,
 	EnqueueApplicationWithdrawnUseCasePort,
 } from "@/recruitment/application/ports/inbound/notifications";
-import { JobApplicationWithdrawnDomainEvent } from "@/recruitment/domain/events";
+import { JobApplicationWithdrawnDomainEvent } from "@/recruitment/domain/events/applications";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";

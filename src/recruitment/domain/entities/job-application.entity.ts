@@ -1,10 +1,10 @@
 import { AggregateRoot } from "@/shared/core";
 import {
+	InternalNoteUpdatedDomainEvent,
 	JobApplicationStatusUpdatedDomainEvent,
 	JobApplicationSubmittedDomainEvent,
 	JobApplicationWithdrawnDomainEvent,
-} from "../events";
-import { InternalNoteUpdatedDomainEvent } from "../events/applications";
+} from "../events/applications";
 import { ApplicationNotUpdatableException } from "../exceptions";
 import { APPLICATION_STATUS, ApplicationStatus } from "../types";
 import { ApplicantId, EmployerId, JobApplicationId, JobListingId } from "../value-objects";
