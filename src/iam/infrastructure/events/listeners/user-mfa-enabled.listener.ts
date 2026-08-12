@@ -2,7 +2,7 @@ import {
 	EnqueueMfaEnabledAlertEmailCommand,
 	EnqueueMfaEnabledAlertEmailUseCasePort,
 } from "@/iam/application/ports/inbound/account/notifications";
-import { UserMfaEnabledDomainEvent } from "@/iam/domain/events";
+import { UserMfaEnabledDomainEvent } from "@/iam/domain/events/account/mfa";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
