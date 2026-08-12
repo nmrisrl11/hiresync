@@ -13,6 +13,16 @@ import {
 	UserRegisteredDomainEvent,
 	VerificationEmailResentDomainEvent,
 } from "../events";
+import {
+	AvatarRemovedDomainEvent,
+	AvatarUploadedDomainEvent,
+	InitialPasswordSetDomainEvent,
+	UserProfileUpdatedDomainEvent,
+} from "../events/account";
+import {
+	OAuthProviderLinkedDomainEvent,
+	OAuthProviderUnlinkedDomainEvent,
+} from "../events/account/oauth";
 import { UserLoggedInDomainEvent, UserSessionRevokedDomainEvent } from "../events/authentication";
 import { NoAccountFoundException, NoPendingEmailChangeException } from "../exceptions";
 import { OAuthProviderType } from "../types";
@@ -122,17 +132,44 @@ export class User extends AggregateRoot {
 
 	public updatePassword(newHash: string): void {
 		if (!this.account) throw new NoAccountFoundException();
+
+		//! Check if this is the first time a password is being set (OAuth account scenario)
+		const isInitialPassword = !this.account.hasPassword();
+
 		this.account.setPasswordHash(newHash);
 
-		this.addDomainEvent(
-			new UserPasswordChangedDomainEvent(this.id.getValue(), this.email.getValue()),
-		);
+		//! Dispatch the appropriate event
+		if (isInitialPassword) {
+			this.addDomainEvent(new InitialPasswordSetDomainEvent(this.id.getValue()));
+		} else {
+			this.addDomainEvent(
+				new UserPasswordChangedDomainEvent(this.id.getValue(), this.email.getValue()),
+			);
+		}
 	}
 
 	public updateProfile(name?: string, image?: string | null): void {
-		if (name !== undefined) this.name = name;
+		const nameChanged = name !== undefined && name !== this.name;
+		const imageChanged = image !== undefined && image !== this.image;
 
+		if (name !== undefined) this.name = name;
 		if (image !== undefined) this.image = image;
+
+		//! Handle Profile (Name) Updates
+		if (nameChanged) {
+			this.addDomainEvent(
+				new UserProfileUpdatedDomainEvent(this.id.getValue(), nameChanged, imageChanged),
+			);
+		}
+
+		//! Handle Avatar Uploads / Removals
+		if (imageChanged) {
+			if (this.image === null) {
+				this.addDomainEvent(new AvatarRemovedDomainEvent(this.id.getValue()));
+			} else {
+				this.addDomainEvent(new AvatarUploadedDomainEvent(this.id.getValue(), this.image));
+			}
+		}
 	}
 
 	public requestEmailChange(newEmail: string, token: string, tokenExpiresInMs: number): void {
@@ -213,7 +250,7 @@ export class User extends AggregateRoot {
 
 	public revokeSession(sessionId: SessionId): void {
 		const session = this.sessions.find((s) => s.id.equals(sessionId));
-		if (session) {
+		if (session && session.isValid()) {
 			session.revoke();
 			this.addDomainEvent(
 				new UserSessionRevokedDomainEvent(this.id.getValue(), session.id.getValue()),
@@ -223,16 +260,18 @@ export class User extends AggregateRoot {
 
 	public revokeAllSessions(): void {
 		for (const session of this.sessions) {
-			session.revoke();
-			this.addDomainEvent(
-				new UserSessionRevokedDomainEvent(this.id.getValue(), session.id.getValue()),
-			);
+			if (session.isValid()) {
+				session.revoke();
+				this.addDomainEvent(
+					new UserSessionRevokedDomainEvent(this.id.getValue(), session.id.getValue()),
+				);
+			}
 		}
 	}
 
 	public revokeAllOtherSessions(currentSessionId: SessionId): void {
 		for (const session of this.sessions) {
-			if (!session.id.equals(currentSessionId)) {
+			if (!session.id.equals(currentSessionId) && session.isValid()) {
 				session.revoke();
 				this.addDomainEvent(
 					new UserSessionRevokedDomainEvent(this.id.getValue(), session.id.getValue()),
@@ -306,6 +345,10 @@ export class User extends AggregateRoot {
 			[oauthAccount],
 		);
 
+		user.addDomainEvent(
+			new OAuthProviderLinkedDomainEvent(idVo.getValue(), oauthAccount.getProviderValue()),
+		);
+
 		return user;
 	}
 
@@ -324,11 +367,20 @@ export class User extends AggregateRoot {
 
 		if (!alreadyLinked) {
 			this.oauthAccounts.push(oauthAccount);
+
+			//! Emit event ONLY when a new account is successfully linked
+			this.addDomainEvent(
+				new OAuthProviderLinkedDomainEvent(this.id.getValue(), oauthAccount.getProviderValue()),
+			);
 		}
 	}
 
 	public unlinkOAuthProvider(providerType: OAuthProviderType): void {
 		const hasPassword = this.account !== null && this.account.hasPassword();
+
+		//! Capture the length before filtering
+		const initialLength = this.oauthAccounts.length;
+
 		const remainingProviders = this.oauthAccounts.filter(
 			(oauth) => oauth.getProviderValue() !== providerType,
 		);
@@ -338,5 +390,10 @@ export class User extends AggregateRoot {
 		}
 
 		this.oauthAccounts = remainingProviders;
+
+		//! Emit event ONLY if the array size changed (meaning an account was actually removed)
+		if (this.oauthAccounts.length !== initialLength) {
+			this.addDomainEvent(new OAuthProviderUnlinkedDomainEvent(this.id.getValue(), providerType));
+		}
 	}
 }
