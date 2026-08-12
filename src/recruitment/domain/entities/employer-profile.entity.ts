@@ -1,6 +1,10 @@
 import { AggregateRoot } from "@/shared/core";
-import { EmployerProfileCreatedDomainEvent, EmployerProfileUpdatedDomainEvent } from "../events";
-import { CompanyLogoRemovedDomainEvent, CompanyLogoUploadedDomainEvent } from "../events/employers";
+import {
+	CompanyLogoRemovedDomainEvent,
+	CompanyLogoUploadedDomainEvent,
+	EmployerProfileCreatedDomainEvent,
+	EmployerProfileUpdatedDomainEvent,
+} from "../events/employers";
 import { CompanyWebsite, EmployerId } from "../value-objects";
 
 export class EmployerProfile extends AggregateRoot {
