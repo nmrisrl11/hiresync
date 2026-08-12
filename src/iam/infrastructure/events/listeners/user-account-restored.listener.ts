@@ -2,7 +2,7 @@ import {
 	EnqueueAccountRestoredEmailCommand,
 	EnqueueAccountRestoredEmailUseCasePort,
 } from "@/iam/application/ports/inbound/account/notifications";
-import { UserAccountRestoredDomainEvent } from "@/iam/domain/events";
+import { UserAccountRestoredDomainEvent } from "@/iam/domain/events/account";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";

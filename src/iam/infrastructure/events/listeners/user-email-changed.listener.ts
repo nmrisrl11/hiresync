@@ -2,7 +2,7 @@ import {
 	EnqueueEmailChangedAlertCommand,
 	EnqueueEmailChangedAlertUseCasePort,
 } from "@/iam/application/ports/inbound/account/notifications";
-import { UserEmailChangedDomainEvent } from "@/iam/domain/events";
+import { UserEmailChangedDomainEvent } from "@/iam/domain/events/account";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
