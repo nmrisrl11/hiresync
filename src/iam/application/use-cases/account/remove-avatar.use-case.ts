@@ -1,5 +1,6 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { UserId } from "@/iam/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { UserNotFoundException } from "../../exceptions";
@@ -16,6 +17,7 @@ export class RemoveAvatarUseCase implements RemoveAvatarUseCasePort {
 		private readonly userRepository: UserRepository,
 		private readonly imageStorage: ImageStoragePort,
 		private readonly logger: LoggerPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: RemoveAvatarCommand): Promise<UpdateAccountResult> {
@@ -31,6 +33,9 @@ export class RemoveAvatarUseCase implements RemoveAvatarUseCasePort {
 			user.updateProfile(undefined, null);
 
 			await this.userRepository.save(user);
+
+			await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+			user.clearEvents();
 		}
 
 		return {

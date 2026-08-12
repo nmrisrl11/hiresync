@@ -1,4 +1,5 @@
 import { OAuthAccount, Session, User } from "@/iam/domain/entities";
+import { FailedLoginAttemptedDomainEvent } from "@/iam/domain/events/authentication";
 import { RoleRepository, UserRepository } from "@/iam/domain/repositories";
 import {
 	Email,
@@ -8,6 +9,7 @@ import {
 	SessionId,
 	UserId,
 } from "@/iam/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 import {
@@ -39,164 +41,183 @@ export class OAuthCallbackLoginUseCase implements OAuthCallbackLoginUseCasePort 
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly envConfig: EnvConfigPort,
 		private readonly timeFormatter: TimeFormatterPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: OAuthCallbackLoginCommand): Promise<LoginResult> {
-		/**
-		 * STEP1: Exchange Code for Profile
-		 * The infrastructure layer makes the HTTP calls to exchange the authorization code
-		 * for an access token, then uses that token to fetch the user's profile.
-		 */
-		const profile = await this.oauthProvider.exchangeCodeForProfile(command.provider, command.code);
-		if (!profile.email) throw new OAuthEmailNotProvidedException();
-
-		/**
-		 * STEP2: Check for Existing Linked Account
-		 * See if this exact social identity (e.g., Google user ID 12345) is already
-		 * linked to a user in our database.
-		 */
-		let user = await this.userRepository.findByOAuth(command.provider, profile.providerAccountId);
-
-		/**
-		 * STEP3: Handle Account Linking or New User Registration
-		 * If no user is explicitly linked to this social identity, we must either link
-		 * it to an existing email match or create a brand new user.
-		 */
-		if (!user) {
+		try {
 			/**
-			 * STEP3.1: Check if the user exists via another method (password signup or another OAuth provider).
+			 * STEP1: Exchange Code for Profile
+			 * The infrastructure layer makes the HTTP calls to exchange the authorization code
+			 * for an access token, then uses that token to fetch the user's profile.
 			 */
-			const emailVo = new Email(profile.email);
-			user = await this.userRepository.findByEmail(emailVo);
-
-			/**
-			 * STEP3.2: Prepare the new OAuthAccount domain entity.
-			 */
-			const oauthProviderVo = new OAuthProvider(command.provider);
-			const oauthAccountIdStr = this.idGenerator.generateId();
-			const oauthAccountId = new OAuthAccountId(oauthAccountIdStr);
-
-			const newOAuthAccount = new OAuthAccount(
-				oauthAccountId,
-				user ? user.id : new UserId(this.idGenerator.generateId()),
-				oauthProviderVo,
-				profile.providerAccountId,
+			const profile = await this.oauthProvider.exchangeCodeForProfile(
+				command.provider,
+				command.code,
 			);
+			if (!profile.email) throw new OAuthEmailNotProvidedException();
 
-			if (user) {
+			/**
+			 * STEP2: Check for Existing Linked Account
+			 * See if this exact social identity (e.g., Google user ID 12345) is already
+			 * linked to a user in our database.
+			 */
+			let user = await this.userRepository.findByOAuth(command.provider, profile.providerAccountId);
+
+			/**
+			 * STEP3: Handle Account Linking or New User Registration
+			 * If no user is explicitly linked to this social identity, we must either link
+			 * it to an existing email match or create a brand new user.
+			 */
+			if (!user) {
 				/**
-				 * STEP3.3: Auto-Linking
-				 * The email exists in our system. Trust the OAuth provider's email verification
-				 * and link this new social account to the existing user aggregate.
+				 * STEP3.1: Check if the user exists via another method (password signup or another OAuth provider).
 				 */
-				user.linkOAuthAccount(newOAuthAccount);
-			} else {
+				const emailVo = new Email(profile.email);
+				user = await this.userRepository.findByEmail(emailVo);
+
 				/**
-				 * STEP3.4: OAuth-First Registration
-				 * The email is entirely new. We fetch the default role and use the domain factory
-				 * to instantiate an auto-verified user without a password.
+				 * STEP3.2: Prepare the new OAuthAccount domain entity.
 				 */
-				const roleCodeVo = new RoleCode("APPLICANT");
-				const defaultRole = await this.roleRepository.findByCode(roleCodeVo);
+				const oauthProviderVo = new OAuthProvider(command.provider);
+				const oauthAccountIdStr = this.idGenerator.generateId();
+				const oauthAccountId = new OAuthAccountId(oauthAccountIdStr);
 
-				if (!defaultRole) throw new DefaultRoleMissingException();
-
-				const emptyAccountId = this.idGenerator.generateId();
-
-				user = User.createForOAuthRegistration(
-					newOAuthAccount.getUserId().getValue(),
-					emptyAccountId,
-					profile.email,
-					profile.name,
-					profile.image,
-					defaultRole,
-					newOAuthAccount,
+				const newOAuthAccount = new OAuthAccount(
+					oauthAccountId,
+					user ? user.id : new UserId(this.idGenerator.generateId()),
+					oauthProviderVo,
+					profile.providerAccountId,
 				);
+
+				if (user) {
+					/**
+					 * STEP3.3: Auto-Linking
+					 * The email exists in our system. Trust the OAuth provider's email verification
+					 * and link this new social account to the existing user aggregate.
+					 */
+					user.linkOAuthAccount(newOAuthAccount);
+				} else {
+					/**
+					 * STEP3.4: OAuth-First Registration
+					 * The email is entirely new. We fetch the default role and use the domain factory
+					 * to instantiate an auto-verified user without a password.
+					 */
+					const roleCodeVo = new RoleCode("APPLICANT");
+					const defaultRole = await this.roleRepository.findByCode(roleCodeVo);
+
+					if (!defaultRole) throw new DefaultRoleMissingException();
+
+					const emptyAccountId = this.idGenerator.generateId();
+
+					user = User.createForOAuthRegistration(
+						newOAuthAccount.getUserId().getValue(),
+						emptyAccountId,
+						profile.email,
+						profile.name,
+						profile.image,
+						defaultRole,
+						newOAuthAccount,
+					);
+				}
+
+				/**
+				 * STEP3.5: Persist the newly linked account or the newly created user.
+				 */
+				await this.userRepository.save(user);
 			}
 
 			/**
-			 * STEP3.5: Persist the newly linked account or the newly created user.
+			 * STEP4: Security & Access Checks
+			 * Ensure the user hasn't scheduled their account for deletion.
 			 */
-			await this.userRepository.save(user);
-		}
+			if (user.account) {
+				const scheduledForDeletionDate = user.account.getScheduledForDeletionAt();
+				if (scheduledForDeletionDate)
+					throw new AccountPendingDeletionException(scheduledForDeletionDate);
+			}
 
-		/**
-		 * STEP4: Security & Access Checks
-		 * Ensure the user hasn't scheduled their account for deletion.
-		 */
-		if (user.account) {
-			const scheduledForDeletionDate = user.account.getScheduledForDeletionAt();
-			if (scheduledForDeletionDate)
-				throw new AccountPendingDeletionException(scheduledForDeletionDate);
-		}
+			/**
+			 * STEP5: Security & Access Checks
+			 * Intercept the login flow if the user has Multi-Factor Authentication enabled.
+			 */
+			if (user.isMfaEnabled()) {
+				const mfaChallengeToken = await this.jwtService.signMfaChallengeToken({
+					sub: user.id.getValue(),
+					email: user.email.getValue(),
+					type: "MFA_CHALLENGE",
+				});
 
-		/**
-		 * STEP5: Security & Access Checks
-		 * Intercept the login flow if the user has Multi-Factor Authentication enabled.
-		 */
-		if (user.isMfaEnabled()) {
-			const mfaChallengeToken = await this.jwtService.signMfaChallengeToken({
+				return { mfaRequired: true, mfaChallengeToken };
+			}
+
+			/**
+			 * STEP6: Session Creation & Token Generation
+			 * Issue the standard JWT access token and refresh token.
+			 */
+			const sessionIdStr = this.idGenerator.generateId();
+
+			const tokens = await this.jwtService.generateTokens({
 				sub: user.id.getValue(),
 				email: user.email.getValue(),
-				type: "MFA_CHALLENGE",
+				role: user.role.code.getValue(),
+				sessionId: sessionIdStr,
 			});
 
-			return { mfaRequired: true, mfaChallengeToken };
+			/**
+			 * STEP6.1: Hash the refresh token before storing it in the database for security.
+			 */
+			const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
+			const expiresInEnv = this.envConfig.getRefreshTokenExpiration();
+			const expiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
+			const expiresAt = new Date(Date.now() + expiresInMs);
+
+			/**
+			 * STEP6.2: Append the new session to the User aggregate and save to the database.
+			 */
+			const session = new Session(
+				new SessionId(sessionIdStr),
+				user.id,
+				refreshTokenHash,
+				command.userAgent ?? null,
+				command.ipAddress ?? null,
+				false,
+				new Date(),
+				expiresAt,
+				new Date(),
+			);
+
+			user.addSession(session);
+			await this.userRepository.save(user);
+
+			await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+			user.clearEvents();
+
+			/**
+			 * STEP6.3: Return Standardized Login Result
+			 */
+			return {
+				mfaRequired: false,
+				accessToken: tokens.accessToken,
+				refreshToken: tokens.refreshToken,
+				user: {
+					id: user.id.getValue(),
+					email: user.email.getValue(),
+					name: user.name,
+					role: user.role.code.getValue(),
+					hasPassword: user.account?.hasPassword() ?? false,
+				},
+			};
+		} catch (error) {
+			//! Publish failed login attempt if anything goes wrong during the OAuth flow
+			const errorMessage = error instanceof Error ? error.message : "OAuth Login Failed";
+			await this.domainEventPublisher.publishAsync(
+				new FailedLoginAttemptedDomainEvent(
+					"Unknown (OAuth)",
+					`Provider: ${command.provider} - ${errorMessage}`,
+				),
+			);
+			throw error;
 		}
-
-		/**
-		 * STEP6: Session Creation & Token Generation
-		 * Issue the standard JWT access token and refresh token.
-		 */
-		const sessionIdStr = this.idGenerator.generateId();
-
-		const tokens = await this.jwtService.generateTokens({
-			sub: user.id.getValue(),
-			email: user.email.getValue(),
-			role: user.role.code.getValue(),
-			sessionId: sessionIdStr,
-		});
-
-		/**
-		 * STEP6.1: Hash the refresh token before storing it in the database for security.
-		 */
-		const refreshTokenHash = await this.hashService.hash(tokens.refreshToken, 10);
-		const expiresInEnv = this.envConfig.getRefreshTokenExpiration();
-		const expiresInMs = this.timeFormatter.parseToMilliseconds(expiresInEnv);
-		const expiresAt = new Date(Date.now() + expiresInMs);
-
-		/**
-		 * STEP6.2: Append the new session to the User aggregate and save to the database.
-		 */
-		const session = new Session(
-			new SessionId(sessionIdStr),
-			user.id,
-			refreshTokenHash,
-			command.userAgent ?? null,
-			command.ipAddress ?? null,
-			false,
-			new Date(),
-			expiresAt,
-			new Date(),
-		);
-
-		user.addSession(session);
-		await this.userRepository.save(user);
-
-		/**
-		 * STEP6.3: Return Standardized Login Result
-		 */
-		return {
-			mfaRequired: false,
-			accessToken: tokens.accessToken,
-			refreshToken: tokens.refreshToken,
-			user: {
-				id: user.id.getValue(),
-				email: user.email.getValue(),
-				name: user.name,
-				role: user.role.code.getValue(),
-				hasPassword: user.account?.hasPassword() ?? false,
-			},
-		};
 	}
 }

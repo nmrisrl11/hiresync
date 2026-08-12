@@ -10,6 +10,7 @@ import { OAuthProviderPort } from "@/iam/application/ports/outbound";
 import { OAuthAccount } from "@/iam/domain/entities";
 import { UserRepository } from "@/iam/domain/repositories";
 import { OAuthAccountId, OAuthProvider, UserId } from "@/iam/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 
@@ -19,6 +20,7 @@ export class LinkOAuthProviderUseCase implements LinkOAuthProviderUseCasePort {
 		private readonly userRepository: UserRepository,
 		private readonly oauthProvider: OAuthProviderPort,
 		private readonly idGenerator: IdGeneratorPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: LinkOAuthProviderCommand): Promise<void> {
@@ -49,5 +51,8 @@ export class LinkOAuthProviderUseCase implements LinkOAuthProviderUseCasePort {
 		user.linkOAuthAccount(oauthAccount);
 
 		await this.userRepository.save(user);
+
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+		user.clearEvents();
 	}
 }

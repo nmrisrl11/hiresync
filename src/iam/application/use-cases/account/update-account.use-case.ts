@@ -1,5 +1,6 @@
 import { UserRepository } from "@/iam/domain/repositories";
 import { UserId } from "@/iam/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { Injectable } from "@nestjs/common";
 import { UserNotFoundException } from "../../exceptions";
 import {
@@ -10,7 +11,10 @@ import {
 
 @Injectable()
 export class UpdateAccountUseCase implements UpdateAccountUseCasePort {
-	constructor(private readonly userRepository: UserRepository) {}
+	constructor(
+		private readonly userRepository: UserRepository,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
+	) {}
 
 	public async execute(command: UpdateAccountCommand): Promise<UpdateAccountResult> {
 		const userIdVo = new UserId(command.userId);
@@ -21,6 +25,9 @@ export class UpdateAccountUseCase implements UpdateAccountUseCasePort {
 		user.updateProfile(command.name, command.image);
 
 		await this.userRepository.save(user);
+
+		await this.domainEventPublisher.publishMultipleAsync(user.domainEvents);
+		user.clearEvents();
 
 		return {
 			id: user.id.getValue(),
