@@ -2,7 +2,7 @@ import {
 	EnqueueApplicantWelcomeEmailCommand,
 	EnqueueApplicantWelcomeEmailUseCasePort,
 } from "@/recruitment/application/ports/inbound/notifications";
-import { ApplicantProfileCreatedDomainEvent } from "@/recruitment/domain/events";
+import { ApplicantProfileCreatedDomainEvent } from "@/recruitment/domain/events/applicants";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";

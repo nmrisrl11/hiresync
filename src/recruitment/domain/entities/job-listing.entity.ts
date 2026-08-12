@@ -3,7 +3,7 @@ import {
 	JobListingClosedDomainEvent,
 	JobListingCreatedDomainEvent,
 	JobListingUpdatedDomainEvent,
-} from "../events";
+} from "../events/jobs";
 import { JobAlreadyClosedException, JobNotUpdatableException } from "../exceptions";
 import { EmploymentType, JOB_STATUS, JobStatus } from "../types";
 import { EmployerId, JobListingId, JobLocation, SalaryRange } from "../value-objects";

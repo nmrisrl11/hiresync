@@ -2,7 +2,7 @@ import {
 	EnqueueApplicationStatusUpdatedCommand,
 	EnqueueApplicationStatusUpdatedUseCasePort,
 } from "@/recruitment/application/ports/inbound/notifications";
-import { JobApplicationStatusUpdatedDomainEvent } from "@/recruitment/domain/events";
+import { JobApplicationStatusUpdatedDomainEvent } from "@/recruitment/domain/events/applications";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";

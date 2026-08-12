@@ -1,5 +1,5 @@
 import { DomainEvent } from "@/shared/events";
-import { ApplicationStatus } from "../types";
+import { ApplicationStatus } from "../../types";
 
 export class JobApplicationStatusUpdatedDomainEvent extends DomainEvent {
 	public readonly actorId: string;

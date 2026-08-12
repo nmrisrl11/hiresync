@@ -2,7 +2,7 @@ import {
 	EnqueueJobClosedEmailCommand,
 	EnqueueJobClosedEmailUseCasePort,
 } from "@/recruitment/application/ports/inbound/notifications";
-import { JobListingClosedDomainEvent } from "@/recruitment/domain/events";
+import { JobListingClosedDomainEvent } from "@/recruitment/domain/events/jobs";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
