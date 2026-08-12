@@ -1,5 +1,4 @@
 import { AggregateRoot } from "@/shared/core";
-import { UserMfaDisabledDomainEvent, UserMfaEnabledDomainEvent } from "../events";
 import {
 	AvatarRemovedDomainEvent,
 	AvatarUploadedDomainEvent,
@@ -12,6 +11,7 @@ import {
 	UserPasswordChangedDomainEvent,
 	UserProfileUpdatedDomainEvent,
 } from "../events/account";
+import { UserMfaDisabledDomainEvent, UserMfaEnabledDomainEvent } from "../events/account/mfa";
 import {
 	OAuthProviderLinkedDomainEvent,
 	OAuthProviderUnlinkedDomainEvent,
