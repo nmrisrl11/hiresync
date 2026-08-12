@@ -5,6 +5,8 @@ import {
 } from "@/recruitment/domain/repositories";
 import { APPLICATION_EVENT_TYPE } from "@/recruitment/domain/types";
 import { JobApplicationHistoryId, JobApplicationId } from "@/recruitment/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
 import {
@@ -23,6 +25,8 @@ export class UpdateInternalNoteUseCase implements UpdateInternalNoteUseCasePort 
 		private readonly employerProfileRepository: EmployerProfileRepository,
 		private readonly jobApplicationRepository: JobApplicationRepository,
 		private readonly idGenerator: IdGeneratorPort,
+		private readonly logger: LoggerPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(command: UpdateInternalNoteCommand): Promise<void> {
@@ -54,5 +58,16 @@ export class UpdateInternalNoteUseCase implements UpdateInternalNoteUseCasePort 
 		application.addHistory(historyRecord);
 
 		await this.jobApplicationRepository.save(application);
+
+		try {
+			await this.domainEventPublisher.publishMultipleAsync(application.domainEvents);
+		} catch (error) {
+			this.logger.error(
+				`Failed to publish internal note event for application ${application.id.getValue()}`,
+				(error as Error).stack,
+			);
+		} finally {
+			application.clearEvents();
+		}
 	}
 }

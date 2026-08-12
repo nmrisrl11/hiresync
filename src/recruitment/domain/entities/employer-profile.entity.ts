@@ -1,5 +1,6 @@
 import { AggregateRoot } from "@/shared/core";
 import { EmployerProfileCreatedDomainEvent, EmployerProfileUpdatedDomainEvent } from "../events";
+import { CompanyLogoRemovedDomainEvent, CompanyLogoUploadedDomainEvent } from "../events/employers";
 import { CompanyWebsite, EmployerId } from "../value-objects";
 
 export class EmployerProfile extends AggregateRoot {
@@ -66,8 +67,10 @@ export class EmployerProfile extends AggregateRoot {
 		this.logoUrl = logoUrl;
 		this.updatedAt = new Date();
 
-		this.addDomainEvent(
-			new EmployerProfileUpdatedDomainEvent(this.id.getValue(), this.companyName),
-		);
+		if (logoUrl) {
+			this.addDomainEvent(new CompanyLogoUploadedDomainEvent(this.id.getValue(), logoUrl));
+		} else {
+			this.addDomainEvent(new CompanyLogoRemovedDomainEvent(this.id.getValue()));
+		}
 	}
 }

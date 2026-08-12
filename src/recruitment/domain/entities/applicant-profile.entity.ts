@@ -4,6 +4,11 @@ import { DocumentType } from "../types";
 import { ApplicantDocumentId, ApplicantId } from "../value-objects";
 import { ApplicantDocument } from "./applicant-document.entity";
 import { DocumentNotFoundException, MaxDocumentLimitReachedException } from "../exceptions";
+import {
+	ApplicantDocumentDeletedDomainEvent,
+	ApplicantDocumentUploadedDomainEvent,
+	PrimaryDocumentSetDomainEvent,
+} from "../events/applicants";
 
 export class ApplicantProfile extends AggregateRoot {
 	public readonly baseUpdatedAt: Date; //! Track original load time for optimistic concurrency
@@ -81,6 +86,14 @@ export class ApplicantProfile extends AggregateRoot {
 
 		this.documents.push(document);
 		this.updatedAt = new Date();
+
+		this.addDomainEvent(
+			new ApplicantDocumentUploadedDomainEvent(
+				this.id.getValue(),
+				document.id.getValue(),
+				document.type,
+			),
+		);
 	}
 
 	public removeDocument(documentIdVo: ApplicantDocumentId): ApplicantDocument {
@@ -95,6 +108,11 @@ export class ApplicantProfile extends AggregateRoot {
 		}
 
 		this.updatedAt = new Date();
+
+		this.addDomainEvent(
+			new ApplicantDocumentDeletedDomainEvent(this.id.getValue(), removedDoc.id.getValue()),
+		);
+
 		return removedDoc;
 	}
 
@@ -106,5 +124,9 @@ export class ApplicantProfile extends AggregateRoot {
 		this.documents.filter((d) => d.type === type).forEach((d) => d.removePrimary());
 		targetDoc.makePrimary();
 		this.updatedAt = new Date();
+
+		this.addDomainEvent(
+			new PrimaryDocumentSetDomainEvent(this.id.getValue(), targetDoc.id.getValue()),
+		);
 	}
 }

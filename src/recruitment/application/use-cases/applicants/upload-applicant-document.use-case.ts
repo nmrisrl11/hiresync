@@ -2,6 +2,7 @@ import { ApplicantDocument } from "@/recruitment/domain/entities";
 import { ApplicantProfileRepository } from "@/recruitment/domain/repositories";
 import { DOCUMENT_TYPE } from "@/recruitment/domain/types";
 import { ApplicantDocumentId } from "@/recruitment/domain/value-objects";
+import { DomainEventPublisherPort } from "@/shared/events/ports";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { IdGeneratorPort } from "@/shared/utils/ports";
 import { Injectable } from "@nestjs/common";
@@ -20,6 +21,7 @@ export class UploadApplicantDocumentUseCase implements UploadApplicantDocumentUs
 		private readonly documentStorage: DocumentStoragePort,
 		private readonly idGenerator: IdGeneratorPort,
 		private readonly logger: LoggerPort,
+		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
 	public async execute(
@@ -54,6 +56,17 @@ export class UploadApplicantDocumentUseCase implements UploadApplicantDocumentUs
 
 			profile.addDocument(document);
 			await this.applicantProfileRepository.save(profile);
+
+			try {
+				await this.domainEventPublisher.publishMultipleAsync(profile.domainEvents);
+			} catch (publishError) {
+				this.logger.error(
+					`Failed to publish document upload events for ${profile.id.getValue()}`,
+					(publishError as Error).stack,
+				);
+			} finally {
+				profile.clearEvents();
+			}
 		} catch (error) {
 			//! Compensate for failed profile update by deleting the orphaned file
 			await this.documentStorage.deleteDocument(fileKey).catch((cleanupError) => {

@@ -1,5 +1,6 @@
 import { EmployerProfileRepository } from "@/recruitment/domain/repositories";
 import { DomainEventPublisherPort } from "@/shared/events/ports";
+import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { EmployerProfileNotFoundException } from "../../exceptions";
 import {
@@ -13,6 +14,7 @@ export class RemoveCompanyLogoUseCase implements RemoveCompanyLogoUseCasePort {
 	constructor(
 		private readonly employerProfileRepository: EmployerProfileRepository,
 		private readonly imageStorage: ImageStoragePort,
+		private readonly logger: LoggerPort,
 		private readonly domainEventPublisher: DomainEventPublisherPort,
 	) {}
 
@@ -29,8 +31,16 @@ export class RemoveCompanyLogoUseCase implements RemoveCompanyLogoUseCasePort {
 
 			await this.employerProfileRepository.save(employerProfile);
 
-			await this.domainEventPublisher.publishMultipleAsync(employerProfile.domainEvents);
-			employerProfile.clearEvents();
+			try {
+				await this.domainEventPublisher.publishMultipleAsync(employerProfile.domainEvents);
+			} catch (error) {
+				console.error(
+					`Failed to publish company logo removal for ${employerProfile.id.getValue()}`,
+					(error as Error).stack,
+				);
+			} finally {
+				employerProfile.clearEvents();
+			}
 		}
 	}
 }
