@@ -132,12 +132,14 @@ export class GlobalAuditLogListener implements OnModuleInit {
 		return redactedObj;
 	}
 
-	//! Strips suffix and converts PascalCase to SCREAMING_SNAKE_CASE
+	//! Normalizes non-alphanumeric separators, acronyms, and formats to SCREAMING_SNAKE_CASE
 	private formatEventName(className: string): string {
 		return className
 			.replace(/(DomainEvent|IntegrationEvent)$/, "") //! Remove the suffixes
-			.replace(/[A-Z]/g, (letter) => `_${letter}`) //! Add underscore before capitals
-			.replace(/^_/, "") //! Remove leading underscore
+			.replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2") //! Handle acronym boundaries
+			.replace(/([a-z0-9])([A-Z])/g, "$1_$2") //! Add underscore before capitals
+			.replace(/[^A-Za-z0-9]+/g, "_") //! Normalize non-alphanumeric (like array dots)
+			.replace(/^_+|_+$/g, "") //! Remove leading/trailing underscores
 			.toUpperCase(); //! Capitalize everything
 	}
 }
