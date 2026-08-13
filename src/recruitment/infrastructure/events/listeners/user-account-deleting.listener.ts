@@ -1,5 +1,5 @@
 import { CleanupRecruitmentDataUseCasePort } from "@/recruitment/application/ports/inbound/system";
-import { UserAccountDeletingIntegrationEvent } from "@/shared/events";
+import { EVENT_NAMES, UserAccountDeletingIntegrationEvent } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -11,7 +11,7 @@ export class UserAccountDeletingListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(UserAccountDeletingIntegrationEvent.name, { async: true, promisify: true })
+	@OnEvent(EVENT_NAMES.USER_ACCOUNT_DELETING, { async: true, promisify: true })
 	public async handle(event: UserAccountDeletingIntegrationEvent): Promise<void> {
 		try {
 			await this.cleanupRecruitmentDataUseCase.execute(event.userId);

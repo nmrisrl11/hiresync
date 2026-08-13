@@ -3,6 +3,7 @@ import {
 	EnqueueApplicantWelcomeEmailUseCasePort,
 } from "@/recruitment/application/ports/inbound/notifications";
 import { ApplicantProfileCreatedDomainEvent } from "@/recruitment/domain/events/applicants";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class ApplicantProfileCreatedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(ApplicantProfileCreatedDomainEvent.name, { async: true, promisify: true })
+	@OnEvent(EVENT_NAMES.APPLICANT_PROFILE_CREATED, { async: true, promisify: true })
 	public async handle(event: ApplicantProfileCreatedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueApplicantWelcomeEmailCommand(
