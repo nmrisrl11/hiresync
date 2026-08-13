@@ -3,6 +3,7 @@ import {
 	EnqueueMfaEnabledAlertEmailUseCasePort,
 } from "@/iam/application/ports/inbound/account/notifications";
 import { UserMfaEnabledDomainEvent } from "@/iam/domain/events/account/mfa";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class UserMfaEnabledListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(UserMfaEnabledDomainEvent.name, { async: true })
+	@OnEvent(EVENT_NAMES.USER_MFA_ENABLED, { async: true })
 	public async handle(event: UserMfaEnabledDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueMfaEnabledAlertEmailCommand(event.email);

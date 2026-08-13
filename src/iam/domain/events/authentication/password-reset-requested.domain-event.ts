@@ -1,6 +1,8 @@
-import { DomainEvent } from "@/shared/events";
+import { DomainEvent, EVENT_NAMES } from "@/shared/events";
 
 export class PasswordResetRequestedDomainEvent extends DomainEvent {
+	public readonly eventName = EVENT_NAMES.PASSWORD_RESET_REQUESTED;
+
 	constructor(
 		public readonly userId: string,
 		public readonly email: string,

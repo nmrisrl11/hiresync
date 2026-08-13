@@ -3,6 +3,7 @@ import {
 	EnqueueApplicationSubmittedUseCasePort,
 } from "@/recruitment/application/ports/inbound/notifications";
 import { JobApplicationSubmittedDomainEvent } from "@/recruitment/domain/events/applications";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class JobApplicationSubmittedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(JobApplicationSubmittedDomainEvent.name, { async: true, promisify: true })
+	@OnEvent(EVENT_NAMES.JOB_APPLICATION_SUBMITTED, { async: true, promisify: true })
 	public async handle(event: JobApplicationSubmittedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueApplicationSubmittedCommand(

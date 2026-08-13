@@ -3,6 +3,7 @@ import {
 	EnqueueApplicationWithdrawnUseCasePort,
 } from "@/recruitment/application/ports/inbound/notifications";
 import { JobApplicationWithdrawnDomainEvent } from "@/recruitment/domain/events/applications";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class JobApplicationWithdrawnListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(JobApplicationWithdrawnDomainEvent.name, { async: true, promisify: true })
+	@OnEvent(EVENT_NAMES.JOB_APPLICATION_WITHDRAWN, { async: true, promisify: true })
 	public async handle(event: JobApplicationWithdrawnDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueApplicationWithdrawnCommand(

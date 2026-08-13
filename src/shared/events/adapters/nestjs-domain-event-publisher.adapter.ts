@@ -9,7 +9,7 @@ export class NestjsDomainEventPublisherAdapter implements DomainEventPublisherPo
 
 	public async publishAsync(event: DomainEvent): Promise<void> {
 		//! Uses the class name (e.g., "UserRegisteredDomainEvent") as the routing key
-		await this.eventEmitter.emitAsync(event.constructor.name, event);
+		await this.eventEmitter.emitAsync(event.eventName, event);
 	}
 
 	public async publishMultipleAsync(events: DomainEvent[]): Promise<void> {

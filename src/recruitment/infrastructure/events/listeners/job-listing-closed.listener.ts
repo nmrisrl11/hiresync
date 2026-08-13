@@ -3,6 +3,7 @@ import {
 	EnqueueJobClosedEmailUseCasePort,
 } from "@/recruitment/application/ports/inbound/notifications";
 import { JobListingClosedDomainEvent } from "@/recruitment/domain/events/jobs";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class JobListingClosedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(JobListingClosedDomainEvent.name, { async: true })
+	@OnEvent(EVENT_NAMES.JOB_LISTING_CLOSED, { async: true })
 	public async handle(event: JobListingClosedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueJobClosedEmailCommand(

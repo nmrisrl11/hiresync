@@ -3,6 +3,7 @@ import {
 	EnqueueChangeEmailRequestUseCasePort,
 } from "@/iam/application/ports/inbound/account/notifications";
 import { EmailChangeRequestedDomainEvent } from "@/iam/domain/events/account";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class EmailChangeRequestedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(EmailChangeRequestedDomainEvent.name, { async: true })
+	@OnEvent(EVENT_NAMES.EMAIL_CHANGE_REQUESTED, { async: true })
 	public async handleEmailChangeRequested(event: EmailChangeRequestedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueChangeEmailRequestCommand(
