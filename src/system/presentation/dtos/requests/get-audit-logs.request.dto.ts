@@ -3,7 +3,7 @@ import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsOptional, IsString } from "class-validator";
 
 export class GetAuditLogsRequestDto extends PaginationDto {
-	@ApiPropertyOptional({ description: "Filter by exact domain event name" })
+	@ApiPropertyOptional({ description: "Filter by exact event name" })
 	@IsOptional()
 	@IsString()
 	public readonly eventName?: string;

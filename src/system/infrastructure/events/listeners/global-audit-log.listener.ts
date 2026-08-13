@@ -48,7 +48,9 @@ export class GlobalAuditLogListener implements OnModuleInit {
 		// Ensure the event is one of our base event classes before logging
 		if (!(event instanceof DomainEvent) && !(event instanceof IntegrationEvent)) return;
 
-		const eventNameStr = Array.isArray(eventName) ? eventName.join(".") : eventName;
+		const rawEventName = Array.isArray(eventName) ? eventName.join(".") : eventName;
+		const formattedEventName = this.formatEventName(rawEventName);
+
 		const payload = this.serializePayload(event);
 		const actorId = this.extractActorId(payload);
 
@@ -64,7 +66,7 @@ export class GlobalAuditLogListener implements OnModuleInit {
 
 		const auditLog = new AuditLog(
 			new AuditLogId(this.idGenerator.generateId()),
-			eventNameStr,
+			formattedEventName,
 			actorId,
 			enhancedPayload,
 			event.occurredOn,
@@ -128,5 +130,16 @@ export class GlobalAuditLogListener implements OnModuleInit {
 		}
 
 		return redactedObj;
+	}
+
+	//! Normalizes non-alphanumeric separators, acronyms, and formats to SCREAMING_SNAKE_CASE
+	private formatEventName(className: string): string {
+		return className
+			.replace(/(DomainEvent|IntegrationEvent)$/, "") //! Remove the suffixes
+			.replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2") //! Handle acronym boundaries
+			.replace(/([a-z0-9])([A-Z])/g, "$1_$2") //! Add underscore before capitals
+			.replace(/[^A-Za-z0-9]+/g, "_") //! Normalize non-alphanumeric (like array dots)
+			.replace(/^_+|_+$/g, "") //! Remove leading/trailing underscores
+			.toUpperCase(); //! Capitalize everything
 	}
 }
