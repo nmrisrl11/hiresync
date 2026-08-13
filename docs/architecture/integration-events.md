@@ -20,16 +20,23 @@ If the database schema utilizes `onDelete: Cascade`, an asynchronous post-delete
 ## Layer-by-Layer Implementation Guide
 
 ### 1. Shared Kernel (`src/shared/events/`)
-Integration events extend a shared base class and live outside specific bounded contexts.
+Integration events extend a shared base class and live outside specific bounded contexts. They must implement the `eventName` property using the `EVENT_NAMES` constant.
 
 ```typescript
 // src/shared/events/integration-event.base.ts
+import { EventName } from "./event-names";
+
 export abstract class IntegrationEvent {
+	public abstract readonly eventName: EventName;
 	public readonly occurredOn: Date = new Date();
 }
 
 // src/shared/events/user-account-deleting.integration-event.ts
+import { EVENT_NAMES } from "./event-names";
+
 export class UserAccountDeletingIntegrationEvent extends IntegrationEvent {
+	public readonly eventName = EVENT_NAMES.USER_ACCOUNT_DELETING;
+
 	constructor(public readonly userId: string) {
 		super();
 	}
@@ -47,7 +54,7 @@ export abstract class IntegrationEventPublisherPort {
 ```
 
 ### 3. Shared Layer: Adapters (`src/shared/events/adapters/`)
-The outbound adapter implements the publisher port, specifically designed for cross-boundary messaging.
+The outbound adapter implements the publisher port, routing via the `eventName` property.
 
 ```typescript
 @Injectable()
@@ -55,8 +62,8 @@ export class NestIntegrationEventPublisherAdapter implements IntegrationEventPub
 	constructor(private readonly eventEmitter: EventEmitter2) {}
 
 	public async publishAsync(event: IntegrationEvent): Promise<void> {
-		// Routes using the exact class name (e.g., "UserAccountDeletingIntegrationEvent")
-		await this.eventEmitter.emitAsync(event.constructor.name, event);
+		// Routes using the explicitly defined constant name (e.g., "USER_ACCOUNT_DELETING")
+		await this.eventEmitter.emitAsync(event.eventName, event);
 	}
 
 	public async publishMultipleAsync(events: IntegrationEvent[]): Promise<void> {
@@ -71,11 +78,13 @@ export class NestIntegrationEventPublisherAdapter implements IntegrationEventPub
 Listeners reside in the responding module's infrastructure layer, catching the shared event and triggering local use cases.
 
 ```typescript
+import { EVENT_NAMES } from "@/shared/events";
+
 @Injectable()
 export class RecruitmentUserAccountDeletingListener {
 	constructor(private readonly cleanupDataUseCase: CleanupRecruitmentDataUseCasePort) {}
 
-	@OnEvent(UserAccountDeletingIntegrationEvent.name, { async: true, promisify: true })
+	@OnEvent(EVENT_NAMES.USER_ACCOUNT_DELETING, { async: true, promisify: true })
 	public async handle(event: UserAccountDeletingIntegrationEvent): Promise<void> {
 		// Triggers the background cleanup of external cloud assets before DB cascade
 		await this.cleanupDataUseCase.execute(event.userId);

@@ -11,6 +11,7 @@ Instead of manually injecting logging commands into every application use case, 
 ### Key Benefits:
 - **Zero Domain Pollution:** The Domain and Application layers are completely unaware of the audit log's existence.
 - **Automatic HTTP Context:** IP addresses and User Agents are captured magically via `AsyncLocalStorage` without needing to be passed down through controller arguments.
+- **Clean Database Records:** By utilizing the centralized `EVENT_NAMES` registry, audit logs are saved as clean, readable `SCREAMING_SNAKE_CASE` strings (e.g., `USER_LOGGED_IN`) instead of minified TypeScript class names.
 - **Secure by Default:** A built-in redaction mechanism ensures sensitive data (passwords, tokens) never touches the audit log table.
 
 ---
@@ -26,16 +27,16 @@ When an HTTP request enters the NestJS application, the `AuditContextMiddleware`
 The request reaches the Controller and is passed to a Use Case. The Use Case executes the core business logic (e.g., `JobApplication.updateStatus()`). The aggregate records a `DomainEvent`. At the end of the Use Case, the `DomainEventPublisherPort` emits the event across the system.
 
 ### Step 3: Global Event Interception
-The `SystemModule` contains a `GlobalAuditLogListener`[cite: 40]. This listener uses NestJS's `EventEmitter2.onAny()` method to catch *every* event that passes through the system[cite: 40]. It immediately filters out anything that is not an instance of `DomainEvent` or `IntegrationEvent`[cite: 40].
+The `SystemModule` contains a `GlobalAuditLogListener`. This listener uses NestJS's `EventEmitter2.onAny()` method to catch *every* event that passes through the system. It immediately filters out anything that is not an instance of `DomainEvent` or `IntegrationEvent`.
 
 ### Step 4: Payload Serialization & Redaction
-Before the payload is saved, it is serialized and passed through a `redactSensitiveData` function[cite: 40]. This recursively scans the event payload for a strict blocklist of `SENSITIVE_KEYS` (e.g., `password`, `token`, `mfaSecret`, `backupCodes`) and replaces their values with `[REDACTED]`[cite: 40].
+Before the payload is saved, it is serialized and passed through a `redactSensitiveData` function. This recursively scans the event payload for a strict blocklist of `SENSITIVE_KEYS` (e.g., `password`, `token`, `mfaSecret`, `backupCodes`) and replaces their values with `[REDACTED]`.
 
 ### Step 5: Actor Extraction
-The listener dynamically determines *who* performed the action by scanning the sanitized payload for known identity keys (`userId`, `accountId`, `employerId`, `applicantId`)[cite: 40].
+The listener dynamically determines *who* performed the action by scanning the sanitized payload for known identity keys (`userId`, `accountId`, `employerId`, `applicantId`).
 
 ### Step 6: Context Enrichment & Persistence
-The listener pulls the `ipAddress` and `userAgent` from the `AsyncLocalStorage` context (`auditContextStorage.getStore()`) and appends them to a `_meta` object inside the payload[cite: 40]. Finally, it saves the structured `AuditLog` entity to the database via the `AuditLogRepository`[cite: 40]. This is done asynchronously as a "fire-and-forget" operation, so any database latency does not delay the user's HTTP response.
+The listener pulls the `ipAddress` and `userAgent` from the `AsyncLocalStorage` context (`auditContextStorage.getStore()`) and appends them to a `_meta` object inside the payload. Finally, it extracts the strict `event.eventName` and saves the structured `AuditLog` entity to the database via the `AuditLogRepository`. This is done asynchronously as a "fire-and-forget" operation, so any database latency does not delay the user's HTTP response.
 
 ---
 
@@ -45,13 +46,13 @@ Because `AsyncLocalStorage` relies on the HTTP request lifecycle, background con
 - **Queues (BullMQ):** When a job is pushed to Redis and processed by a worker, the original HTTP context is lost.
 - **Scheduled Tasks (Cron):** System-triggered events (like `ExpireJobListingsTask`) have no incoming HTTP request.
 
-**Handling:** The `GlobalAuditLogListener` handles this gracefully. If `auditContextStorage.getStore()` returns `undefined`, it safely assigns `null` to the `ipAddress` and `userAgent` fields in the `_meta` block, ensuring background jobs are successfully audited without crashing[cite: 40].
+**Handling:** The `GlobalAuditLogListener` handles this gracefully. If `auditContextStorage.getStore()` returns `undefined`, it safely assigns `null` to the `ipAddress` and `userAgent` fields in the `_meta` block, ensuring background jobs are successfully audited without crashing.
 
 ---
 
 ## 4. Security & Compliance (Redaction)
 
-To ensure GDPR/CCPA compliance and maintain system security, the `GlobalAuditLogListener` contains a hardcoded `SENSITIVE_KEYS` set[cite: 40]. 
+To ensure GDPR/CCPA compliance and maintain system security, the `GlobalAuditLogListener` contains a hardcoded `SENSITIVE_KEYS` set. 
 
 If a `UserPasswordChangedDomainEvent` is emitted containing the new hashed password, the listener intercepts it and transforms it:
 
@@ -81,4 +82,6 @@ If a `UserPasswordChangedDomainEvent` is emitted containing the new hashed passw
 
 Audit logs are strictly for internal compliance and security monitoring. They are accessible exclusively to platform administrators. 
 
-The `SystemAdminController` exposes a `GET /admin/audit-logs` endpoint, protected by the `@Roles(ROLES.ADMIN)` guard. It allows administrators to retrieve a paginated history of system events, with optional filtering by `actorId` (to track a specific user's activity) or `eventName` (to track specific system behaviors).
+The `SystemAdminController` exposes two endpoints:
+* `GET /api/admin/audit-logs/meta`: Returns a complete array of all possible `EVENT_NAMES` constants to easily populate frontend filters and dropdowns.
+* `GET /api/admin/audit-logs`: Retrieves a paginated history of system events, with optional filtering by `actorId` (to track a specific user's activity) or `eventName` (to track specific system behaviors).
