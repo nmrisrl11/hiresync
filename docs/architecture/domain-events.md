@@ -19,7 +19,7 @@ When an internal side-effect is triggered, the system executes across three dist
 6. **The Response:** The Use Case immediately returns a success state to the Controller, completing the HTTP request (Optimistic UI).
 
 ### Phase 2: The Event Reaction (Asynchronous)
-7. **The Bus:** The `NestDomainEventPublisherAdapter` pushes the event across the internal Node.js event bus.
+7. **The Bus:** The `NestDomainEventPublisherAdapter` pushes the event across the internal Node.js event bus utilizing the centralized `EVENT_NAMES` constant.
 8. **The Listener:** The `UserRegisteredListener` (located in the Infrastructure layer) catches the event.
 9. **The Command:** The listener formats an `EnqueueVerificationEmailCommand` and triggers the notification Use Case.
 10. **The Queue Adapter:** The Use Case sends the job to the BullMQ adapter, dropping it into the local Redis queue.
@@ -33,13 +33,24 @@ When an internal side-effect is triggered, the system executes across three dist
 ## Layer-by-Layer Implementation Guide
 
 ### 1. Domain Layer (`src/*/domain/`)
-Entities that trigger events extend the `AggregateRoot`, which manages the event queue. 
+Entities that trigger events extend the `AggregateRoot`, which manages the event queue. The events must define their `eventName` via the shared constant registry.
 
 ```typescript
 // src/iam/domain/entities/user.entity.ts
+import { EVENT_NAMES } from "@/shared/events";
+
 export class User extends AggregateRoot {
 	public delete(): void {
 		this.addDomainEvent(new UserAccountDeletedDomainEvent(this.id.getValue(), this.email.getValue()));
+	}
+}
+
+// src/iam/domain/events/account/user-account-deleted.domain-event.ts
+export class UserAccountDeletedDomainEvent extends DomainEvent {
+	public readonly eventName = EVENT_NAMES.USER_ACCOUNT_DELETED;
+	
+	constructor(public readonly userId: string, public readonly email: string) {
+		super();
 	}
 }
 ```
@@ -55,7 +66,7 @@ export abstract class DomainEventPublisherPort {
 ```
 
 ### 3. Shared Layer: Adapters (`src/shared/events/adapters/`)
-The outbound adapter implements the publisher port using `@nestjs/event-emitter`. We route events using their class name dynamically.
+The outbound adapter implements the publisher port using `@nestjs/event-emitter`. We route events dynamically using their strongly-typed `eventName` property.
 
 ```typescript
 @Injectable()
@@ -63,7 +74,7 @@ export class NestDomainEventPublisherAdapter implements DomainEventPublisherPort
 	constructor(private readonly eventEmitter: EventEmitter2) {}
 
 	public async publish(event: DomainEvent): Promise<void> {
-		await this.eventEmitter.emitAsync(event.constructor.name, event);
+		await this.eventEmitter.emitAsync(event.eventName, event);
 	}
 
 	public async publishMultiple(events: DomainEvent[]): Promise<void> {
@@ -75,14 +86,16 @@ export class NestDomainEventPublisherAdapter implements DomainEventPublisherPort
 ```
 
 ### 4. Infrastructure Layer (`src/*/infrastructure/events/listeners/`)
-Event listeners act as internal adapters that bridge the gap between the application's message bus and the Application Layer's Use Cases. 
+Event listeners act as internal adapters that bridge the gap between the application's message bus and the Application Layer's Use Cases. They bind using the `EVENT_NAMES` constant.
 
 ```typescript
+import { EVENT_NAMES } from "@/shared/events";
+
 @Injectable()
 export class UserRegisteredListener {
 	constructor(private readonly enqueueEmailUseCase: EnqueueVerificationEmailUseCasePort) {}
 
-	@OnEvent("UserRegisteredDomainEvent", { async: true })
+	@OnEvent(EVENT_NAMES.USER_REGISTERED, { async: true })
 	public async handle(event: UserRegisteredDomainEvent): Promise<void> {
 		const command = new EnqueueVerificationEmailCommand(event.email);
 		await this.enqueueEmailUseCase.execute(command);
