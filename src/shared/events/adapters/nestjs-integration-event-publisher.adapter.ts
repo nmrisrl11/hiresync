@@ -8,7 +8,7 @@ export class NestjsIntegrationEventPublisherAdapter implements IntegrationEventP
 	constructor(private readonly eventEmitter: EventEmitter2) {}
 
 	public async publishAsync(event: IntegrationEvent): Promise<void> {
-		await this.eventEmitter.emitAsync(event.constructor.name, event);
+		await this.eventEmitter.emitAsync(event.eventName, event);
 	}
 
 	public async publishMultipleAsync(events: IntegrationEvent[]): Promise<void> {

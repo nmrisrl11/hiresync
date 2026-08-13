@@ -10,6 +10,7 @@ When creating new features, ALWAYS follow these guidelines:
 - When an implementation needs a third-party library or external dependency, access it through an outbound port implemented by an Infrastructure adapter.
 - Always follow SRP (Single Responsibility Principle)
 - Always follow the Hexagonal Architecture principles
+- Always follow DRY (Don't Repeat Yourself) principles
 - When logging needed use the shared Logger
 - When an ID is needed, use the shared ID generator from the shared utils
 - When pagination is needed, use the shared pagination dto from the shared http/dtos
