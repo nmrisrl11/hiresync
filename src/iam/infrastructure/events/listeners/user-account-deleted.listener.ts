@@ -4,6 +4,7 @@ import {
 } from "@/iam/application/ports/inbound/account/notifications";
 import { ImageStoragePort } from "@/iam/application/ports/outbound";
 import { UserAccountDeletedDomainEvent } from "@/iam/domain/events/account";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -16,7 +17,7 @@ export class UserAccountDeletedListener {
 		private readonly imageStorage: ImageStoragePort,
 	) {}
 
-	@OnEvent(UserAccountDeletedDomainEvent.name, { async: true })
+	@OnEvent(EVENT_NAMES.USER_ACCOUNT_DELETED, { async: true })
 	public async handleAccountDeleted(event: UserAccountDeletedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueFarewellEmailCommand(event.email);

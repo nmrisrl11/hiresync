@@ -3,6 +3,7 @@ import {
 	EnqueueWelcomeEmailUseCasePort,
 } from "@/iam/application/ports/inbound/authentication/notifications";
 import { UserEmailVerifiedDomainEvent } from "@/iam/domain/events/authentication";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class UserEmailVerifiedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(UserEmailVerifiedDomainEvent.name, { async: true })
+	@OnEvent(EVENT_NAMES.USER_EMAIL_VERIFIED, { async: true })
 	public async handleUserVerified(event: UserEmailVerifiedDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueWelcomeEmailCommand(event.email);

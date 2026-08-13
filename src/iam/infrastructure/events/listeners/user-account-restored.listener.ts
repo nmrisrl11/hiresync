@@ -3,6 +3,7 @@ import {
 	EnqueueAccountRestoredEmailUseCasePort,
 } from "@/iam/application/ports/inbound/account/notifications";
 import { UserAccountRestoredDomainEvent } from "@/iam/domain/events/account";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class UserAccountRestoredListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(UserAccountRestoredDomainEvent.name, { async: true })
+	@OnEvent(EVENT_NAMES.USER_ACCOUNT_RESTORED, { async: true })
 	public async handle(event: UserAccountRestoredDomainEvent): Promise<void> {
 		try {
 			const command = new EnqueueAccountRestoredEmailCommand(event.email);

@@ -3,6 +3,7 @@ import {
 	EnqueuePasswordResetEmailUseCasePort,
 } from "@/iam/application/ports/inbound/authentication/notifications";
 import { PasswordResetRequestedDomainEvent } from "@/iam/domain/events/authentication";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class PasswordResetRequestedListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(PasswordResetRequestedDomainEvent.name, { async: true })
+	@OnEvent(EVENT_NAMES.PASSWORD_RESET_REQUESTED, { async: true })
 	public async handlePasswordResetRequested(
 		event: PasswordResetRequestedDomainEvent,
 	): Promise<void> {

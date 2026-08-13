@@ -3,6 +3,7 @@ import {
 	EnqueueAccountDeletionScheduledEmailUseCasePort,
 } from "@/iam/application/ports/inbound/account/notifications";
 import { UserAccountDeletionScheduledDomainEvent } from "@/iam/domain/events/account";
+import { EVENT_NAMES } from "@/shared/events";
 import { LoggerPort } from "@/shared/logger/ports/logger.port";
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
@@ -14,7 +15,7 @@ export class UserAccountDeletionScheduledListener {
 		private readonly logger: LoggerPort,
 	) {}
 
-	@OnEvent(UserAccountDeletionScheduledDomainEvent.name, { async: true })
+	@OnEvent(EVENT_NAMES.USER_ACCOUNT_DELETION_SCHEDULED, { async: true })
 	public async handle(event: UserAccountDeletionScheduledDomainEvent): Promise<void> {
 		try {
 			if (!event.scheduledForDeletionAt) return;
