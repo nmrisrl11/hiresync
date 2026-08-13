@@ -7,6 +7,7 @@ import { Throttle } from "@nestjs/throttler";
 import { GetAuditLogsRequestDto } from "../dtos/requests";
 import { PaginatedAuditLogsResponseDto } from "../dtos/responses";
 import { PaginatedAuditLogsResponseMapper } from "../mappers";
+import { EVENT_NAMES } from "@/shared/events";
 
 @ApiTags("System Administration")
 @ApiBearerAuth()
@@ -37,5 +38,15 @@ export class SystemAdminController {
 		const result = await this.getAuditLogsUseCase.execute(query);
 
 		return PaginatedAuditLogsResponseMapper.toDto(result, queryDto.limit, queryDto.offset);
+	}
+
+	@Get("meta")
+	@Throttle({ default: { ttl: 60000, limit: 60 } })
+	@ApiOperation({ summary: "Get audit log constants for dropdowns and filters." })
+	public getAuditLogConstants() {
+		return {
+			//! Sort alphabetically for the frontend dropdown
+			eventNames: Object.values(EVENT_NAMES).sort(),
+		};
 	}
 }
